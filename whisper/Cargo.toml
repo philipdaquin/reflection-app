@@ -12,6 +12,7 @@ actix-web = { version = "4.3.1", features = ["openssl"] }
 anyhow = "1.0.69"
 async-trait = "0.1.65"
 bytes = "1.4.0"
+dotenv = "0.15.0"
 env_logger = "0.10.0"
 futures = "0.3.26"
 futures-util = "0.3.26"
