@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useRecorder } from "react-recorder-voice";
 import { convertWav } from '../util/convertWav';
+import { uploadWav } from '../util/uploadWav';
 
 function RecordComponent() {
     const {
@@ -38,16 +39,24 @@ function RecordComponent() {
 
     }
 
-    // useEffect(() => {
-    //   first
-    
-    //   return () => {
-    //     second
-    //   }
-    // }, [third])
-    
 
-    // convertWav(audioData)
+    const [audioRecording, setAudioRecording] = useState(null)
+
+    useEffect(() => {
+        console.log(audioData)
+
+        if (audioData == null) return 
+        convertWav(audioData)
+            .then(resp => uploadWav(resp))
+    }, [audioData])
+
+
+    const [fileList, setFileList] = useState<FileList | null>(null);
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+      setFileList(e.target.files);
+    };
+
 
     const [recording, isRecording] = useState(false)
 
@@ -59,8 +68,12 @@ function RecordComponent() {
 
             <div className='space-x-6 '>
                 <button className='p-2 px-5 text-white bg-black rounded-md font-bold' onClick={start}>Start</button>
-                <button hidden={!record} onClick={cancel}>Cancel</button>
+                <button hidden={record} onClick={cancel}>Cleared</button>
                 <button hidden={!record} onClick={save}>Stop and Save</button>
+
+
+
+
             </div>
 
             <audio controls  src={audioURL}></audio>
