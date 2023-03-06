@@ -6,7 +6,7 @@ use actix_web::{get, middleware::Logger, route,
 use futures_util::stream::{TryStreamExt};
 use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
 use tempfile::NamedTempFile;
-use crate::ml::whisper::{parse_wav_file, transcribe_audio};
+use crate::ml::{whisper::{parse_wav_file, transcribe_audio}, chat::get_chat_response};
 
 
 pub fn configure_service(cfg: &mut web::ServiceConfig) { 
@@ -47,6 +47,9 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         log::info!("{}", transcribed);
 
         temp_file.close().unwrap();
+
+        get_chat_response(&transcribed).await?;
+
     }
 
     Ok(HttpResponse::Ok().into())
