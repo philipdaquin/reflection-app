@@ -7,6 +7,7 @@ use crate::error::Result;
 use std::io::Cursor;
 
 /// Parse the audio data as a WAV file 
+#[tracing::instrument(level= "debug")]
 pub async fn parse_wav_file(mut file: &NamedTempFile) -> Vec<i16> {
     
     
@@ -36,6 +37,7 @@ pub async fn parse_wav_file(mut file: &NamedTempFile) -> Vec<i16> {
         .collect::<Vec<_>>()
 }
 
+#[tracing::instrument(level= "debug")]
 pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     
     let samples = whisper_rs::convert_integer_to_float_audio(&audio);

@@ -14,6 +14,7 @@ struct ChatAIChoices {
     text: String, 
     index: u8, 
     logprobs: Option<u8>,
+    token_logprobs: Option<Vec<f64>>,
     finish_reason: String
 }
 
@@ -27,39 +28,40 @@ struct ChatResponse {
 }
 #[derive(Serialize, Debug)]
 struct OAIRequest { 
-    prompt: String, 
+    prompt: String,
+    temperature: f32, 
     max_tokens: u32
 }
 
 /// 
 /// Receives text input from the user and sends out request to OpenAI GPT
-/// 
-/// 
+#[tracing::instrument(fields(input), level= "debug")]
 pub async fn get_chat_response(input: &str) -> Result<()> {
     
     dotenv().ok();
 
     log::info!("{}", input);
 
-    // let preamble = "You are a very curious bot, and you want to know more about the users problem. 
-    //     Dont give any advice yet, ask for more clarifiications.
-    //     If it's a sad prompt, you need to match your response with the same tone and choice of words";
+    let preamble = "You are a very curious bot, and you want to know more about the users problem. \n
+        Dont give any advice yet, ask for more clarifiications. \n
+        If it's a sad prompt, you need to match your response with the same tone and choice of words";
 
     let https = HttpsConnector::new();
     let client = Client::builder().build(https);
     
     // Construct the API endpoint URL
-    let endpoint_url = "https://api.openai.com/v1/engines/text-davinci-001/completions";
+    let endpoint_url = "https://api.openai.com/v1/engines/text-davinci-003/completions";
 
     // Construct the request body 
     let token = std::env::var("OPENAI_API_KEY").expect("Missing Open AI Token");
     let header = format!("Bearer {}", token);
-    // let prompt = format!("{} `{}`", preamble, input);
-    let prompt = format!("Answer the prompt in a short and concise manner: {}", input);
+    let prompt = format!("{} {}", preamble, input);
+    // let prompt = format!("{}", input);
 
 
     let oi_request = OAIRequest {
         prompt,
+        temperature: 0.0,
         max_tokens: 100,
     };
     let body = Body::from(serde_json::to_vec(&oi_request)?);
@@ -77,6 +79,7 @@ pub async fn get_chat_response(input: &str) -> Result<()> {
     // Extract the response body as a string
     let resp: ChatResponse = serde_json::from_reader(body.reader()).unwrap();
 
+    // log::info!("{:?}", resp.choices[0].text);
     log::info!("{}", resp.choices[0].text);
     Ok(())
 }
