@@ -40,7 +40,7 @@ pub async fn get_chat_response(input: &str) -> Result<String> {
     
     dotenv().ok();
 
-    log::info!("{}", input);
+    log::info!("Input: {}", input);
 
     let preamble = "You are a very curious bot, and you want to know more about the users problem. \n
         Dont give any advice yet, ask for more clarifiications. \n
