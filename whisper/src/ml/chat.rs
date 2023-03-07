@@ -36,7 +36,7 @@ struct OAIRequest {
 /// 
 /// Receives text input from the user and sends out request to OpenAI GPT
 #[tracing::instrument(fields(input), level= "debug")]
-pub async fn get_chat_response(input: &str) -> Result<()> {
+pub async fn get_chat_response(input: &str) -> Result<String> {
     
     dotenv().ok();
 
@@ -73,7 +73,10 @@ pub async fn get_chat_response(input: &str) -> Result<()> {
         .body(body)
         .unwrap();
 
-    let resp = client.request(request).await.unwrap();
+    let resp = client
+        .request(request)
+        .await
+        .unwrap();
     let body = aggregate(resp).await.unwrap();
     
     // Extract the response body as a string
@@ -81,6 +84,9 @@ pub async fn get_chat_response(input: &str) -> Result<()> {
 
     // log::info!("{:?}", resp.choices[0].text);
     log::info!("{}", resp.choices[0].text);
-    Ok(())
+
+    let response = resp.choices[0].text.to_string();
+
+    Ok(response)
 }
 

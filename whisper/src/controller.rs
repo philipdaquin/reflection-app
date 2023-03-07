@@ -6,7 +6,7 @@ use actix_web::{get, middleware::Logger, route,
 use futures_util::stream::{TryStreamExt};
 use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
 use tempfile::NamedTempFile;
-use crate::ml::{whisper::{parse_wav_file, transcribe_audio}, chat::get_chat_response};
+use crate::ml::{whisper::{parse_wav_file, transcribe_audio}, chat::get_chat_response, tts::process_text_to_audio};
 
 
 pub fn configure_service(cfg: &mut web::ServiceConfig) { 
@@ -25,7 +25,7 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
 
 #[route("/", method = "POST")]
 pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
-
+    let mut transcribed = String::new();
     while let Some(mut item) = payload.try_next().await? { 
         // A multipart stream has to contain `contain_disposition`
         let content = item.content_disposition();
@@ -43,14 +43,22 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         let wav_file = parse_wav_file(&temp_file).await;
 
         // Transfer audio file into a worker 
-        let transcribed = transcribe_audio(wav_file).await.unwrap();
+        transcribed = transcribe_audio(wav_file).await.unwrap();
         log::info!("{}", transcribed);
 
         temp_file.close().unwrap();
-
-        get_chat_response(&transcribed).await?;
-
     }
 
-    Ok(HttpResponse::Ok().into())
+    let resp = get_chat_response(&transcribed).await?;
+    
+    // Send 
+    let tts_response = process_text_to_audio(&resp)
+        .await
+        .unwrap();
+
+    Ok(
+        HttpResponse::Ok()
+        .content_type("audio/mpeg")
+        .body(tts_response)
+    )
 }

@@ -47,7 +47,9 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
 
     let mut ctx = WhisperContext::new(&whisper_path.to_string_lossy())
         .expect("failed to open model");
-    let params = FullParams::new(SamplingStrategy::default());
+    let mut params = FullParams::new(SamplingStrategy::default());
+
+    params.set_print_realtime(true);
 
     ctx.full(params, &samples)
         .expect("failed to convert samples");
