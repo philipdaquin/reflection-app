@@ -7,11 +7,21 @@ use actix_multipart::Multipart;
 use actix_web::Result;
 use hyper::Response;
 
-#[derive(Debug, Serialize, Default, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct VoiceSettings { 
     stability: u32, 
     similarity_boost: u32
 }
+
+impl Default for VoiceSettings { 
+    fn default() -> Self {
+        Self { 
+            stability: 75,
+            similarity_boost: 75
+        }
+    }
+}
+
 
 #[derive(Debug, Serialize, Deserialize)]
 struct OAIRequest { 
