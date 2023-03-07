@@ -23,7 +23,7 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
 }
 
 
-#[route("/", method = "POST")]
+#[route("/", method = "POST", method = "GET")]
 pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
     let mut transcribed = String::new();
     while let Some(mut item) = payload.try_next().await? { 
@@ -49,9 +49,10 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         temp_file.close().unwrap();
     }
 
+    // Send request to get OpenAI text response
     let resp = get_chat_response(&transcribed).await?;
     
-    // Send 
+    // Send a post request to get a Text to Speech 
     let tts_response = process_text_to_audio(&resp)
         .await
         .unwrap();

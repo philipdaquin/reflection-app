@@ -5,7 +5,7 @@ import { uploadWav } from '../util/uploadWav';
 
 function RecordComponent() {
     const {
-        audioURL,
+        // audioURL,
         audioData,
         timer,
         recordingStatus,
@@ -65,6 +65,11 @@ function RecordComponent() {
     const handleFileSelect = (e) => {
         setSelectedFile(e.target.files[0]);
     };
+
+
+    const [audioSource, setAudioSource] = useState('')
+
+
     const handleFormSubmit = (e ) => {
         e.preventDefault();
         const formData = new FormData();
@@ -74,18 +79,22 @@ function RecordComponent() {
         method: "POST",
         body: formData,
         })
-        .then((response) => response.json())
+        .then(async (response) => {
+            if (response.ok) {
+                const blob = await response.blob()
+                const url = URL.createObjectURL(blob)
+                setAudioSource(url)
+            }
+        })
         .then((data) => {
-            console.log(data);
+            console.log("THIS IS THE DATA", data);
         })
         .catch((error) => {
             console.error(error);
         });
     };
-
-
-    
-    return (
+      console.log(audioSource)
+      return (
         <div className='space-y-7 items-center'>
             <div className='mb-2 font-bold text-xl uppercase'>
                 {recordingStatus}
@@ -95,9 +104,6 @@ function RecordComponent() {
                 <button className='p-2 px-5 text-white bg-black rounded-md font-bold' onClick={start}>Start</button>
                 <button hidden={record} onClick={cancel}>Cleared</button>
                 <button hidden={!record} onClick={save}>Stop and Save</button>
-
-
-
 
             </div>
             
@@ -111,8 +117,7 @@ function RecordComponent() {
                     />
                 <button type="submit">Upload</button>
             </form>
-
-            <audio controls  src={audioURL}></audio>
+            <audio controls  src={audioSource}></audio>
             <h1>{timer}</h1>
         </div>
     );

@@ -7,13 +7,13 @@ use actix_multipart::Multipart;
 use actix_web::Result;
 use hyper::Response;
 
-#[derive(Debug, Serialize, Default)]
+#[derive(Debug, Serialize, Default, Deserialize)]
 struct VoiceSettings { 
     stability: u32, 
     similarity_boost: u32
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct OAIRequest { 
     text: String, 
     voice_settings: VoiceSettings
@@ -35,28 +35,30 @@ struct OIErrorMessage {
 pub async fn process_text_to_audio(input: &str) -> Result<Vec<u8>> {
     dotenv().ok();
 
-    let connector = HttpConnector::new();
+    log::info!("Sending request to ElevenLabs...");
+
+    let connector = HttpsConnector::new();
     let client = Client::builder().build(connector);
 
 
     let api_key = std::env::var("ELEVEN_LABS_API_KEY").expect("Unable to read ELEVAN LABS API KEY");
-    let header = format!("Bearer {}", api_key);
+    let header = format!("{}", api_key);
     
     // Default Voice is Elli
-    let voice_id = "MF3mGyEYCl7XYWbV9V6O";
+    let voice_id = "";
     let tts_request = OAIRequest { 
         text: input.to_string(), 
         voice_settings: VoiceSettings::default()
     };
-    let endpoint_url = format!("https://api.elevenlabs.io/v1/text-to-speech/{}", voice_id);
+    let endpoint_url = "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM";
     let body = Body::from(serde_json::to_vec(&tts_request)?);
-    
+    log::info!("{:?}", body);
     
     // Send the request to the endpoint API
     let request = Request::post(endpoint_url)
-        // .header(header::CONTENT_TYPE, "application/json")
-        .header(header::ACCEPT, "audio/mpeg")
-        .header("Authorization", &header)
+    .header(header::CONTENT_TYPE, "application/json")
+    .header("xi-api-key", header)
+    .header(header::ACCEPT, "audio/mpeg")
         .body(body)
         .unwrap();
 
@@ -65,13 +67,15 @@ pub async fn process_text_to_audio(input: &str) -> Result<Vec<u8>> {
         .request(request)
         .await
         .unwrap();
+        // .into_body();
 
-    // Build the response 
+    // Extract the body from the Response and convert it to bytes
     let body = hyper::body::to_bytes(resp)
         .await
         .unwrap()
         .to_vec();
 
+    // log::info!("{:#?}", resp.status());
 
     Ok(body)
 
