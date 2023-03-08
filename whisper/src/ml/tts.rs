@@ -9,15 +9,15 @@ use hyper::Response;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct VoiceSettings { 
-    stability: u32, 
-    similarity_boost: u32
+    stability: f32, 
+    similarity_boost: f32
 }
 
 impl Default for VoiceSettings { 
     fn default() -> Self {
         Self { 
-            stability: 75,
-            similarity_boost: 75
+            stability: 0.75,
+            similarity_boost: 0.75
         }
     }
 }

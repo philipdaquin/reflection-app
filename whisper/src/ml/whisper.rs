@@ -5,7 +5,7 @@ use std::path::Path;
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::error::Result;
 use std::io::Cursor;
-
+use num_cpus;
 use super::chat::get_chat_response;
 
 /// Parse the audio data as a WAV file 
@@ -42,13 +42,12 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     
     let samples = whisper_rs::convert_integer_to_float_audio(&audio);
     // Whisper Model 
-    let whisper_path = Path::new("./models/ggml-medium.bin");
+    let whisper_path = Path::new("./models/ggml-base.en.bin");
     
     //
     // The decoding strategies are: 
     //  - Beam Search with 5 beams usng log probability for the score function 
     //  - Greedy decoding with best of 5 sampling. 
-    // 
     let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 5 });
     params.set_offset_ms(0);
     params.set_translate(false);
@@ -59,11 +58,21 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     params.set_print_timestamps(true);    
     params.set_print_special(false);
     // params.set_speed_up(true);
+
+    params.set_duration_ms(10000);
+
     params.set_max_tokens(32);
     // Partial encoder context for better performance 
-    params.set_audio_ctx(768);
+    // params.set_audio_ctx(768);
     // Disable temperature fallback
-    params.set_temperature(-1.0);
+    params.set_temperature(-1.0);   
+
+    // Based on Streaming fast 
+    // params.set_speed_up(true);
+
+
+    log::info!("{}", num_cpus::get());
+
     // Whisper context 
     let mut ctx = WhisperContext::new(&whisper_path.to_string_lossy()).expect("failed to open model");
     // Run the model 
