@@ -1,13 +1,13 @@
 use actix_web::{get, middleware::Logger, route, web, App, HttpServer, Responder};
 use actix_cors::Cors;
 
-use crate::controller::configure_service;
+use crate::{controller::configure_service, ml::whisper::transcribe_audio};
 
 
 pub async fn new_server(port: u32) -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    
+    // transcribe_audio(Vec::new()).await.unwrap();
     
     log::info!("🚀 Starting HTTP server on port {} ", port);
     log::info!("📭 GraphiQL playground: http://localhost:{}/graphiql", port);

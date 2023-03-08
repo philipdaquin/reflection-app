@@ -1,13 +1,14 @@
-use std::io::{Write, Cursor};
-
+use actix::{Actor, Addr, StreamHandler, Message};
 use actix_multipart::{Multipart, form::{MultipartForm, tempfile::TempFile}};
 use actix_web::{get, middleware::Logger, route, 
-    App, HttpServer, Responder, HttpResponse, HttpRequest, guard, Result, web};
+    App, HttpServer, Responder, HttpResponse, HttpRequest, guard::{self}, Result, web};
+use actix_web_actors::ws;
 use futures_util::stream::{TryStreamExt};
 use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
-use hound::WavReader;
-use tempfile::NamedTempFile;
 use crate::ml::{whisper::{parse_wav_file, transcribe_audio}, chat::get_chat_response, tts::process_text_to_audio};
+use bytes::Bytes;
+use actix::ActorContext;
+use ws::Message::{Close, Binary, Ping, Text};
 
 pub fn configure_service(cfg: &mut web::ServiceConfig) { 
     cfg
@@ -51,12 +52,12 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         .await
         .unwrap();
 
-    Ok(
-        HttpResponse::Ok()
-        .content_type("audio/mpeg")
-        .body(tts_response)
-    )
+    // Ok(
+    //     HttpResponse::Ok()
+    //     .content_type("audio/mpeg")
+    //     .body(tts_response)
+    // )
 
-    // Ok(HttpResponse::Ok().into())
+    Ok(HttpResponse::Ok().into())
 
 }
