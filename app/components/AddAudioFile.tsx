@@ -71,9 +71,8 @@ function AddAudioFile() {
             </form>
             {
                 audioSource && (
-                    <audio autoPlay controls>
-                        <source src={audioSource} type="audio/mpeg"/>
-                    </audio>
+                    <audio controls  autoPlay src={audioSource}></audio>
+
                 )
             }
         </div>

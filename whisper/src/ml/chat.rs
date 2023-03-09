@@ -42,10 +42,10 @@ pub async fn get_chat_response(input: &str) -> Result<String> {
 
     log::info!("Input: {}", input);
 
-    let preamble = "You are a very curious bot, and you want to know more about the users problem. \n
-        Dont give any advice yet, ask for more clarifiications. \n
-        If it's a sad prompt, you need to match your response with the same tone and choice of words \n 
-        If sad, add pauses in the form of '...' to make the message more human.";
+    // let preamble = "You are a very curious bot, and you want to know more about the users problem. \n
+    //     Dont give any advice yet, ask for more clarifiications. \n
+    //     If it's a sad prompt, you need to match your response with the same tone and choice of words \n 
+    //     If sad, add pauses in the form of '...' to make the message more human.";
 
     let https = HttpsConnector::new();
     let client = Client::builder().build(https);
@@ -56,8 +56,8 @@ pub async fn get_chat_response(input: &str) -> Result<String> {
     // Construct the request body 
     let token = std::env::var("OPENAI_API_KEY").expect("Missing Open AI Token");
     let header = format!("Bearer {}", token);
-    let prompt = format!("{} {}", preamble, input);
-    // let prompt = format!("{}", input);
+    // let prompt = format!("{} {}", preamble, input);
+    let prompt = format!("{}", input);
 
 
     let oi_request = OAIRequest {

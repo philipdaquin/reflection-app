@@ -55,12 +55,12 @@ pub async fn process_text_to_audio(input: &str) -> Result<Vec<u8>> {
     let header = format!("{}", api_key);
     
     // Default Voice is Elli
-    let voice_id = "";
+    let voice_id = "MF3mGyEYCl7XYWbV9V6O";
     let tts_request = OAIRequest { 
         text: input.to_string(), 
         voice_settings: VoiceSettings::default()
     };
-    let endpoint_url = "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM";
+    let endpoint_url = format!("https://api.elevenlabs.io/v1/text-to-speech/{}", voice_id);
     let body = Body::from(serde_json::to_vec(&tts_request)?);
     log::info!("{:?}", body);
     

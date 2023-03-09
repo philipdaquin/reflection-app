@@ -105,12 +105,12 @@ function RecordComponent() {
 
 
 
-            {/* <div>
+            <div>
                 <h1 className="font-bold text-md">
                     INSERT AUDIO FILE``
                 </h1>
                 <AddAudioFile />
-            </div> */}
+            </div>
 
 
             <div>
