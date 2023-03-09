@@ -26,33 +26,36 @@ function AddAudioFile() {
         const formData = new FormData();
         formData.append("audioFile", selectedFile);
 
-        fetch("http://localhost:4000/", {
+        fetch("http://localhost:4001/", {
         method: "POST",
         body: formData,
         })
         .then(async (response) => {
             if (response.ok) {
                 const blob = await response.blob()
-                const url = URL.createObjectURL(blob)
-                setAudioSource(url)
+                // const url = URL.createObjectURL(blob)
+                // setAudioSource(url)
+
+                return blob
+            } else { 
+                throw new Error("Failed to get audio file ")
             }
         })
         .then((data) => {
-            console.log("THIS IS THE DATA", data);
+            const url = URL.createObjectURL(data)
+            setAudioSource(url)
         })
         .catch((error) => {
-            console.error(error);
+            throw new Error(error)
         });
     };
-      console.log(audioSource)
 
 
-    useEffect(() => {
-        console.log(audioData)
-
-        if (audioData == null) return 
-        convertWav(audioData).then(resp => uploadWav(resp))
-    }, [audioData])
+    // useEffect(() => {
+    //     console.log(audioData)
+    //     if (audioData == null) return 
+    //     convertWav(audioData).then(resp => uploadWav(resp))
+    // }, [audioData])
 
     return (
         <div>
@@ -66,7 +69,13 @@ function AddAudioFile() {
                     />
                 <button type="submit">Upload</button>
             </form>
-            <audio controls  autoPlay src={audioSource}></audio>
+            {
+                audioSource && (
+                    <audio autoPlay controls>
+                        <source src={audioSource} type="audio/mpeg"/>
+                    </audio>
+                )
+            }
         </div>
     )
 }

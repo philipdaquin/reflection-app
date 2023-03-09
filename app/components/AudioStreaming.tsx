@@ -24,7 +24,7 @@ function AudioStreaming() {
     const start = () => { 
         setStartStream(true)
         startRecording()
-        socketRef.current = io("https://localhost:4000/")
+        socketRef.current = io("https://localhost:4001")
     }
 
     const stop = () => { 
