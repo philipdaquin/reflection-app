@@ -55,7 +55,7 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     // The decoding strategies are: 
     //  - Beam Search with 5 beams usng log probability for the score function 
     //  - Greedy decoding with best of 5 sampling. 
-    let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 0 });
+    let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 5 });
     
     // Output into one single segment
     params.set_single_segment(true);
@@ -71,8 +71,11 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     
     params.set_offset_ms(0);
     
+    // Supress blank outputs
+    params.set_suppress_blank(true);
+
     // Speed up audio by x2 (expect reduced accuracy)
-    params.set_speed_up(true);
+    params.set_speed_up(false);
 
     // Audio length in milliseconds 
     params.set_duration_ms(10000);

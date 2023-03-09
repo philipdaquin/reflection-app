@@ -1,4 +1,3 @@
-use actix::{Actor, Addr, StreamHandler, Message, Handler, MessageResult, dev::MessageResponse, AsyncContext, ResponseActFuture};
 use actix_multipart::{Multipart, form::{MultipartForm, tempfile::TempFile}};
 use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
 use futures_util::stream::{TryStreamExt};
@@ -7,13 +6,8 @@ use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
 use crate::{ml::{
     whisper::{parse_wav_file, transcribe_audio}, 
     chat::get_chat_response, tts::process_text_to_audio}};
-use bytes::Bytes;
-use actix::ActorContext;
-use actix_web_actors::ws::{Message::{Close, Binary, Ping, Text}, self,
-    WebsocketContext, ProtocolError};
 use serde_derive::{Deserialize, Serialize};
 
-use actix::prelude::{Recipient};
 
 pub fn configure_service(cfg: &mut web::ServiceConfig) { 
     cfg
@@ -27,12 +21,6 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     // )
     ;
 }
-
-/// Define a message type to pass audio data between actors 
-#[derive(Debug, Serialize, Deserialize, Message)]
-#[rtype(result = "()")]
-struct TextTranscribed(pub String);
-
 
 #[route("/", method = "POST", method = "GET")]
 pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {

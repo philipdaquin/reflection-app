@@ -38,9 +38,9 @@ tracing-bunyan-formatter = "0.3.2"
 wav = "1.0.0"
 num_cpus = "1.15.0"
 tokio-stream = "0.1.12"
-actix-web-actors = "4.2.0"
-actix = "0.13.0"
-actix-rt = "2.8.0"
+# actix-web-actors = "4.2.0"
+# actix = "0.13.0"
+# actix-rt = "2.8.0"
 
 [profile.release]
 # Less code to include into binary

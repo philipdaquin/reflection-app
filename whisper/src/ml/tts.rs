@@ -66,9 +66,9 @@ pub async fn process_text_to_audio(input: &str) -> Result<Vec<u8>> {
     
     // Send the request to the endpoint API
     let request = Request::post(endpoint_url)
-    .header(header::CONTENT_TYPE, "application/json")
-    .header("xi-api-key", header)
-    .header(header::ACCEPT, "audio/mpeg")
+        .header(header::CONTENT_TYPE, "application/json")
+        .header("xi-api-key", header)
+        .header(header::ACCEPT, "audio/mpeg")
         .body(body)
         .unwrap();
 

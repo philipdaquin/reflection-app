@@ -86,7 +86,9 @@ pub async fn get_chat_response(input: &str) -> Result<String> {
     // log::info!("{:?}", resp.choices[0].text);
     log::info!("{}", resp.choices[0].text);
 
-    let response = resp.choices[0].text.to_string();
+    let mut response = resp.choices[0].text.to_string();
+
+    if response.is_empty() { response = "I'm sorry, would you please repeat that again?".to_string()}
 
     Ok(response)
 }
