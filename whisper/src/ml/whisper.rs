@@ -49,7 +49,7 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     samples = whisper_rs::convert_stereo_to_mono_audio(&samples);
     
     // Whisper Model 
-    let whisper_path = Path::new("./models/ggml-base.en.bin");
+    let whisper_path = Path::new("./models/ggml-small.en.bin");
     
     //
     // The decoding strategies are: 
@@ -67,7 +67,7 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     params.set_print_special(false);
     
     // Keep context between audio chunks 
-    params.set_no_context(true);
+    params.set_no_context(false);
     
     params.set_offset_ms(0);
     
@@ -78,13 +78,13 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     params.set_speed_up(false);
 
     // Audio length in milliseconds 
-    params.set_duration_ms(10000);
+    params.set_duration_ms(0);
 
     // The max number of tokens per audio chunk     
-    params.set_max_tokens(32);
+    params.set_max_tokens(0);
 
     // Partial encoder context for better performance 
-    params.set_audio_ctx(768);
+    params.set_audio_ctx(0);
 
     // Non Speech
     // If the probability of the no speech token is higher than this value AND
