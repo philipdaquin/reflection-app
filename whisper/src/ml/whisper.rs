@@ -4,6 +4,11 @@ use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::error::Result;
 use std::io::Cursor;
 use num_cpus;
+use lazy_static::lazy_static;
+
+lazy_static! { 
+    static ref ENGINE_MODEL: String = std::env::var("VOICE_ENGINE").expect("Unable to read the VOICE ENGINE FOR ELEVEN LABS");
+}
 
 /// Parse the audio data as a WAV file 
 #[tracing::instrument(level= "debug")]
@@ -48,8 +53,9 @@ pub async fn transcribe_audio(audio: Vec<i16>) -> Result<String> {
     
     samples = whisper_rs::convert_stereo_to_mono_audio(&samples);
     
+    let path = format!("./models/{}", ENGINE_MODEL.to_string());
     // Whisper Model 
-    let whisper_path = Path::new("./models/ggml-small.en.bin");
+    let whisper_path = Path::new(&path);
     
     //
     // The decoding strategies are: 

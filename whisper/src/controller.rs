@@ -22,6 +22,8 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     ;
 }
 
+/// An API endpoint that accepts user audio and settings for OpenAi response 
+/// 
 #[route("/", method = "POST", method = "GET")]
 pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
     let mut transcribed = String::new();
@@ -44,24 +46,25 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
 
         transcribed = transcriber.await.unwrap();
 
-
         log::info!("{}", transcribed);
         
     }
     // Send request to get OpenAI text response
     let resp = get_chat_response(&transcribed).await?;
     
+    log::info!("✉️ {:#?}", resp);
+
     // Send a post request to get a Text to Speech 
-    let tts_response = process_text_to_audio(&resp)
-        .await
-        .unwrap();
+    // let tts_response = process_text_to_audio(&resp)
+    //     .await
+    //     .unwrap();
 
-    Ok(
-        HttpResponse::Ok()
-        .content_type("audio/mpeg")
-        .body(tts_response)
-    )
+    // Ok(
+    //     HttpResponse::Ok()
+    //     .content_type("audio/mpeg")
+    //     .body(tts_response)
+    // )
 
-    // Ok(HttpResponse::Ok().into())
+    Ok(HttpResponse::Ok().into())
 
 }

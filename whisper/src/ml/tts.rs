@@ -1,4 +1,5 @@
 
+use lazy_static::lazy_static;
 use serde_derive::{Serialize, Deserialize};
 use dotenv::dotenv;
 use hyper::{header, Body, Client, Request, body::{aggregate, Buf}, client::HttpConnector, StatusCode};
@@ -6,6 +7,18 @@ use hyper_tls::HttpsConnector;
 use actix_multipart::Multipart;
 use actix_web::Result;
 use hyper::Response;
+
+lazy_static! { 
+    static ref OPENAI_API_KEY: String = std::env::var("OPENAI_API_KEY")
+        .expect("Unable to read OPEN API KEY");
+
+    static ref VOICEID: String = std::env::var("VOICE_ID")
+        .expect("Unable to read VOICE ID");
+
+    static ref ELEVEN_LABS_API_KEY: String = std::env::var("ELEVEN_LABS_API_KEY")
+        .expect("Unable to read ELEVEN_LABS_API_KEY");
+}
+
 
 #[derive(Debug, Serialize, Deserialize)]
 struct VoiceSettings { 
@@ -49,18 +62,14 @@ pub async fn process_text_to_audio(input: &str) -> Result<Vec<u8>> {
 
     let connector = HttpsConnector::new();
     let client = Client::builder().build(connector);
-
-
-    let api_key = std::env::var("ELEVEN_LABS_API_KEY").expect("Unable to read ELEVAN LABS API KEY");
-    let header = format!("{}", api_key);
+    let header = format!("{}", ELEVEN_LABS_API_KEY.to_string());
     
     // Default Voice is Elli
-    let voice_id = "MF3mGyEYCl7XYWbV9V6O";
     let tts_request = OAIRequest { 
         text: input.to_string(), 
         voice_settings: VoiceSettings::default()
     };
-    let endpoint_url = format!("https://api.elevenlabs.io/v1/text-to-speech/{}", voice_id);
+    let endpoint_url = format!("https://api.elevenlabs.io/v1/text-to-speech/{}", VOICEID.to_string());
     let body = Body::from(serde_json::to_vec(&tts_request)?);
     log::info!("{:?}", body);
     
