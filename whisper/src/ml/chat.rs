@@ -36,7 +36,7 @@ struct OAIRequest {
 
 lazy_static! { 
     static ref CONTEXT: String = format!("
-    You are in a movie scene and you're friend comes to you for any advice, or any daily reflections. This friend enjoys being able to talk about what they’re going through.
+        You are in a movie scene and you're friend comes to you for any advice, or any daily reflections. This friend enjoys being able to talk about what they’re going through.
 
         Your only job is to hold space for someone. Do not use generic responses or any repeated ones, If possible, make you responses similar to Aaron Sorkin's screen writing style.
         
@@ -84,7 +84,7 @@ pub async fn get_chat_response(input: &str) -> Result<String> {
     let oi_request = OAIRequest {
         prompt,
         temperature: 0.5,
-        max_tokens: 100,
+        max_tokens: 50,
     };
 
     let body = Body::from(serde_json::to_vec(&oi_request)?);

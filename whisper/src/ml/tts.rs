@@ -35,6 +35,12 @@ impl Default for VoiceSettings {
     }
 }
 
+impl VoiceSettings { 
+    fn set(stability: f32, boost: f32) -> Self { 
+        Self { stability, similarity_boost: boost }  
+    }
+}
+
 
 #[derive(Debug, Serialize, Deserialize)]
 struct OAIRequest { 
@@ -67,7 +73,7 @@ pub async fn process_text_to_audio(input: &str) -> Result<Vec<u8>> {
     // Default Voice is Elli
     let tts_request = OAIRequest { 
         text: input.to_string(), 
-        voice_settings: VoiceSettings::default()
+        voice_settings: VoiceSettings::set(0.75, 0.75)
     };
     let endpoint_url = format!("https://api.elevenlabs.io/v1/text-to-speech/{}", VOICEID.to_string());
     let body = Body::from(serde_json::to_vec(&tts_request)?);

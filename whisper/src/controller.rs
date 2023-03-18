@@ -55,16 +55,16 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
     log::info!("✉️ {:#?}", resp);
 
     // Send a post request to get a Text to Speech 
-    // let tts_response = process_text_to_audio(&resp)
-    //     .await
-    //     .unwrap();
+    let tts_response = process_text_to_audio(&resp)
+        .await
+        .unwrap();
 
-    // Ok(
-    //     HttpResponse::Ok()
-    //     .content_type("audio/mpeg")
-    //     .body(tts_response)
-    // )
+    Ok(
+        HttpResponse::Ok()
+        .content_type("audio/mpeg")
+        .body(tts_response)
+    )
 
-    Ok(HttpResponse::Ok().into())
+    // Ok(HttpResponse::Ok().into())
 
 }
