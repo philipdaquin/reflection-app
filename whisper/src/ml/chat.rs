@@ -10,6 +10,8 @@ use actix_web::{
 use hyper::{header, Body, Client, Request, body::{aggregate, Buf}};
 use dotenv::dotenv;
 
+use crate::ml::{ENGINE};
+
 #[derive(Debug, Deserialize)]
 struct ChatAIChoices { 
     text: String, 
@@ -34,33 +36,11 @@ struct OAIRequest {
     max_tokens: u32,
 }
 
-lazy_static! { 
-    static ref CONTEXT: String = format!("
-        You are in a movie scene and you're friend comes to you for any advice, or any daily reflections. This friend enjoys being able to talk about what they’re going through.
-
-        Your only job is to hold space for someone. Do not use generic responses or any repeated ones, If possible, make you responses similar to Aaron Sorkin's screen writing style.
-        
-        The pauses are in the in form of `...` not `Pause`
-        
-        In your responses, add pauses to help convey a sense of empathy and emotional support.
-        
-        Make it more empathising. For every response, start with a pause which is in `...`, and add pauses which is `...` to the rest of the response where it is appropriate.
-        
-        If you don't know how to answer, say 'I'm sorry, would you please repeat that again?'
-        
-        Make sure your responses are concise, special.
-        
-        Keep it in one paragraph. 
-    ");
-
-    static ref ENGINE: String = std::env::var("CHAT_MODEL_ENGINE").expect("Unable to read Engine ID");
-}
-
 
 /// 
 /// Receives text input from the user and sends out request to OpenAI GPT
 #[tracing::instrument(fields(input), level= "debug")]
-pub async fn get_chat_response(input: &str) -> Result<String> {
+pub async fn get_chat_response(input: &str, context: &str) -> Result<String> {
     
     dotenv().ok();
 
@@ -79,12 +59,12 @@ pub async fn get_chat_response(input: &str) -> Result<String> {
     // Construct the request body 
     let token = std::env::var("OPENAI_API_KEY").expect("Missing Open AI Token");
     let header = format!("Bearer {}", token);
-    let prompt = format!("{} ### {}", CONTEXT.to_string(), input);
+    let prompt = format!("{} ### {}", context, input);
 
     let oi_request = OAIRequest {
         prompt,
         temperature: 0.5,
-        max_tokens: 50,
+        max_tokens: 100,
     };
 
     let body = Body::from(serde_json::to_vec(&oi_request)?);

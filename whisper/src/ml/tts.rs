@@ -8,16 +8,7 @@ use actix_multipart::Multipart;
 use actix_web::Result;
 use hyper::Response;
 
-lazy_static! { 
-    static ref OPENAI_API_KEY: String = std::env::var("OPENAI_API_KEY")
-        .expect("Unable to read OPEN API KEY");
-
-    static ref VOICEID: String = std::env::var("VOICE_ID")
-        .expect("Unable to read VOICE ID");
-
-    static ref ELEVEN_LABS_API_KEY: String = std::env::var("ELEVEN_LABS_API_KEY")
-        .expect("Unable to read ELEVEN_LABS_API_KEY");
-}
+use crate::ml::{ELEVEN_LABS_API_KEY, VOICEID};
 
 
 #[derive(Debug, Serialize, Deserialize)]

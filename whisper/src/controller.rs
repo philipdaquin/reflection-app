@@ -5,7 +5,7 @@ use futures_util::future::{FutureExt, Future};
 use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
 use crate::{ml::{
     whisper::{parse_wav_file, transcribe_audio}, 
-    chat::get_chat_response, tts::process_text_to_audio}};
+    chat::get_chat_response, tts::process_text_to_audio, prompt::GENERAL_CONTEXT}};
 use serde_derive::{Deserialize, Serialize};
 
 
@@ -21,6 +21,14 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     // )
     ;
 }
+
+pub async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse> { 
+    
+    
+    
+    todo!()
+}
+
 
 /// An API endpoint that accepts user audio and settings for OpenAi response 
 /// 
@@ -50,7 +58,7 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         
     }
     // Send request to get OpenAI text response
-    let resp = get_chat_response(&transcribed).await?;
+    let resp = get_chat_response(&transcribed, &GENERAL_CONTEXT).await?;
     
     log::info!("✉️ {:#?}", resp);
 
