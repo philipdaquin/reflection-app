@@ -4,7 +4,7 @@ use futures_util::stream::{TryStreamExt};
 use futures_util::future::{FutureExt, Future};
 use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
 use crate::{ml::{
-    whisper::{parse_wav_file, transcribe_audio}, 
+    whisper::{AudioData}, 
     chat::get_chat_response, tts::process_text_to_audio, prompt::GENERAL_CONTEXT}};
 use serde_derive::{Deserialize, Serialize};
 
@@ -45,11 +45,11 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         while let Some(chunk) = item.try_next().await? { 
             bytes.extend_from_slice(&chunk);
         }
-        let wav_data = parse_wav_file(bytes).await.unwrap();
+        let mut wav_data = AudioData::parse_wav_file(bytes).await.unwrap();
     
         // Transfer audio file into a worker 
-        let transcriber = tokio::spawn(async {
-            return transcribe_audio(wav_data).await.unwrap();
+        let transcriber = tokio::spawn(async move {
+            return wav_data.transcribe_audio().await.unwrap();
         });
 
         transcribed = transcriber.await.unwrap();
