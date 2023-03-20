@@ -6,15 +6,19 @@ use std::io::Cursor;
 use num_cpus;
 use parking_lot::Mutex;
 
+use super::text_classification::TextClassification;
+
 #[derive(Debug, Clone)]
 pub struct AudioData { 
     wav_data: Option<Arc<Mutex<Vec<i16>>>>,
     transcription: Option<String>,
-    summary: Option<String>
+    summary: Option<String>,
+    text_classification: Option<TextClassification>
 }
 
 impl AudioData { 
     
+    /// 
     /// Parse the audio data as a WAV file 
     #[tracing::instrument(level= "debug")]
     pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Self> {
@@ -50,13 +54,16 @@ impl AudioData {
         let res = Self { 
             wav_data: Some(Arc::new(Mutex::new(wav_data))), 
             transcription: None,
-            summary: None
+            summary: None,
+            text_classification: None
         };
 
         Ok(res)
     
     }
     
+    ///
+    /// Transcribe the given WAV FILE
     #[tracing::instrument(level= "debug")]
     pub async fn transcribe_audio(&mut self) -> Result<String> {
         let mut res = String::new();
@@ -64,7 +71,7 @@ impl AudioData {
         if self.wav_data.is_none() { return Ok(res)}
 
 
-        let mut samples = whisper_rs::convert_integer_to_float_audio(&self.wav_data.clone().unwrap().lock());
+        let mut samples = whisper_rs::convert_integer_to_float_audio(&self.wav_data.as_mut().unwrap().lock());
         
         samples = whisper_rs::convert_stereo_to_mono_audio(&samples);
         
@@ -173,12 +180,21 @@ impl AudioData {
 
         Ok(summary)
     }
-
     ///
     /// Gets Sentimental analysis of transcribed text
     #[tracing::instrument(level= "debug")]
-    pub async fn get_sentimental_analysis(&mut self) -> Result<String> { 
-        todo!()
+    pub async fn get_sentimental_analysis(&mut self) -> Result<TextClassification> { 
+        if let Some(ret) = &self.text_classification { 
+            return Ok(ret.clone())
+        }
+
+        let mut new_analysis = TextClassification::default();
+            new_analysis
+            .get_text_analysis(&self.transcription.as_mut().unwrap())
+            .await
+            .unwrap();
+
+        Ok(new_analysis)
     }
 }
 
