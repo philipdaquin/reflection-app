@@ -5,6 +5,7 @@ import { uploadWav } from '../util/uploadWav';
 import io from 'socket.io-client';
 import AddAudioFile from './AddAudioFile';
 import AudioStreaming from './AudioStreaming';
+import AudioStreamer from './AudioStreamer';
 
 
 
@@ -103,7 +104,7 @@ function RecordComponent() {
                 <button hidden={!record} onClick={save}>Stop and Save</button>
             </div>
 
-
+            <AudioStreamer />
 
             <div>
                 <h1 className="font-bold text-md">
@@ -113,7 +114,7 @@ function RecordComponent() {
             </div>
 
 
-            <div>
+            {/* <div>
                 <h1 className="font-bold text-md">
                     Converted to Wav
                 </h1>
@@ -123,7 +124,7 @@ function RecordComponent() {
             <div>
                 <h1 className="font-bold text-md">Server Response</h1>
                 <audio controls  autoPlay src={audioRecording}></audio>
-            </div>
+            </div> */}
 
         </div>
     );

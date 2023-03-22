@@ -4,6 +4,8 @@ import { Socket } from 'socket.io';
 import io from 'socket.io-client'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
+const SERVER_URL = 'http://localhost:4001/ws'
+
 
 function AudioStreaming() {
             
@@ -24,7 +26,7 @@ function AudioStreaming() {
     const start = () => { 
         setStartStream(true)
         startRecording()
-        socketRef.current = io("https://localhost:4001")
+        socketRef.current = io(SERVER_URL)
     }
 
     const stop = () => { 

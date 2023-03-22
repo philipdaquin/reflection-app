@@ -3,7 +3,7 @@ pub mod chat;
 pub mod tts;
 pub mod prompt;
 pub mod sockets;
-
+pub mod text_classification;
 
 use lazy_static::lazy_static;
 

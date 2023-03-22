@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use actix_web::{get, middleware::Logger, route, web, App, HttpServer, Responder};
 use actix_cors::Cors;
+use parking_lot::Mutex;
 
-use crate::{controller::configure_service};
+use crate::{controller::configure_service, ml::sockets::{WebSocketSession, AppState}};
 
 
 pub async fn new_server(port: u32) -> std::io::Result<()> {
@@ -13,14 +16,16 @@ pub async fn new_server(port: u32) -> std::io::Result<()> {
     log::info!("📭 GraphiQL playground: http://localhost:{}/graphiql", port);
     log::info!("📢 Query at https://studio.apollographql.com/dev");
     
+    let app_state = web::Data::new(AppState::default());
+
     HttpServer::new(move || {
         App::new()
-            // .app_data(schema.clone())
+            .app_data(app_state.clone())
             .configure(configure_service)
             .wrap(Cors::permissive())
             .wrap(Logger::default())
     })
-    .workers(1)
+    .workers(2)
     .bind(format!("127.0.0.1:{}", port))?
     .run()
     .await

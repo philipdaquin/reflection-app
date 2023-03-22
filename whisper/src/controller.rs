@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use actix_multipart::{Multipart, form::{MultipartForm, tempfile::TempFile}};
 use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
 use futures_util::stream::{TryStreamExt};
@@ -5,30 +7,27 @@ use futures_util::future::{FutureExt, Future};
 use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
 use crate::{ml::{
     whisper::{AudioData}, 
-    chat::get_chat_response, tts::process_text_to_audio, prompt::GENERAL_CONTEXT}};
+    chat::get_chat_response, tts::process_text_to_audio, prompt::GENERAL_CONTEXT, sockets::{AppState, WebSocketSession}}};
 use serde_derive::{Deserialize, Serialize};
-
+use actix_web_actors::ws;
 
 pub fn configure_service(cfg: &mut web::ServiceConfig) { 
     cfg
     .service(upload)
-    // .service(
-    //     web::resource("/ws")
-    //         .route(web::post()
-    //             .guard(guard::Header("upgrade", "websocket"))
-    //             .to(index_ws)
-    //     )
-    // )
-    ;
+    .service(
+        web::resource("/ws")
+            .route(web::get()
+                // .guard(guard::Header("upgrade", "websocket"))
+                .to(ws_handler)
+        )
+    );
 }
+async fn ws_handler(data: web::Data<AppState>, req: HttpRequest, stream: web::Payload) -> Result<HttpResponse> { 
+    log::info!("✅✅✅✅");
+    
+    ws::start(WebSocketSession::new(Arc::new(data.get_ref().clone())), &req, stream)
 
-pub async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse> { 
-    
-    
-    
-    todo!()
 }
-
 
 /// An API endpoint that accepts user audio and settings for OpenAi response 
 /// 
@@ -38,7 +37,7 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
     while let Some(mut item) = payload.try_next().await? { 
         // A multipart stream has to contain `contain_disposition`
         let content = item.content_disposition();
-        log::info!("{}", content.to_owned());
+        log::info!("{}", content.to_owned()); 
         
         let mut bytes = Vec::new();
         // Write the content of the file of the temporary file 
@@ -63,16 +62,16 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
     log::info!("✉️ {:#?}", resp);
 
     // Send a post request to get a Text to Speech 
-    let tts_response = process_text_to_audio(&resp)
-        .await
-        .unwrap();
+    // let tts_response = process_text_to_audio(&resp)
+    //     .await
+    //     .unwrap();
 
-    Ok(
-        HttpResponse::Ok()
-        .content_type("audio/mpeg")
-        .body(tts_response)
-    )
+    // Ok(
+    //     HttpResponse::Ok()
+    //     .content_type("audio/mpeg")
+    //     .body(tts_response)
+    // )
 
-    // Ok(HttpResponse::Ok().into())
+    Ok(HttpResponse::Ok().into())
 
 }

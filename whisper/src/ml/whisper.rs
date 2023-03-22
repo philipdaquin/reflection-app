@@ -10,7 +10,7 @@ use super::text_classification::TextClassification;
 
 #[derive(Debug, Clone)]
 pub struct AudioData { 
-    wav_data: Option<Arc<Mutex<Vec<i16>>>>,
+    wav_data: Option<Vec<i16>>,
     transcription: Option<String>,
     summary: Option<String>,
     text_classification: Option<TextClassification>
@@ -22,7 +22,7 @@ impl AudioData {
     /// Parse the audio data as a WAV file 
     #[tracing::instrument(level= "debug")]
     pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Self> {
-     
+        log::info!("👷‍♂️ Parsing WaV FILE");
         let mut reader = Cursor::new(&bytes);
         let wav_reader = WavReader::new(&mut reader).unwrap();
         
@@ -52,11 +52,12 @@ impl AudioData {
             .collect::<Vec<_>>();
         
         let res = Self { 
-            wav_data: Some(Arc::new(Mutex::new(wav_data))), 
+            wav_data: Some(wav_data), 
             transcription: None,
             summary: None,
             text_classification: None
         };
+        log::info!("✅ FINISHED parsing data");
 
         Ok(res)
     
@@ -71,7 +72,7 @@ impl AudioData {
         if self.wav_data.is_none() { return Ok(res)}
 
 
-        let mut samples = whisper_rs::convert_integer_to_float_audio(&self.wav_data.as_mut().unwrap().lock());
+        let mut samples = whisper_rs::convert_integer_to_float_audio(&self.wav_data.as_mut().unwrap());
         
         samples = whisper_rs::convert_stereo_to_mono_audio(&samples);
         
@@ -83,22 +84,22 @@ impl AudioData {
         // The decoding strategies are: 
         //  - Beam Search with 5 beams usng log probability for the score function 
         //  - Greedy decoding with best of 5 sampling. 
-        let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 5 });
+        let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 0});
         
         // Output into one single segment
         params.set_single_segment(true);
     
-    
-        params.set_print_realtime(false);
-        params.set_print_progress(false);
+        
+        params.set_print_realtime(true);
+        params.set_print_progress(true);
         params.set_print_timestamps(false);    
         params.set_print_special(false);
         
         // Keep context between audio chunks 
-        params.set_no_context(false);
+        params.set_no_context(true);
         
-        params.set_offset_ms(0);
-        
+        params.set_offset_ms(500);
+
         // Supress blank outputs
         params.set_suppress_blank(true);
     
@@ -106,14 +107,13 @@ impl AudioData {
         params.set_speed_up(false);
     
         // Audio length in milliseconds 
-        params.set_duration_ms(0);
-    
+        params.set_duration_ms(5000);
+
         // The max number of tokens per audio chunk     
-        params.set_max_tokens(0);
+        params.set_max_tokens(32);
     
         // Partial encoder context for better performance 
         params.set_audio_ctx(0);
-    
         // Non Speech
         // If the probability of the no speech token is higher than this value AND
         // the decoding has failed due to 'pr'
@@ -121,24 +121,25 @@ impl AudioData {
     
         // Temperature to increase when falling back when the decoding fails to 
         // meet either of the thresholds elow  
-        params.set_temperature_inc(0.2);
+        params.set_temperature_inc(-1.0);
     
         // If the averate log probability is lower than this value, treat the decoding as failed 
-        params.set_logprob_thold(-1.0);
+        params.set_logprob_thold(100.0);
     
         // Temperature to use for sampling 
         // - Sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random
         //   while lower values like 0.2 will make it more focused and deterministic
         //   If set to 0, the model will use log probability to automatically increase the temperature until certain 
         //   thresholds are hit
-        params.set_temperature(-1.0);   
+        params.set_temperature(0.0);   
     
         // Number of threads to use during computation
-        params.set_n_threads(i32::min(4, num_cpus::get() as i32));
+        params.set_n_threads(8);
     
         // Translate the source to english 
         params.set_translate(false);
-    
+        
+
         // Spoken language
         params.set_language(Some("en"));
     
@@ -162,8 +163,7 @@ impl AudioData {
             res.push_str(&segment);
         }
         // Save in memory 
-        let copy = res.clone();
-        self.transcription = Some(copy);
+        self.transcription = Some(res.to_string());
     
         Ok(res)
     }
