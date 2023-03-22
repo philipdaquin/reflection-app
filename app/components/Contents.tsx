@@ -1,11 +1,12 @@
 import React from 'react'
 import GreetingUser from './GreetingUser'
 import MoodTrackerIndex from './MoodTrackerIndex'
+import RecentEntries from './RecentEntries'
 import WeeklyRoundUpComp from './WeeklyRoundUpComp'
 
 function Contents() {
   return (
-    <div>
+    <div className=''>
       <GreetingUser />
       <div className='mt-10'>
         <MoodTrackerIndex />
@@ -16,6 +17,10 @@ function Contents() {
         <WeeklyRoundUpComp/>
       </div>
       {/* Recent entries  */}
+      <div className='pt-11'>
+        <RecentEntries />
+
+      </div>
     </div>
   )
 }

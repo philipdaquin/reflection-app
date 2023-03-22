@@ -19,6 +19,7 @@
     "react-voice-recorder": "^2.1.2",
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
+    "tailwind-scrollbar-hide": "^1.1.7",
     "webm-to-wav-converter": "^1.1.0"
   },
   "devDependencies": {
