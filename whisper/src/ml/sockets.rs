@@ -49,8 +49,7 @@ impl Actor for WebSocketSession {
     fn started(&mut self, ctx: &mut Self::Context) {
         let addr = ctx.address();
         self.send_heartbeats(ctx);
-        
-        
+
         self.state.conn.lock().push(addr);
     }
 
@@ -95,7 +94,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocketSession 
                 ctx.stop();
             }
 
-            _ => ctx.stop(),
+            _ => {},
         }
     }
 }

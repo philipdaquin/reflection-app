@@ -16,7 +16,7 @@ pub async fn new_server(port: u32) -> std::io::Result<()> {
     log::info!("📭 GraphiQL playground: http://localhost:{}/graphiql", port);
     log::info!("📢 Query at https://studio.apollographql.com/dev");
     
-    let app_state = web::Data::new(AppState::default());
+    let app_state = AppState::default();
 
     HttpServer::new(move || {
         App::new()

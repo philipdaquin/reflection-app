@@ -17,7 +17,7 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     .service(
         web::resource("/ws")
             .route(web::get()
-                // .guard(guard::Header("upgrade", "websocket"))
+                .guard(guard::Header("upgrade", "websocket"))
                 .to(ws_handler)
         )
     );
@@ -25,8 +25,9 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
 async fn ws_handler(data: web::Data<AppState>, req: HttpRequest, stream: web::Payload) -> Result<HttpResponse> { 
     log::info!("✅✅✅✅");
     
-    ws::start(WebSocketSession::new(Arc::new(data.get_ref().clone())), &req, stream)
+    let resp = ws::start(WebSocketSession::new(Arc::new(data.get_ref().clone())), &req, stream)?;
 
+    Ok(resp)
 }
 
 /// An API endpoint that accepts user audio and settings for OpenAi response 
