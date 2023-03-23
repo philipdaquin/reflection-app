@@ -1,12 +1,12 @@
 import React from 'react'
-import GreetingUser from './GreetingUser'
-import MoodTrackerIndex from './MoodTrackerIndex'
-import RecentEntries from './RecentEntries'
-import WeeklyRoundUpComp from './WeeklyRoundUpComp'
+import GreetingUser from '../GreetingUser'
+import MoodTrackerIndex from '../MoodTrackerIndex'
+import RecentEntries from '../RecentEntries'
+import WeeklyRoundUpComp from '../WeeklyRoundUpComp'
 
-function Contents() {
+function HomeContents() {
   return (
-    <div className='bg-white md:w-full md:h-full w-full h-full rounded-full'>
+    <div className='bg-white md:w-full md:h-full w-full h-full rounded-[70px]'>
       <GreetingUser />
       <div className='mt-10'>
         <MoodTrackerIndex />
@@ -24,4 +24,4 @@ function Contents() {
   )
 }
 
-export default Contents
+export default HomeContents
