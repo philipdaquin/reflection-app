@@ -2,6 +2,7 @@ import Head from 'next/head'
 import React from 'react'
 import NavigationButtons from '../components/NavigationButtons'
 import ChatContent from '../components/pages/ChatContent'
+import LibraryContent from '../components/pages/LibraryContent'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
 
@@ -20,7 +21,7 @@ function playlist() {
                 <div className='relative right-10'>
                     <NavigationButtons />        
                 </div>
-                <PhoneView children={<ChatContent/>} />
+                <PhoneView children={<LibraryContent/>} />
             </div>
             <div className='md:block hidden'>
                 <SwitchView />
