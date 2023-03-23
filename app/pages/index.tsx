@@ -7,15 +7,17 @@ import SwitchView from '../components/SwitchView'
 
 const Home: NextPage = () => {
   return (
-    <div className="bg-[#EEEEEE] flex min-h-screen flex-col items-center justify-center py-2">
+    <div className="md:bg-[#EEEEEE] bg-white transition-all duration-500 ease-in-out  flex min-h-screen flex-col items-center justify-center md:py-2 py-14">
       <Head>
-        <title>Create Next App</title>
+        <title>Hello John 👋</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className=" justify-center flex flex-col items-center space-y-[27px]">
         <PhoneView />
-        <SwitchView />
+        <div className='md:block hidden'>
+          <SwitchView />
+        </div>
 
       {/* <RecordComponent /> */}
       </main>

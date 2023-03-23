@@ -38,12 +38,36 @@ function RecentEntries() {
           thumbnailUrl: 'https://example.com/thumbnails/2.jpg'
         },
         {
+          id: 1,
+          title: 'Intro to JavaScript',
+          duration: 1200,
+          thumbnailUrl: 'https://example.com/thumbnails/1.jpg'
+        },
+        {
+          id: 2,
+          title: 'Python for Beginners',
+          duration: 1800,
+          thumbnailUrl: 'https://example.com/thumbnails/2.jpg'
+        },
+        {
+          id: 1,
+          title: 'Intro to JavaScript',
+          duration: 1200,
+          thumbnailUrl: 'https://example.com/thumbnails/1.jpg'
+        },
+        {
+          id: 2,
+          title: 'Python for Beginners',
+          duration: 1800,
+          thumbnailUrl: 'https://example.com/thumbnails/2.jpg'
+        },
+        {
           id: 3,
           title: 'React Hooks Tutorial',
           duration: 900,
           thumbnailUrl: 'https://example.com/thumbnails/3.jpg'
         }
-      ].slice(0, 3);
+      ];
 
 
     return (

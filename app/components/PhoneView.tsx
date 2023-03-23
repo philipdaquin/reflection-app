@@ -3,11 +3,12 @@ import Contents from './Contents'
 
 function PhoneView() {
   return (
-    <div className='w-[424px] h-[803px] bg-white shadow-xl rounded-[70px] border-[#F5F5F5] border-8'>
-        <div className='px-4 pt-10 w-full h-full border-[16px] shadow-sm border-[#FCFCFC] rounded-[60px] bg-white p-2  overflow-scroll scrollbar-hide'>
+    <div className='transition-all duration-500 ease-in-out  md:w-[424px] md:h-[803px] bg-white md:shadow-xl md:rounded-[70px] md:border-[#F5F5F5] md:border-8 border-white shadow-inherit'>
+        <div className='md:px-4 md:pt-10 w-full h-full md:border-[16px] md:shadow-sm md:border-[#FCFCFC] md:rounded-[60px] md:bg-white md:p-2 shadow-inherit md:overflow-scroll md:scrollbar-hide'>
             <Contents />
         </div>
     </div>
+
   )
 }
 

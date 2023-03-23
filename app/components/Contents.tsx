@@ -6,7 +6,7 @@ import WeeklyRoundUpComp from './WeeklyRoundUpComp'
 
 function Contents() {
   return (
-    <div className=''>
+    <div className='bg-white md:w-full md:h-full w-full h-full rounded-full'>
       <GreetingUser />
       <div className='mt-10'>
         <MoodTrackerIndex />
@@ -19,7 +19,6 @@ function Contents() {
       {/* Recent entries  */}
       <div className='pt-11'>
         <RecentEntries />
-
       </div>
     </div>
   )

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {DevicePhoneMobileIcon, ComputerDesktopIcon} from '@heroicons/react/24/outline'
+import { DeviceTabletIcon } from '@heroicons/react/20/solid'
 
 interface Prop { 
     title: string, 
@@ -12,7 +13,7 @@ function Button({title, icon, isSelected, onClick}: Prop) {
     return (
         <div  onClick={() => onClick(title)} 
             className={`
-        ${isSelected ? 'bg-black text-white' : ''}
+        ${isSelected ? 'bg-black text-white' : ''} cursor-pointer
         flex flex-row justify-between space-x-1 h-full rounded-[13px] w-full items-center px-3`}>
             {icon}
             <h2 className='text-left font-semibold text-[16px]'>{title}</h2>
