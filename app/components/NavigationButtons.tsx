@@ -10,7 +10,7 @@ interface Props {
 
 function Button({icon, routerName}: Props) { 
     return (
-        <Link href={`/${routerName}`} className='cursor-pointer'>
+        <Link href={`/${routerName}`} className='cursor'>
           <div className='bg-[#424242] rounded-full p-2 cursor-pointer'>
             {icon}
           </div>
@@ -21,18 +21,19 @@ function Button({icon, routerName}: Props) {
 
 function NavigationButtons() {
     return (
+      // <div className='flex flex-col space-y-3 p-2 h-[244px]  justify-between items-center w-[53px]  space-x-1 rounded-[20px] bg-white shadow-xl'>
       <div className='flex flex-col space-y-3'>
         <Button 
-          routerName='/'
+          routerName=''
           icon={<HomeIcon height={24} width={24} color="white"/>}/>
         <Button 
-          routerName='/chat'
+          routerName='chat'
           icon={<RiChatVoiceLine size={24} color="white"/>}/>
         <Button 
-          routerName='/record'
+          routerName='record'
           icon={<MicrophoneIcon height={24} width={24} color="white"/>}/>
         <Button 
-          routerName='/playlist'
+          routerName='playlist'
           icon={<MusicalNoteIcon height={24} width={24} color="white"/>}/>
       </div>
     )

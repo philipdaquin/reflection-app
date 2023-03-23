@@ -67,7 +67,7 @@ function RecentEntries() {
           duration: 900,
           thumbnailUrl: 'https://example.com/thumbnails/3.jpg'
         }
-      ];
+      ].slice(0,5);
 
 
     return (
