@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
+import { useAudioRecorder } from 'react-audio-voice-recorder'
 import AudioControls from '../components/AudioControls'
 import AudioVisualizer from '../components/AudioVisualizer'
 import NavigationButtons from '../components/NavigationButtons'
@@ -10,6 +11,7 @@ import RecordComponent from '../components/RecordComponent'
 import SwitchView from '../components/SwitchView'
 
 function record() {
+   
     return (
       <>
         <Head>
@@ -28,7 +30,7 @@ function record() {
                     <SwitchView />
                 </div>
             {/* <RecordComponent /> */}
-
+        
             </main>
         </div>
       

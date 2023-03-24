@@ -1,21 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useRecorder } from 'react-recorder-voice';
 import { convertWav } from '../util/convertWav';
 import { uploadWav } from '../util/uploadWav';
 
 function AddAudioFile() {
     const [selectedFile, setSelectedFile] = useState(null);
-    const {
-        // audioURL,
-        audioData,
-        timer,
-        recordingStatus,
-        cancelRecording,
-        saveRecordedAudio,
-        startRecording,
-
-    } = useRecorder();
-
 
     const handleFileSelect = (e: any) => {
         setSelectedFile(e.target.files[0]);

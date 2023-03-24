@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import {HomeIcon, MagnifyingGlassIcon, MicrophoneIcon, UserIcon, MusicalNoteIcon, SpeakerWaveIcon, XMarkIcon, StopIcon, PlayIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import {HiOutlineAnnotation} from 'react-icons/hi'
-import { useRecorder } from 'react-recorder-voice'
 import { convertWav } from '../util/convertWav'
+import { useAudioRecorder } from 'react-audio-voice-recorder'
+import { useRecoilState } from 'recoil'
+import { RecordingState, TimerState } from '../atoms/atoms'
+import formatTime from '../util/formatTime'
 
 interface Props { 
   icon: any
@@ -19,22 +22,26 @@ function Button({icon}: Props) {
 function StartStopRecording() { 
 
     const {
-       // audioURL,
-       audioData,
-       timer,
-       recordingStatus,
-       cancelRecording,
-       saveRecordedAudio,
-       startRecording,
+      startRecording,
+      stopRecording,
+      togglePauseResume,
+      recordingBlob,
+      isRecording,
+      isPaused,
+      recordingTime,
 
-    } = useRecorder()
+    } = useAudioRecorder();
 
-    const [isRecording, setRecord] = useState(false)
+
+    const [isCurrRecording, setRecord] = useState(false)
     const [stopRecord, setStopRecord] = useState(false)
     const [process, setProcess] = useState(false)
     
     const [audioURL, setAudioURL] = useState('')
     const [loading, setLoading] = useState(false)
+    const [showRecordingTime, setRecordingTime] = useRecoilState(TimerState);
+    const [showRecordingState, setRecordingState] = useRecoilState(RecordingState);
+
 
     // START THE RECORDING
     const start = () => {   
@@ -46,16 +53,19 @@ function StartStopRecording() {
 
     // STOP THE RECORDING
     const stop = () => {  
-      if (recordingStatus !== 'recording') return;
-        setStopRecord(true)
-        saveRecordedAudio()
-    }
+      if (!isRecording) return
+      stopRecording()
+      setStopRecord(true)
+      setRecordingState(false)
 
+    }
+    
     // SAVES THE DATA AND MOVE TO THE NEXT STAGE 
     const processAudioRecording = () => { 
-        if (audioData == null) return
+        if (recordingBlob == null) return
         setProcess(true)
-        saveRecordedAudio()
+        setRecordingTime(0)
+        // saveRecordedAudio()
     }
 
     // STARTS FROM THE BEGINNING
@@ -63,19 +73,26 @@ function StartStopRecording() {
         setStopRecord(false)
         setRecord(false)
         setProcess(false)
-        saveRecordedAudio()
-        cancelRecording()
+        // saveRecordedAudio()
+        stopRecording()
     }
+
+    useEffect(() => {
+      setRecordingTime(recordingTime)
+      setRecordingState(isRecording)
     
+    }, [recordingTime, isRecording])
+
     // Listener: 
     // Once Process == true, convert and send over to the server
     // Next, if all ok, reset Recording states to default 
     useEffect(() => { 
         if (!process) return 
-        if (audioData == null) return 
+        if (recordingBlob == null) return 
         setLoading(true)
+        
         // Convert to Wav
-        convertWav(audioData)
+        convertWav(recordingBlob)
           // Upload to server and get the response 
           .then((resp) => {
               const formData = new FormData();
@@ -100,7 +117,7 @@ function StartStopRecording() {
               });
           })
         
-    }, [audioData, process])
+    }, [recordingBlob, process])
 
       const START = () => { 
         return (
@@ -129,7 +146,7 @@ function StartStopRecording() {
       
       return (
         <>
-          {isRecording ? (
+          {isCurrRecording ? (
             <div className=" items-center space-y-2 flex flex-col justify-center">
               {stopRecord ? <CONTINUE/> : <STOP/>}
               <Button icon={<XMarkIcon height={24} width={24} color="white" strokeWidth={2} onClick={resetRecordingStates} />} />

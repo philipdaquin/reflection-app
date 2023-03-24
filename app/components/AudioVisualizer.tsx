@@ -4,27 +4,7 @@ interface AudioVisualizerProps {
   width: number;
   height: number;
 }
-const fillRoundRect = (
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    radius: number
-  ) => {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-    ctx.fill();
-  };
+
 const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -40,9 +20,14 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ width, height }) => {
       source.connect(analyser);
 
       // Configure analyser
-      analyser.fftSize = 256;
+      analyser.fftSize = 512 * 8 ;
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
+
+      // Initialize time variables
+      let startTime = performance.now();
+      let lastFrameTime = startTime;
+      let offset = 0;
 
       // Render loop
       const renderFrame = () => {
@@ -50,9 +35,20 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ width, height }) => {
 
         // Get audio data and render spectrum
         analyser.getByteFrequencyData(dataArray);
+
+        // Calculate offset based on elapsed time
+        let elapsedTime = performance.now() - startTime;
+        offset = (elapsedTime / 1000) * width;
+        let deltaOffset = offset - (elapsedTime - 16) / 1000 * width;
+
+        // Clear canvas
         context.clearRect(0, 0, width, height);
-        const barWidth = width / bufferLength * 2;
-        let x = 0;
+
+        // Draw bars
+        const barWidth = width / bufferLength * 10
+        // let x = -offset % (barWidth + 8);
+        let x = (barWidth + 10) -offset % width;
+
         for (let i = 0; i < bufferLength; i++) {
           const amplitude = dataArray[i] / 255;
           context.beginPath();
@@ -63,6 +59,10 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ width, height }) => {
           context.stroke();
           x += barWidth + 8;
         }
+
+        // Update time variables
+        lastFrameTime = performance.now() ;
+        offset = deltaOffset;
       };
 
       renderFrame();
