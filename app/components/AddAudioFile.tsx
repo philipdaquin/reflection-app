@@ -17,14 +17,15 @@ function AddAudioFile() {
     } = useRecorder();
 
 
-    const handleFileSelect = (e) => {
+    const handleFileSelect = (e: any) => {
         setSelectedFile(e.target.files[0]);
     };
     const [audioSource, setAudioSource] = useState('')
-    const handleFormSubmit = (e ) => {
+    const handleFormSubmit = (e: any) => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append("audioFile", selectedFile);
+
+        formData.append("audioFile", selectedFile!);
 
         fetch("http://localhost:4001/", {
         method: "POST",

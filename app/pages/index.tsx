@@ -6,6 +6,7 @@ import RecordComponent from '../components/RecordComponent'
 import SwitchView from '../components/SwitchView'
 import NavigationButtons from '../components/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
+import AudioVisualizer from '../components/AudioVisualizer'
 
 
 const Home: NextPage = () => {
@@ -16,7 +17,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <div className="md:bg-[#EEEEEE] bg-white duration-500  flex min-h-screen flex-col 
+      <div className="md:bg-[#EEEEEE] bg-white duration-700  flex min-h-screen flex-col 
         items-center justify-center md:py-2 py-14">
         <main className=" justify-center flex flex-col items-center space-y-[27px] ">
 
@@ -30,6 +31,7 @@ const Home: NextPage = () => {
             <SwitchView />
           </div>
         {/* <RecordComponent /> */}
+
         </main>
       </div>
     </>

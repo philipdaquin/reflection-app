@@ -14,9 +14,7 @@ function ChatContent() {
             </div>
             <div className='flex flex-col justify-center items-center'>
                 <GeneratePrompt />
-                
             </div>
-
         </>
         
     )
