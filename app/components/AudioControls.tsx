@@ -6,7 +6,7 @@ import { useAudioRecorder } from 'react-audio-voice-recorder'
 import { useRecoilState } from 'recoil'
 import { RecordingState, TimerState } from '../atoms/atoms'
 import formatTime from '../util/formatTime'
-
+import { useRouter } from 'next/router';
 interface Props { 
   icon: any
 }
@@ -42,6 +42,7 @@ function StartStopRecording() {
     const [showRecordingTime, setRecordingTime] = useRecoilState(TimerState);
     const [showRecordingState, setRecordingState] = useRecoilState(RecordingState);
 
+    const router = useRouter();
 
     // START THE RECORDING
     const start = () => {   
@@ -80,8 +81,7 @@ function StartStopRecording() {
     useEffect(() => {
       setRecordingTime(recordingTime)
       setRecordingState(isRecording)
-    
-    }, [recordingTime, isRecording])
+    }, [recordingTime, isRecording, loading])
 
     // Listener: 
     // Once Process == true, convert and send over to the server
@@ -104,8 +104,19 @@ function StartStopRecording() {
               .then(async (response) => {
                   if (response.ok) {
                       const blob = await response.blob()
+
+                      let id = blob.type
+                      console.log(id)
+
+                      // Testing purposes 
                       const url = URL.createObjectURL(blob)
                       setAudioURL(url)
+                      console.log(url)
+                      
+                      // Once done, route the user to the post summary with the id
+                      router.push(`/post_analysis/${id}`)
+
+
                       // Once done, Reset the Recording States
                       resetRecordingStates()
                       setLoading(false)
@@ -113,6 +124,7 @@ function StartStopRecording() {
               })
               .catch((error) => {
                 setLoading(false)
+                resetRecordingStates()
                 throw new Error(error)
               });
           })
@@ -135,6 +147,7 @@ function StartStopRecording() {
           </div>
         )
       }
+      // On Process, add loading spinners 
       const CONTINUE = () => { 
         return (
           <div className='bg-[#5d5fef] cursor-pointer rounded-full h-[185px] flex items-center w-[62px] justify-center' 
