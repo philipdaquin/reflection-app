@@ -3,6 +3,7 @@ import Head from 'next/head'
 import React from 'react'
 import SummaryContent from '../components/pages/SummaryContent'
 import PhoneView from '../components/PhoneView'
+import PostSummaryControls from '../components/PostSummaryControls'
 import SwitchView from '../components/SwitchView'
 
 //
@@ -23,7 +24,8 @@ function post_analysis() {
                 items-center justify-center md:py-2 py-14">
                 <main className=" justify-center flex flex-col items-center space-y-[27px] ">
 
-                <div className="flex items-center ">
+                <div className="flex items-center relative right-10 space-x-5">
+                    <PostSummaryControls />
                     <PhoneView children={<SummaryContent/>} />
                 </div>
                 <div className='md:block hidden'>
