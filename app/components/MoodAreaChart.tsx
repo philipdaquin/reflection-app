@@ -1,5 +1,6 @@
 import React from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Label, Line, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
+  Label, Line, ResponsiveContainer,  ReferenceDot, ReferenceLine } from 'recharts';
 
 type WeeklyData = {
   name: string,
@@ -23,7 +24,6 @@ type WeeklyData = {
 // };
 
 
-
 interface Props { 
  data: WeeklyData[]
 }
@@ -39,7 +39,7 @@ function MoodAreaChart({data}: Props) {
 
     
 const CustomizedLabel: React.FC = () => (
-  <text x={250} y={40} fontSize={14} fill="#FFA500" textAnchor="middle">
+  <text x={250} y={40} fontSize={14} fill="#000" textAnchor="middle">
     {`Max UV: ${maxValue}`}
   </text>
 );
@@ -63,19 +63,42 @@ const CustomizedLabel: React.FC = () => (
                 </defs>
 
                 <XAxis dataKey="name" />
-                {/* <YAxis />
-                <CartesianGrid strokeDasharray="3 3" /> */}
                 <Tooltip />
-                <Line dataKey="mood" stroke="#8884d8" />
+
+
+
+                {/* MAX DATA */}
+                <ReferenceDot x={maxData?.name} y={maxData?.mood} r={7} fill="#000" className=''  
+                  isFront={true}>
+                  <Label x={maxData?.name} value="MAX" position={"top"}className="font-bold text-sm"/>
+                </ReferenceDot >
+                <ReferenceLine 
+                    x={maxData?.name} 
+                    x2={maxData?.name} 
+                    r={7} 
+                    stroke="#000" 
+                    strokeDasharray=" 3 3 "
+                    label={undefined}
+                  />
+
+                {/* MIN DATA */}
+                <ReferenceDot x={minData?.name} y={minData?.mood} r={7} fill="#000" 
+                isFront={true}>
+                  <Label x={maxData?.name} value="SEVERE" position={"top"} className="font-bold text-sm"/>
+                </ReferenceDot>
+                <ReferenceLine 
+                  x={minData?.name}
+                  x2={minData?.name}
+
+                  r={7} 
+                  stroke="#000" 
+                  strokeDasharray="3 3" />
+
+
+
+
 
                 <Area type="monotone" dataKey="mood" stroke="#FFA500" fillOpacity={1} fill="url(#colorUv)" />
-                <Label value={`THIS IS THE MAX ${maxData}`} 
-                  offset={5} 
-                  position="top"
-                  
-                  content={<CustomizedLabel/>}
-                />
-
             </AreaChart>
         </ResponsiveContainer>
     )
