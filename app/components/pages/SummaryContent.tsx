@@ -30,13 +30,13 @@ function SummaryContent() {
     } 
 
     return (
-        <>  
+        <section>
             <div className='flex flex-row items-center justify-between pb-5'>
                 <BackButton link='record' />
                 <h1 className='font-bold text-[15px] text-center '>Journal Entry Summary</h1>
                 <div className='px-4 bg-black'></div>
             </div>
-             
+            
             
             <div className='flex flex-col items-center space-y-6 pb-7'>
                 <JournalThumbnail />
@@ -62,7 +62,7 @@ function SummaryContent() {
                 <CgTranscript size={24} />
                 <h1>Save transcript</h1>
             </div>
-        </>
+        </section>
     )
 }
 

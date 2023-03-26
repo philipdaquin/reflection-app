@@ -6,7 +6,9 @@ function JournalThumbnail() {
     
     const [file, setFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    
+    const [loading, setloading] = useState(false)
+
+
     const handleAvatar = () => { 
         if (imageUrl) return  
         const input = document.createElement("input");
@@ -31,7 +33,7 @@ function JournalThumbnail() {
   
     const handleUploadClick = async () => {
       if (!file) return;
-  
+    setloading(true)
       // Upload the file to the server
       const formData = new FormData();
       formData.append("file", file);
@@ -41,9 +43,12 @@ function JournalThumbnail() {
       });
       const data = await response.json();
       console.log("Upload response:", data);
+      setloading(true)
     };
     
+    // Automatically upload the image 
     useEffect(() => {
+        if (!imageUrl || !file) return 
         handleUploadClick()
     }, [imageUrl, file])
 
