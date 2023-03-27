@@ -1,61 +1,75 @@
 import React, { ChangeEvent, HtmlHTMLAttributes, HTMLInputTypeAttribute, useEffect, useState } from 'react'
-import { useRecorder } from "react-recorder-voice";
 import { convertWav } from '../util/convertWav';
 import { uploadWav } from '../util/uploadWav';
 import io from 'socket.io-client';
 import AddAudioFile from './AddAudioFile';
 import AudioStreaming from './AudioStreaming';
 import AudioStreamer from './AudioStreamer';
+import { useAudioRecorder } from 'react-audio-voice-recorder';
 
 
 
 function RecordComponent() {
     const {
-        // audioURL,
-        audioData,
-        timer,
-        recordingStatus,
-        cancelRecording,
-        saveRecordedAudio,
         startRecording,
-
-    } = useRecorder();
-
-
-    const [record, setRecord] = useState(false)
-    const [stopRecord, setStopRecord] = useState(false)
-    
-
-
-
-
-    const start = () => {   
-        setRecord(true)
-
-
-        startRecording()
-        setStopRecord(false)
-    }
-
-    const cancel = () => {  
-        
+        stopRecording,
+        togglePauseResume,
+        recordingBlob,
+        isRecording,
+        isPaused,
+        recordingTime,
+  
+      } = useAudioRecorder();
+  
+  
+      const [isCurrRecording, setRecord] = useState(false)
+      const [stopRecord, setStopRecord] = useState(false)
+      const [process, setProcess] = useState(false)
+      
+      const [audioURL, setAudioURL] = useState('')
+      const [loading, setLoading] = useState(false)
+  
+      // START THE RECORDING
+      const start = () => {   
+          setRecord(true)
+          startRecording()
+          setStopRecord(false)
+          setProcess(false)
+      }
+  
+      // STOP THE RECORDING
+      const stop = () => {  
+        if (!isRecording) return
+        stopRecording()
         setStopRecord(true)
-        // cancelRecording()
-        setRecord(false)
-    }
-
-    const save = () => { 
-        setStopRecord(true)
-        saveRecordedAudio()
-        setRecord(false)
-
-    }
-    const [audioRecording, setAudioRecording] = useState<string>('')
-    const [micSource, setMicSource] = useState<string>('')
-    useEffect(() => { 
-        if (audioData == null) return 
-            // Convert to Wav
-        convertWav(audioData)
+  
+      }
+      
+      // SAVES THE DATA AND MOVE TO THE NEXT STAGE 
+      const processAudioRecording = () => { 
+          if (recordingBlob == null) return
+          setProcess(true)
+          // saveRecordedAudio()
+      }
+  
+      // STARTS FROM THE BEGINNING
+      const resetRecordingStates = () => { 
+          setStopRecord(false)
+          setRecord(false)
+          setProcess(false)
+          // saveRecordedAudio()
+          stopRecording()
+      }
+      // Listener: 
+      // Once Process == true, convert and send over to the server
+      // Next, if all ok, reset Recording states to default 
+      useEffect(() => { 
+          if (!process) return 
+          if (recordingBlob == null) return 
+          setLoading(true)
+          
+          // Convert to Wav
+          convertWav(recordingBlob)
             // Upload to server and get the response 
             .then((resp) => {
                 const formData = new FormData();
@@ -67,41 +81,45 @@ function RecordComponent() {
                 .then(async (response) => {
                     if (response.ok) {
                         const blob = await response.blob()
+  
+                        let id = blob.name
+                        console.log(id)
+                        console.log(blob)
+  
+                        // Testing purposes 
                         const url = URL.createObjectURL(blob)
-                        setAudioRecording(url)
+                        setAudioURL(url)
+                        console.log(url)
+                        // Once done, route the user to the post summary with the id
+                        // router.push(`/post_analysis/${id}`)
+  
+  
+                        // Once done, Reset the Recording States
+                        // resetRecordingStates()
+                        // setLoading(false)
                     }
                 })
                 .catch((error) => {
-                   throw new Error(error)
+                  setLoading(false)
+                  resetRecordingStates()
+                  throw new Error(error)
                 });
             })
-        
-    }, [audioData])
-
-    const convert = async () => { 
-        convertWav(audioData)
-        .then((res) => { 
-            const url = URL.createObjectURL(res)
-            setMicSource(url)
-        })
-    }
-    useEffect(() => {
-        if (audioData == null) return;
-        convert()
-    }, [audioData])
+          
+      }, [recordingBlob, process])
     
 
       return (
         <div className='space-y-7 items-center'>
             <div className='mb-2 font-bold text-xl uppercase'>
-                {recordingStatus}
+                {isRecording ? "Recording" : "NOT RECORDING"}
             </div>
 
              <div className='space-x-6 '>
                 <button className='p-2 px-5 text-white bg-black rounded-md font-bold' 
                     onClick={start}>Start</button>
-                <button hidden={record} onClick={cancel}>Cleared</button>
-                <button hidden={!record} onClick={save}>Stop and Save</button>
+                <button hidden={isCurrRecording} onClick={resetRecordingStates}>Cleared</button>
+                <button hidden={!isCurrRecording} onClick={stop}>Stop and Save</button>
             </div>
 
             <AudioStreamer />
