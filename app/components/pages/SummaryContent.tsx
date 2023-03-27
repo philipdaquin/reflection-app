@@ -8,6 +8,14 @@ import {CgTranscript} from 'react-icons/cg'
 import PostSummaryControls from '../PostSummaryControls'
 
 
+interface Props { 
+    audioUrl: string
+    title: string
+    summary: string
+    tags: string[]
+    transcript: string[]
+}
+
 function SummaryContent() {
 
     let tags = [

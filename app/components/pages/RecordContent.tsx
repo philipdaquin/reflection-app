@@ -25,11 +25,13 @@ function RecordContent() {
                 <div className='px-4 bg-black'></div>
             </div>
             
-            <div className='flex flex-col justify-center items-center space-y-10 pt-10'>
-                <GeneratePrompt />
+            <div className='flex flex-col justify-center items-center pt-10 space-y-2'>
+                <div className='h-[80px]'>
+                    <GeneratePrompt />
+                </div>
                 <UserChannel userImg={IMAGE_URL} userName='Username'/>
                 {/* Timer  */}
-            {/* Visualiser */}
+             {/* Visualiser */}
 
                 {recordingState && (
                     <div>

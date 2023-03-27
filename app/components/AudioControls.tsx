@@ -105,21 +105,21 @@ function StartStopRecording() {
                   if (response.ok) {
                       const blob = await response.blob()
 
-                      let id = blob.type
+                      let id = blob.name
                       console.log(id)
+                      console.log(blob)
 
                       // Testing purposes 
                       const url = URL.createObjectURL(blob)
                       setAudioURL(url)
                       console.log(url)
-                      
                       // Once done, route the user to the post summary with the id
-                      router.push(`/post_analysis/${id}`)
+                      // router.push(`/post_analysis/${id}`)
 
 
                       // Once done, Reset the Recording States
-                      resetRecordingStates()
-                      setLoading(false)
+                      // resetRecordingStates()
+                      // setLoading(false)
                   }
               })
               .catch((error) => {

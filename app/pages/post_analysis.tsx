@@ -9,7 +9,8 @@ import SwitchView from '../components/SwitchView'
 //
 // url/post_analysis/id_url
 interface Props { 
-
+    audioUrl: string
+    
 }
 
 function post_analysis() {

@@ -60,7 +60,7 @@ function AudioPlayer({src} : Props) {
           />
         </div>
         <div className='space-y-2'>
-          <div className="flex items-center flex-row justify-between w-full text-[#9e9e9e] text-xs text-left font-bold">
+          <div className="flex items-center flex-row justify-between w-full text-[#9e9e9e] text-[9px] text-left font-bold">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
