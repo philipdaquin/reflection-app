@@ -6,6 +6,7 @@ import AddAudioFile from './AddAudioFile';
 import AudioStreaming from './AudioStreaming';
 import AudioStreamer from './AudioStreamer';
 import { useAudioRecorder } from 'react-audio-voice-recorder';
+import WebSocketClient from './WebsocketExample';
 
 
 
@@ -108,7 +109,10 @@ function RecordComponent() {
           
       }, [recordingBlob, process])
     
-
+      const handleWebSocketMessage = (message: string) => {
+        console.log(`Received message: ${message}`);
+      };
+    
       return (
         <div className='space-y-7 items-center'>
             <div className='mb-2 font-bold text-xl uppercase'>
@@ -130,6 +134,8 @@ function RecordComponent() {
                 </h1>
                 <AddAudioFile />
             </div>
+
+
 
 
             {/* <div>

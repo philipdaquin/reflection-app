@@ -2,12 +2,12 @@ use std::sync::Arc;
 
 use actix_multipart::{Multipart, form::{MultipartForm, tempfile::TempFile}};
 use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
-use futures_util::stream::{TryStreamExt};
+use futures_util::stream::{TryStreamExt, StreamExt};
 use futures_util::future::{FutureExt, Future};
 use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
 use crate::{ml::{
     whisper::{AudioData}, 
-    chat::get_chat_response, tts::process_text_to_audio, prompt::GENERAL_CONTEXT, sockets::{AppState, WebSocketSession}}};
+    chat::get_chat_response, tts::process_text_to_audio, prompt::GENERAL_CONTEXT, sockets::{WebSocketSession}}};
 use serde_derive::{Deserialize, Serialize};
 use actix_web_actors::ws;
 
@@ -15,24 +15,27 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     cfg
     .service(upload)
     .service(
-        web::resource("/ws")
+        web::resource("/")
             .route(web::get()
-                .guard(guard::Header("upgrade", "websocket"))
+                // .guard(guard::Header("upgrade", "websocket"))
                 .to(ws_handler)
         )
     );
 }
-async fn ws_handler(data: web::Data<AppState>, req: HttpRequest, stream: web::Payload) -> Result<HttpResponse> { 
-    log::info!("✅✅✅✅");
-    
-    let resp = ws::start(WebSocketSession::new(Arc::new(data.get_ref().clone())), &req, stream)?;
 
-    Ok(resp)
+async fn ws_handler(req: HttpRequest, mut stream: web::Payload) -> Result<HttpResponse> { 
+    
+    // Create a new WebSocket actor
+    let res = ws::start(WebSocketSession::new(), &req, stream);
+    println!("WebSocket connection established: {:?}", res);
+
+    res
+   
 }
 
 /// An API endpoint that accepts user audio and settings for OpenAi response 
 /// 
-#[route("/", method = "POST", method = "GET")]
+#[route("/upload", method = "POST", method = "GET")]
 pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
     let mut transcribed = String::new();
     while let Some(mut item) = payload.try_next().await? { 
@@ -58,9 +61,9 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         
     }
     // Send request to get OpenAI text response
-    let resp = get_chat_response(&transcribed, &GENERAL_CONTEXT).await?;
+    // let resp = get_chat_response(&transcribed, &GENERAL_CONTEXT).await?;
     
-    log::info!("✉️ {:#?}", resp);
+    // log::info!("✉️ {:#?}", resp);
 
     // Send a post request to get a Text to Speech 
     // let tts_response = process_text_to_audio(&resp)

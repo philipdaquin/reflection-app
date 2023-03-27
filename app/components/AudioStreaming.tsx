@@ -1,64 +1,68 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useRecorder } from 'react-recorder-voice';
-import { Socket } from 'socket.io';
-import io from 'socket.io-client'
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import React, { useEffect, useState } from 'react';
+import { useAudioRecorder } from 'react-audio-voice-recorder';
+import io, { Socket } from 'socket.io-client';
+import { convertWav } from '../util/convertWav';
 
-const SERVER_URL = 'http://localhost:4001/ws'
-
+const SERVER_URL = 'ws://localhost:3000';
 
 function AudioStreaming() {
-            
-    const [startStream, setStartStream] = useState(false)
-    const {
-        // audioURL,
-        audioData,
-        timer,
-        recordingStatus,
-        cancelRecording,
-        saveRecordedAudio,
-        startRecording,
+  const {
+    startRecording,
+    stopRecording,
+    togglePauseResume,
+    recordingBlob,
+    isRecording,
+    isPaused,
+    recordingTime,
+  } = useAudioRecorder();
 
-    } = useRecorder();
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [startStream, setStartStream] = useState<boolean>(false);
 
-    const socketRef = useRef<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null)
+  const start = (): void => {
+    setStartStream(true);
+    startRecording();
+    const newSocket = io(SERVER_URL);
+    setSocket(newSocket);
+  };
 
-    const start = () => { 
-        setStartStream(true)
-        startRecording()
-        socketRef.current = io(SERVER_URL)
+  const stop = (): void => {
+    setStartStream(false);
+    stopRecording();
+    socket?.disconnect();
+  };
+
+  const sendAudioChunk = async (chunk: Blob): Promise<void> => {
+    const convertedChunk = await convertWav(chunk);
+    socket?.emit('audioChunk', convertedChunk);
+  };
+
+  useEffect(() => {
+    if (startStream && recordingBlob) {
+      sendAudioChunk(recordingBlob);
     }
+  }, [recordingBlob, startStream, socket]);
 
-    const stop = () => { 
-        setStartStream(true)
-        saveRecordedAudio
-        socketRef.current?.disconnect()
-        saveRecordedAudio()
-    }
-    
+  return (
+    <div>
+      <div className='mb-2 font-bold text-xl uppercase'>
+        {isRecording ? 'Recording' : 'Not recording'} | Timer: {recordingTime}
+      </div>
 
-    useEffect(() => { 
-
-        if (startStream) {
-            socketRef.current?.emit('audioData', audioData)
-        }
-
-    }, [startStream])
-
-
-    return (
-        <div>
-            <div className='mb-2 font-bold text-xl uppercase'>
-                {recordingStatus} | timer: {timer}
-            </div>
-
-            <div className='space-x-6 '>
-                <button className='p-2 px-5 text-white bg-black rounded-md font-bold' 
-                        onClick={start}>Start</button>
-                <button onClick={stop}>stop</button>
-            </div>
-        </div>
-    )
+      <div className='space-x-6'>
+        <button
+          className='p-2 px-5 text-white bg-black rounded-md font-bold'
+          onClick={start}
+          disabled={isRecording}
+        >
+          Start
+        </button>
+        <button onClick={stop} disabled={!isRecording}>
+          Stop
+        </button>
+      </div>
+    </div>
+  );
 }
 
-export default AudioStreaming
+export default AudioStreaming;
