@@ -72,10 +72,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocketSession 
                 self.heartbeats = Instant::now();
                 ctx.pong(&msg)
             },
-            // Ok(ws::Message::Close(rea)) => { 
-            //     ctx.close(rea);
-            //     ctx.stop();
-            // }
+            Ok(ws::Message::Close(rea)) => { 
+                ctx.close(rea);
+                ctx.stop();
+            }
 
             _ => {},
         }

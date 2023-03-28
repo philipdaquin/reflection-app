@@ -15,9 +15,9 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     cfg
     .service(upload)
     .service(
-        web::resource("/")
+        web::resource("/ws")
             .route(web::get()
-                // .guard(guard::Header("upgrade", "websocket"))
+                .guard(guard::Header("upgrade", "websocket"))
                 .to(ws_handler)
         )
     );
