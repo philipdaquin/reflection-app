@@ -17,6 +17,8 @@ const WebSocketClient = () => {
       <div>Ready State: {readyState}</div>
       <div>Last Message: {lastMessage ? lastMessage.data : null}</div>
     
+    
+
     </div>
   );
 };

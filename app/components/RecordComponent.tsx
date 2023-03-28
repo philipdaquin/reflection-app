@@ -1,10 +1,8 @@
 import React, { ChangeEvent, HtmlHTMLAttributes, HTMLInputTypeAttribute, useEffect, useState } from 'react'
 import { convertWav } from '../util/convertWav';
 import { uploadWav } from '../util/uploadWav';
-import io from 'socket.io-client';
 import AddAudioFile from './AddAudioFile';
 import AudioStreaming from './AudioStreaming';
-import AudioStreamer from './AudioStreamer';
 import { useAudioRecorder } from 'react-audio-voice-recorder';
 import WebSocketClient from './WebsocketClient';
 
@@ -43,7 +41,7 @@ function RecordComponent() {
         if (!isRecording) return
         stopRecording()
         setStopRecord(true)
-  
+        processAudioRecording()
       }
       
       // SAVES THE DATA AND MOVE TO THE NEXT STAGE 
@@ -123,7 +121,7 @@ function RecordComponent() {
 
             <WebSocketClient />
 
-
+ 
 
 
              <div className='space-x-6 '>
@@ -133,7 +131,7 @@ function RecordComponent() {
                 <button hidden={!isCurrRecording} onClick={stop}>Stop and Save</button>
             </div>
 
-            <AudioStreamer />
+            <AudioStreaming />
 
             <div>
                 <h1 className="font-bold text-md">
@@ -141,7 +139,6 @@ function RecordComponent() {
                 </h1>
                 <AddAudioFile />
             </div>
-
 
 
             {/* <div>

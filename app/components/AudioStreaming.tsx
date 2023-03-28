@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAudioRecorder } from 'react-audio-voice-recorder';
-import io, { Socket } from 'socket.io-client';
 import { convertWav } from '../util/convertWav';
+import useWebSocket from 'react-use-websocket';
 
-const SERVER_URL = 'ws://localhost:3000';
+const SERVER_URL = 'ws://localhost:4001/ws';
 
 function AudioStreaming() {
   const {
@@ -16,39 +16,54 @@ function AudioStreaming() {
     recordingTime,
   } = useAudioRecorder();
 
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [startStream, setStartStream] = useState<boolean>(false);
 
+
+  const {sendMessage, lastMessage, readyState, lastJsonMessage} = useWebSocket(SERVER_URL);
+
+  //  Audio Controls 
   const start = (): void => {
     setStartStream(true);
     startRecording();
-    const newSocket = io(SERVER_URL);
-    setSocket(newSocket);
   };
 
   const stop = (): void => {
     setStartStream(false);
     stopRecording();
-    socket?.disconnect();
   };
 
+  
   const sendAudioChunk = async (chunk: Blob): Promise<void> => {
-    const convertedChunk = await convertWav(chunk);
-    socket?.emit('audioChunk', convertedChunk);
+    await convertWav(chunk)
+      .then((resp) => { 
+        if (readyState === 1) { // check if websocket connection is open
+          sendMessage(resp)
+          console.log("Sending Blobs to server!")
+        }
+      }).catch(e => console.log);
+
+    // Send over to websocket
+    
   };
+
 
   useEffect(() => {
-    if (startStream && recordingBlob) {
-      sendAudioChunk(recordingBlob);
-    }
-  }, [recordingBlob, startStream, socket]);
+    const intervalId = setInterval(() => {
+      if (startStream && recordingBlob) {
+        sendAudioChunk(recordingBlob);
+      }
+    }, 1000); // send every 1 second
+
+    return () => clearInterval(intervalId);
+  }, [recordingBlob, startStream]);
 
   return (
     <div>
       <div className='mb-2 font-bold text-xl uppercase'>
         {isRecording ? 'Recording' : 'Not recording'} | Timer: {recordingTime}
       </div>
-
+      <div>Ready State: {readyState}</div>
+      <div>Last Message: {lastMessage ? lastMessage.data : null}</div>
       <div className='space-x-6'>
         <button
           className='p-2 px-5 text-white bg-black rounded-md font-bold'
