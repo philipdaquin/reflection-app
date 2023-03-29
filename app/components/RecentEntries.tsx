@@ -77,16 +77,22 @@ function RecentEntries() {
                 <h3 className='text-[14px] text-[#757575] text-left'>See all</h3>
             </div>
 
-            {
-                list.map(({id, title, duration, thumbnailUrl}, k) => { 
-                    return <AudioEntry  
-                        id={id}
-                        title={title}
-                        duration={duration}
-                        thumbnailUrl={thumbnailUrl}
-                    />
-                })
-            }
+            <div className='space-y-2'>
+              {
+                  list.map(({id, title, duration, thumbnailUrl}, k) => { 
+                      return (
+                        <div key={k}>
+                          <AudioEntry  
+                              id={id}
+                              title={title}
+                              duration={duration}
+                              thumbnailUrl={thumbnailUrl}
+                          />
+                        </div>
+                      )
+                  })
+              }
+            </div>
         </div>
     )
 }

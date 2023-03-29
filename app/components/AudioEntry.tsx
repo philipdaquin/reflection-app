@@ -12,7 +12,7 @@ function AudioEntry({id, title, duration, thumbnailUrl}: Props) {
 
 
   return (
-    <div key={id} className='flex flex-row justify-between items-center'>
+    <div className='flex flex-row justify-between items-center'>
         <div className='flex space-x-3'>
             <div className="w-[61px] h-[61px] rounded-xl bg-[#d9d9d9]"></div>
             <h1 className='text-left font-medium relative top-2 text-[14px]'>

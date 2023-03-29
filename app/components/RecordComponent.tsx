@@ -119,10 +119,10 @@ function RecordComponent() {
 
 
 
-            <WebSocketClient />
+            {/* <WebSocketClient /> */}
 
  
-
+            <h1>Helo</h1>
 
              <div className='space-x-6 '>
                 <button className='p-2 px-5 text-white bg-black rounded-md font-bold' 

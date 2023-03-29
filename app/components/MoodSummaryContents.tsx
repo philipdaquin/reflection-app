@@ -156,15 +156,17 @@ function MoodSummaryContents() {
                 <MoodAreaChart data={data}/>
             </div>
 
-
             {/* Common Mood  */}
             <div className='pt-[24px] space-y-3'>
                 <h1 className='text-left font-bold text-[#757575] text-[14px]'>Most Common Moods</h1>
                 <div className='flex flex-wrap'>
                     {
-                        moodData.map((data) => {
+                        moodData.map((data, k) => {
                             return (
-                                <CommonMoodContainer moodData={data}/>
+                                <div key={k}>
+                                    <CommonMoodContainer moodData={data}/>
+                                </div> 
+
                             )
                         })
                     }
