@@ -1,10 +1,11 @@
 use hound::{SampleFormat, WavReader};
-use std::{path::Path, sync::Arc};
+use std::{path::Path, sync::Arc, io::BufReader};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::{error::Result, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}};
 use std::io::Cursor;
 use num_cpus;
 use parking_lot::Mutex;
+use crate::ml::prompt::GET_TAGS;
 
 use super::text_classification::TextClassification;
 
@@ -13,18 +14,18 @@ pub struct AudioData {
     wav_data: Option<Vec<i16>>,
     transcription: Option<String>,
     summary: Option<String>,
-    text_classification: Option<TextClassification>
+    text_classification: Option<TextClassification>,
+    tags: Vec<String>
 }
 
 impl AudioData { 
-    
     /// 
     /// Parse the audio data as a WAV file 
     #[tracing::instrument(level= "debug")]
     pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Self> {
         log::info!("👷‍♂️ Parsing WaV FILE");
-        let mut reader = Cursor::new(&bytes);
-        let wav_reader = WavReader::new(&mut reader).unwrap();
+        let reader = BufReader::new(&bytes[..]);
+        let wav_reader = WavReader::new(reader).unwrap();
         
         let hound::WavSpec {
             channels,
@@ -55,9 +56,10 @@ impl AudioData {
             wav_data: Some(wav_data), 
             transcription: None,
             summary: None,
-            text_classification: None
+            text_classification: None,
+            tags: Vec::new()
         };
-        log::info!("✅ FINISHED parsing data");
+        log::info!("✅ 1. PARSING DATA");
 
         Ok(res)
     
@@ -68,13 +70,13 @@ impl AudioData {
     #[tracing::instrument(level= "debug")]
     pub async fn transcribe_audio(&mut self) -> Result<String> {
         let mut res = String::new();
-
+    
         if self.wav_data.is_none() { return Ok(res)}
-
-
+    
+    
         let mut samples = whisper_rs::convert_integer_to_float_audio(&self.wav_data.as_mut().unwrap());
         
-        samples = whisper_rs::convert_stereo_to_mono_audio(&samples);
+        samples = whisper_rs::convert_stereo_to_mono_audio(&samples).expect("Failed to convert to mono audio");
         
         let path = format!("./models/{}", SPEECH_ENGINE_MODEL.to_string());
         // Whisper Model 
@@ -98,8 +100,8 @@ impl AudioData {
         // Keep context between audio chunks 
         params.set_no_context(true);
         
-        params.set_offset_ms(500);
-
+        // params.set_offset_ms(500);
+    
         // Supress blank outputs
         params.set_suppress_blank(true);
     
@@ -107,10 +109,10 @@ impl AudioData {
         params.set_speed_up(false);
     
         // Audio length in milliseconds 
-        params.set_duration_ms(5000);
-
+        // params.set_duration_ms(5000);
+    
         // The max number of tokens per audio chunk     
-        params.set_max_tokens(32);
+        // params.set_max_tokens(32);
     
         // Partial encoder context for better performance 
         params.set_audio_ctx(0);
@@ -139,7 +141,7 @@ impl AudioData {
         // Translate the source to english 
         params.set_translate(false);
         
-
+    
         // Spoken language
         params.set_language(Some("en"));
     
@@ -158,44 +160,53 @@ impl AudioData {
             let segment = ctx.full_get_segment_text(i).expect("failed to get segment");
             let start_timestamp = ctx.full_get_segment_t0(i);
             let end_timestamp = ctx.full_get_segment_t1(i);
-            println!("[{} - {}]: {}", start_timestamp, end_timestamp, segment);
-    
-            res.push_str(&segment);
+            let full_text = format!("[{} - {}]: {}", start_timestamp, end_timestamp, segment);
+            
+            
+            res.push_str(&full_text);
         }
         // Save in memory 
+        log::info!("2. TRANSCRIPT {res}");
         self.transcription = Some(res.to_string());
     
         Ok(res)
     }
-
-    ///
-    /// Get audio summary  
-    #[tracing::instrument(level= "debug")]
-    pub async fn summarise_audio(&mut self) -> Result<String> { 
-        let mut summary = String::new();
-        if let Some(script) = &self.transcription { 
-           summary = get_chat_response(script, &SUMMARISE_TEXT).await.unwrap();
-        }   
-        self.summary = Some(summary.clone());
-
-        Ok(summary)
-    }
-    ///
-    /// Gets Sentimental analysis of transcribed text
-    #[tracing::instrument(level= "debug")]
-    pub async fn get_sentimental_analysis(&mut self) -> Result<TextClassification> { 
-        if let Some(ret) = &self.text_classification { 
-            return Ok(ret.clone())
-        }
-
-        let mut new_analysis = TextClassification::default();
-            new_analysis
-            .get_text_analysis(&self.transcription.as_mut().unwrap())
-            .await
-            .unwrap();
-
-        Ok(new_analysis)
-    }
 }
 
 
+/// Get tags related to the passage
+#[tracing::instrument(level= "debug")]
+pub async fn get_tags(transcription: Option<String>) -> Result<Vec<String>> { 
+    let mut resp = String::new();
+    if let Some(script) = &transcription { 
+        resp = get_chat_response(script, &GET_TAGS).await.unwrap_or_default();
+    }   
+    let res: Vec<String> = serde_json::from_str(&resp).unwrap_or_default();
+
+    Ok(res)
+}
+
+///
+/// Get audio summary  
+#[tracing::instrument(level= "debug")]
+pub async fn get_summary(transcription: Option<String>) -> Result<String> { 
+    let mut summary = String::new();
+    if let Some(script) = &transcription { 
+       summary = get_chat_response(script, &SUMMARISE_TEXT).await.unwrap_or_default();
+    }   
+
+    Ok(summary)
+}
+///
+/// Gets Sentimental analysis of transcribed text
+#[tracing::instrument(level= "debug")]
+pub async fn get_sentimental_analysis(mut transcription: Option<String>) -> Result<TextClassification> { 
+
+    let mut new_analysis = TextClassification::default();
+        new_analysis
+        .get_text_analysis(&transcription.as_mut().unwrap())
+        .await
+        .unwrap();
+
+    Ok(new_analysis)
+}

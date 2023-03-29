@@ -4,7 +4,7 @@ use actix_web::{get, middleware::Logger, route, web, App, HttpServer, Responder}
 use actix_cors::Cors;
 use parking_lot::Mutex;
 
-use crate::{controller::configure_service, ml::sockets::{WebSocketSession}};
+use crate::{controller::{configure_service}, ml::{sockets::{WebSocketSession}, whisper::AudioData}};
 
 
 pub async fn new_server(port: u32) -> std::io::Result<()> {
@@ -22,7 +22,7 @@ pub async fn new_server(port: u32) -> std::io::Result<()> {
             .wrap(Cors::permissive())
             .wrap(Logger::default())
     })
-    .workers(2)
+    .workers(3)
     .bind(format!("127.0.0.1:{}", port))?
     .run()
     .await

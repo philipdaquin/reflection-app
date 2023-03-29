@@ -1,11 +1,11 @@
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 
 use crate::error::Result;
 
 use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT};
 
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct TextClassification { 
     positive: f32, 
     neutral: f32, 
@@ -20,7 +20,10 @@ impl TextClassification {
     #[tracing::instrument(fields(input, self), level= "debug")]
     pub async fn get_text_analysis(&mut self, input: &str) -> Result<Self> { 
         let resp = get_chat_response(&input, &ANALYSE_TEXT_SENTIMENT).await.unwrap();
-        let self_object: TextClassification = serde_json::from_str(&resp).unwrap();
+        
+        log::info!("{resp:?}");
+        
+        let self_object: TextClassification = serde_json::from_str(&resp).unwrap_or_default();
         return Ok(self_object)
     }   
 }
