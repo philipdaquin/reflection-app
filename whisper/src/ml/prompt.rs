@@ -18,17 +18,21 @@ lazy_static! {
         Keep it in one paragraph. 
     ");
 
-    pub static ref SUMMARISE_TEXT: String = format!("Summarise this input: ");
+    pub static ref SUMMARISE_TEXT: String = format!("Summarise the text below to a 20 year old, do not write any followup explainations. Only print out the text summary: ");
+    
+    pub static ref GET_TAGS: String = format!("Print out related tags based on the orignal passage, do not write any followup explanations. Only print out the best answers inside of an array: ");
+
     pub static ref ANALYSE_TEXT_SENTIMENT: String = format!("
         I want you to analyse the sentiment from this passage and in your response assign each score for each label inside of the object below. 
-        In your response, you must only return this object and nothing else. 
         do not write explanations. 
-        do not create new labels unless I told you so:
-
+        do not create new labels unless I told you so.
+        
+        In your response, the format should follow the structure below and you must only return this object and nothing else. 
+        
         `{{
-            positive: {{}},
-            neutral: {{}},
-            negativity: {{}}
+            positive: 0.0,
+            neutral: 0.0,
+            negativity: 0.0
         }}`
         
         The inputs are:  
