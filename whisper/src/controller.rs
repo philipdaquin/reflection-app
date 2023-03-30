@@ -1,15 +1,11 @@
-use std::{sync::Arc, io::Cursor};
 
-use actix_multipart::{Multipart, form::{MultipartForm, tempfile::TempFile}};
+use actix_multipart::{Multipart};
 use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
-use futures_util::stream::{TryStreamExt, StreamExt};
-use futures_util::future::{FutureExt, Future};
-use futures::{AsyncBufReadExt, AsyncWriteExt, AsyncWrite};
-use parking_lot::Mutex;
+use futures_util::stream::{TryStreamExt};
 use crate::{ml::{
     whisper::{AudioData, get_summary, get_sentimental_analysis, get_tags}, 
-    chat::get_chat_response, tts::process_text_to_audio, prompt::GENERAL_CONTEXT, sockets::{WebSocketSession}}};
-use serde_derive::{Deserialize, Serialize};
+    sockets::{WebSocketSession}}};
+use serde_derive::{Deserialize};
 use actix_web_actors::ws;
 
 pub fn configure_service(cfg: &mut web::ServiceConfig) { 
@@ -42,32 +38,32 @@ async fn ws_handler(req: HttpRequest, stream: web::Payload) -> Result<HttpRespon
     res
 }
 
+#[derive(Deserialize, Debug)]
+pub struct Input { 
+    pub value: String
+}
+
 ///
 /// Get text summary instantly
 /// id -> Audio summary id 
-#[route("/api/summary", method = "GET")]
-pub async fn get_text_summary(input: web::Path<String>) -> Result<HttpResponse> {
-
-    let summary = get_summary(Some(input.to_string())).await.unwrap();
+#[route("/api/summary", method = "POST")]
+pub async fn get_text_summary(input: web::Json<Input>) -> Result<HttpResponse> {
+    let summary = get_summary(Some(input.value.clone())).await.unwrap();
     Ok(HttpResponse::Ok().body(summary))
-   
 }
 
 ///
 /// Get sentiment analysis from the transcript\
-#[route("/api/analysis", method = "GET")]
-pub async fn get_text_analysis(input: web::Path<String>) -> Result<HttpResponse> {
-
-    let analysis = get_sentimental_analysis(Some(input.to_string())).await.unwrap();
-
+#[route("/api/analysis", method = "POST")]
+pub async fn get_text_analysis(input: web::Json<Input>) -> Result<HttpResponse> {
+    let analysis = get_sentimental_analysis(Some(input.value.to_string())).await.unwrap();
     let serialized = serde_json::to_string(&analysis).unwrap();
     Ok(HttpResponse::Ok().body(serialized))
 } 
 
 #[route("/api/tags", method = "GET")]
-pub async fn get_related_tags(input: web::Path<String>) -> Result<HttpResponse> {
-    let analysis = get_tags(Some(input.to_string())).await.unwrap();
-
+pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
+    let analysis = get_tags(Some(input.value.to_string())).await.unwrap();
     let serialized = serde_json::to_string(&analysis).unwrap();
     Ok(HttpResponse::Ok().body(serialized))
 } 

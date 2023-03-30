@@ -1,10 +1,7 @@
-use std::sync::Arc;
 
-use actix_web::{get, middleware::Logger, route, web, App, HttpServer, Responder};
+use actix_web::{ middleware::Logger, App, HttpServer};
 use actix_cors::Cors;
-use parking_lot::Mutex;
-
-use crate::{controller::{configure_service}, ml::{sockets::{WebSocketSession}, whisper::AudioData}};
+use crate::{controller::{configure_service}};
 
 
 pub async fn new_server(port: u32) -> std::io::Result<()> {

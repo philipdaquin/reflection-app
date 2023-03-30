@@ -2,9 +2,7 @@ use hound::{SampleFormat, WavReader};
 use std::{path::Path, sync::Arc, io::BufReader};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::{error::Result, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}};
-use std::io::Cursor;
 use num_cpus;
-use parking_lot::Mutex;
 use crate::ml::prompt::GET_TAGS;
 
 use super::text_classification::TextClassification;

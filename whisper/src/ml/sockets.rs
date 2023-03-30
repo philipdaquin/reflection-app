@@ -1,11 +1,10 @@
 use std::time::{Instant, Duration};
 
-use actix::{prelude::{Addr}, fut, Actor, AsyncContext, StreamHandler, ActorContext, ActorFuture, WrapFuture, ContextFutureSpawner, Message, Handler, ActorFutureExt};
-use actix_web::{web, HttpResponse, Result, Error};
-use actix_web_actors::{ws, ws::Frame };
+use actix::{fut, Actor, AsyncContext, StreamHandler, ActorContext, WrapFuture, ContextFutureSpawner, Message, Handler, ActorFutureExt};
+use actix_web::{Result, Error};
+use actix_web_actors::{ws};
 use bytes::Bytes;
-use futures::{TryStreamExt, FutureExt, StreamExt};
-use crate::{ml::{chat::get_chat_response, prompt::GENERAL_CONTEXT}, error::ServerError};
+use crate::{ml::{chat::get_chat_response, prompt::GENERAL_CONTEXT}};
 use super::whisper::AudioData;
 
 use actix_http::ws::Item as WsItem;

@@ -14,7 +14,7 @@ async fn main() -> Result<()> {
     let port = std::env::var("PORT")
         .ok()
         .and_then(|port| port.parse::<u32>().ok())
-        .unwrap_or(4003);
+        .unwrap_or(backup);
         
     new_server(port)
         .await

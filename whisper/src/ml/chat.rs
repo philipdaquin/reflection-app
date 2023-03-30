@@ -1,12 +1,7 @@
 use hyper_tls::HttpsConnector;
-use lazy_static::lazy_static;
 use serde_derive::{Deserialize, Serialize};
 
-use actix_web::{
-    get, middleware::Logger, route, 
-    App, HttpServer, Responder, HttpResponse, 
-    HttpRequest, guard, Result, web
-};
+use actix_web::{Result};
 use hyper::{header, Body, Client, Request, body::{aggregate, Buf}};
 use dotenv::dotenv;
 
