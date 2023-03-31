@@ -17,7 +17,6 @@ function mood_summary() {
           <div className="md:bg-[#EEEEEE] bg-white duration-700  flex min-h-screen flex-col 
             items-center justify-center md:py-2 py-14">
             <main className=" justify-center flex flex-col items-center space-y-[27px] ">
-    
               <div className="flex items-center">
                 <div className='relative right-10'>
                   <NavigationButtons />        

@@ -7,6 +7,8 @@ import { useRecoilState } from 'recoil'
 import { RecordingState, TimerState } from '../atoms/atoms'
 import formatTime from '../util/formatTime'
 import { useRouter } from 'next/router';
+import { getTextSummary } from '../util/getTextSummary'
+import { getRelatedTags } from '../util/getRelatedTags'
 interface Props { 
   icon: any
 }
@@ -41,6 +43,11 @@ function StartStopRecording() {
     const [loading, setLoading] = useState(false)
     const [showRecordingTime, setRecordingTime] = useRecoilState(TimerState);
     const [showRecordingState, setRecordingState] = useRecoilState(RecordingState);
+
+
+    const [transcription, setTranscription] = useState('')
+    const [summary, setSummary] = useState<string>('')
+    const [relatedTags, setRelatedTags] = useState<string[] | null>(null)
 
     const router = useRouter();
 
@@ -96,31 +103,46 @@ function StartStopRecording() {
           // Upload to server and get the response 
           .then((resp) => {
               const formData = new FormData();
-              formData.append('audio', resp);
-              fetch("http://localhost:4001/", {
-              method: "POST",
-              body: formData,
+                formData.append('audio', resp);
+                fetch("http://localhost:4001/api/upload", {
+                method: "POST",
+                body: formData,
               })
               .then(async (response) => {
                   if (response.ok) {
-                      const blob = await response.blob()
+                      // const blob = await response.blob()
+                      const url = URL.createObjectURL(recordingBlob)
+                      const data = await response.text()
 
-                      let id = blob.name
-                      console.log(id)
-                      console.log(blob)
-
-                      // Testing purposes 
-                      const url = URL.createObjectURL(blob)
+                      console.log(data)
                       setAudioURL(url)
-                      console.log(url)
-                      // Once done, route the user to the post summary with the id
-                      // router.push(`/post_analysis/${id}`)
 
-
-                      // Once done, Reset the Recording States
-                      // resetRecordingStates()
-                      // setLoading(false)
+                      return data
+                  } else { 
+                    throw new Error("Failed to get audio file")
                   }
+              }) 
+              .then(async (data) => { 
+                const summary = await getTextSummary(data);
+                const tags = await getRelatedTags(data);
+
+                const pageData = {
+                    transcript: transcription,
+                    orginalAudio: audioURL,
+                    summary: summary,
+                    tags: tags
+                }
+
+                router.push({
+                    pathname: '/post_analysis',
+                    query: {
+                      
+                      data: JSON.stringify(pageData)
+                    }
+                })
+                // Once done, Reset the Recording States
+                resetRecordingStates()
+                setLoading(false)
               })
               .catch((error) => {
                 setLoading(false)

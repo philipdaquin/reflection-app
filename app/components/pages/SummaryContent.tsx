@@ -10,20 +10,25 @@ import PostSummaryControls from '../PostSummaryControls'
 
 interface Props { 
     audioUrl: string
-    title: string
+    // title: string
     summary: string
     tags: string[]
     transcript: string[]
 }
 
-function SummaryContent() {
+function SummaryContent({
+    audioUrl,
+    summary,
+    tags,
+    transcript,
+}: Props) {
 
-    let tags = [
-        "Pet Loss",
-        " Grief",
-        "Mourning",
-        "Loss",
-    ]
+    // let tags = [
+    //     "Pet Loss",
+    //     " Grief",
+    //     "Mourning",
+    //     "Loss",
+    // ]
 
     const saveButton = async () => { 
         if (tags.length == 0) return new Error("Emprty Trasncript")
@@ -51,16 +56,16 @@ function SummaryContent() {
                 <h1 className='text-[20px] font-bold text-center'>What's it like to lose a pet</h1>
             </div>
             {/* media player */}
-            <AudioPlayer src='https://www.youtube.com/watch?v=cTH824WnA3U' />
+            <AudioPlayer src={audioUrl} />
             {/* Text summary */}
             <div className='pt-[25px]'>
-                <AudioSynopsys />
+                <AudioSynopsys summary={summary} />
             </div>
             {/* Suggested Tags */}
             <h1 className="text-lg font-bold pt-2">Tags</h1>
             <div className="pt-3">
                 <div className="flex flex-wrap ">
-                    {tags.map((tag, index) => (
+                    {tags.slice(0, 4).map((tag, index) => (
                     <SuggestedTags name={tag} key={tag} />
                     ))}
                 </div>
