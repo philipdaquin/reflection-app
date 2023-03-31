@@ -158,10 +158,8 @@ impl AudioData {
             let segment = ctx.full_get_segment_text(i).expect("failed to get segment");
             let start_timestamp = ctx.full_get_segment_t0(i);
             let end_timestamp = ctx.full_get_segment_t1(i);
-            let full_text = format!("[{} - {}]: {}", start_timestamp, end_timestamp, segment);
-            
-            
-            res.push_str(&full_text);
+            // let full_text = format!("[{} - {}]: {}", start_timestamp, end_timestamp, segment);
+            res.push_str(&segment);
         }
         // Save in memory 
         log::info!("2. TRANSCRIPT {res}");

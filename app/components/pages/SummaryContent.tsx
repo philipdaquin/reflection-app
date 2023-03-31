@@ -23,13 +23,6 @@ function SummaryContent({
     transcript,
 }: Props) {
 
-    // let tags = [
-    //     "Pet Loss",
-    //     " Grief",
-    //     "Mourning",
-    //     "Loss",
-    // ]
-
     const saveButton = async () => { 
         if (tags.length == 0) return new Error("Emprty Trasncript")
         let formData = new FormData()
@@ -65,7 +58,7 @@ function SummaryContent({
             <h1 className="text-lg font-bold pt-2">Tags</h1>
             <div className="pt-3">
                 <div className="flex flex-wrap ">
-                    {tags.slice(0, 4).map((tag, index) => (
+                    {tags?.map((tag, index) => (
                     <SuggestedTags name={tag} key={tag} />
                     ))}
                 </div>

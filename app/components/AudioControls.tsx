@@ -110,11 +110,10 @@ function StartStopRecording() {
               })
               .then(async (response) => {
                   if (response.ok) {
-                      // const blob = await response.blob()
                       const url = URL.createObjectURL(recordingBlob)
                       const data = await response.text()
 
-                      console.log(data)
+                      console.log(url)
                       setAudioURL(url)
 
                       return data
@@ -123,8 +122,15 @@ function StartStopRecording() {
                   }
               }) 
               .then(async (data) => { 
-                const summary = await getTextSummary(data);
-                const tags = await getRelatedTags(data);
+                setTranscription(data)
+
+                const [summary, tags] = await Promise.all([
+                  getTextSummary(data), 
+                  getRelatedTags(data)
+                ])
+
+                setSummary(summary)
+                setRelatedTags(tags)
 
                 const pageData = {
                     transcript: transcription,
@@ -136,11 +142,9 @@ function StartStopRecording() {
                 router.push({
                     pathname: '/post_analysis',
                     query: {
-                      
                       data: JSON.stringify(pageData)
                     }
                 })
-                // Once done, Reset the Recording States
                 resetRecordingStates()
                 setLoading(false)
               })
@@ -153,6 +157,14 @@ function StartStopRecording() {
         
     }, [recordingBlob, process])
 
+    const getTags = async () => { 
+        const as = await getRelatedTags(transcription)
+        setRelatedTags(as)
+    }
+    useEffect(() => { 
+        if (transcription == null) return   
+        getTags()
+    }, [transcription])
       const START = () => { 
         return (
           <div className='bg-[#5d5fef] cursor-pointer rounded-full h-[185px] flex items-center w-[62px] justify-center' 

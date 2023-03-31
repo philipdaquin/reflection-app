@@ -194,7 +194,7 @@ function MoodSummaryContents() {
             </div>
             {/* Events that influenced your emotions */}
             <div className='pt-8 space-y-3'>
-                <h1 className='text-left font-bold text-[#757575] text-[14px]'>Events that affected your mood</h1>
+                <h1 className='text-left font-bold text-[#757575] text-[14px]'>Recommended Activities</h1>
                 <div className='space-y-3'>
                     {
                         recommendedActivities.map((v) => { 

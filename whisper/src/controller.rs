@@ -15,13 +15,13 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     .service(get_text_summary)
     .service(get_text_analysis)
     .service(get_related_tags)
-    // .service(
-    //     web::resource("/ws")
-    //         .route(web::get()
-    //             .guard(guard::Header("upgrade", "websocket"))
-    //             .to(ws_handler)
-    //     )
-    // )
+    .service(
+        web::resource("/ws")
+            .route(web::get()
+                .guard(guard::Header("upgrade", "websocket"))
+                .to(ws_handler)
+        )
+    )
     ;
 }
 
@@ -53,7 +53,7 @@ pub async fn get_text_summary(input: web::Json<Input>) -> Result<HttpResponse> {
 }
 
 ///
-/// Get sentiment analysis from the transcript\
+/// Get sentiment analysis from the transcript
 #[route("/api/analysis", method = "POST")]
 pub async fn get_text_analysis(input: web::Json<Input>) -> Result<HttpResponse> {
     let analysis = get_sentimental_analysis(Some(input.value.to_string())).await.unwrap();
@@ -61,6 +61,7 @@ pub async fn get_text_analysis(input: web::Json<Input>) -> Result<HttpResponse> 
     Ok(HttpResponse::Ok().body(serialized))
 } 
 
+/// Get related tags from the transcript 
 #[route("/api/tags", method = "POST")]
 pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
     let analysis = get_tags(Some(input.value.to_string())).await.unwrap();

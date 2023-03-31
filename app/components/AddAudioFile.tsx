@@ -13,11 +13,11 @@ function AddAudioFile() {
     };
     const [audioSource, setAudioSource] = useState('')
 
-    const [transcription, setTranscription] = useState('')
+    // const [transcription, setTranscription] = useState('')
     const [summary, setSummary] = useState<string>('')
     const [relatedTags, setRelatedTags] = useState<string[] | null>(null)
 
-    // const transcription = "I can feel the weight of everything you're carrying right now. Losing your mother and feeling stuck in a job you hate can make it feel like life is just piling on the struggles. I want you to know that it's okay to feel overwhelmed and uncertain. These are incredibly challenging circumstances to navigate. It might be helpful to take some time to reflect on what you truly want out of life, and what[3000 - 6000]:  make progress towards that. Remember, you're not alone. There are people who care about you and want to support you through this difficult time. You deserve to find happiness and fulfillment, even in the midst of all this pain. Don't give up on yourself, and don't hesitate to reach out for help when you need it. I'm here for you, my friend."
+    const transcription = "I can feel the weight of everything you're carrying right now. Losing your mother and feeling stuck in a job you hate can make it feel like life is just piling on the struggles. I want you to know that it's okay to feel overwhelmed and uncertain. These are incredibly challenging circumstances to navigate. It might be helpful to take some time to reflect on what you truly want out of life, and what[3000 - 6000]:  make progress towards that. Remember, you're not alone. There are people who care about you and want to support you through this difficult time. You deserve to find happiness and fulfillment, even in the midst of all this pain. Don't give up on yourself, and don't hesitate to reach out for help when you need it. I'm here for you, my friend."
     const handleFormSubmit = (e: any) => {
         e.preventDefault();
         const formData = new FormData();
@@ -37,11 +37,14 @@ function AddAudioFile() {
             }
         })
         .then(async (data) => {
-            setTranscription(data)
+            // setTranscription(data)
 
             const summary = await getTextSummary(data);
-            const tags = await getRelatedTags(data);
-
+            setSummary(summary)
+            
+            const tags = await getRelatedTags(transcription);
+            setRelatedTags(tags)
+            
             const pageData = {
                 transcript: transcription,
                 orginalAudio: selectedFile,

@@ -13,7 +13,7 @@ import { getRelatedTags } from '../util/getRelatedTags'
 //
 // url/post_analysis/id_url
 interface Props { 
-    audioUrl: string
+    orginalAudio: string
     // title: string
     summary: string
     tags: string[]
@@ -21,7 +21,7 @@ interface Props {
 }
 
 function post_analysis({
-    audioUrl,
+    orginalAudio,
     // title,
     summary,
     tags,
@@ -46,7 +46,7 @@ function post_analysis({
                     <PostSummaryControls />
                     <PhoneView children={
                         <SummaryContent 
-                            audioUrl={audioUrl}
+                            audioUrl={orginalAudio}
                             summary={summary}
                             tags={tags}
                             // title={}
@@ -70,14 +70,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     // if (!query.data) return 
     
     const {transcript, orginalAudio, summary, tags} = JSON.parse(query.data)
-    
+    console.log(tags)
     return {
         props: { 
-            audioUrl: orginalAudio,
+            orginalAudio,
             // title,
             summary: summary,
             tags,
-            transcript: transcript
+            transcript
         },
     };
 };
