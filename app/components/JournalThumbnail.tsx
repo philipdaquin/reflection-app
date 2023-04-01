@@ -1,27 +1,27 @@
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 function JournalThumbnail() {
     
     const [file, setFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [loading, setloading] = useState(false)
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-    const handleAvatar = () => {
-      const fileInputRef = useRef<HTMLInputElement>(null);
-    
-      if (imageUrl) return;
-    
-      if (fileInputRef.current) {
-        fileInputRef.current.click();
-      }
-    };
+    const handleAvatar = () => { 
+        if (imageUrl) return  
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        // @ts-ignore
+        input.onchange = handleFileChange
+        input.click();
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
+    }
+
+    const handleFileChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+      const file = ev.target.files?.[0];
       setFile(file || null);
       if (file) {
         const imageUrl = URL.createObjectURL(file);
@@ -64,13 +64,7 @@ function JournalThumbnail() {
     return (
         <>
            
-            <input 
-             type="file"
-             accept="image/*"
-             style={{ display: "none" }}
-             ref={fileInputRef}
-             onChange={handleFileChange}
-            >
+            <div onClick={handleAvatar} onMouseEnter={showClearButton} >
                 {
                     imageUrl ? ( 
                     
@@ -93,7 +87,7 @@ function JournalThumbnail() {
                         </div>
                     )
                 }
-            </input>
+            </div>
            
       </>
   )
