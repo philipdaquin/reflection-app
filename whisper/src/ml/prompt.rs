@@ -18,7 +18,7 @@ lazy_static! {
         Keep it in one paragraph. 
     ");
 
-    pub static ref SUMMARISE_TEXT: String = format!("Summarise the text below to a 20 year old, do not write any followup explainations. Only print out the text summary: ");
+    pub static ref SUMMARISE_TEXT: String = format!("Summarise the text below, do not write any followup explainations. Only print out the text summary: ");
     
     pub static ref GET_TAGS: String = format!("Print out related tags based on the orignal passage, do not write any followup explanations. Only print out the best answers inside of an array: ");
 

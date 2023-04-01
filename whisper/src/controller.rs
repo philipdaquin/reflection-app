@@ -4,7 +4,7 @@ use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
 use futures_util::stream::{TryStreamExt};
 use crate::{ml::{
     whisper::{AudioData, get_summary, get_sentimental_analysis, get_tags}, 
-    sockets::{WebSocketSession}}};
+    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio}};
 use serde_derive::{Deserialize};
 use actix_web_actors::ws;
 
@@ -15,13 +15,14 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     .service(get_text_summary)
     .service(get_text_analysis)
     .service(get_related_tags)
-    .service(
-        web::resource("/ws")
-            .route(web::get()
-                .guard(guard::Header("upgrade", "websocket"))
-                .to(ws_handler)
-        )
-    )
+    .service(chat_response)
+    // .service(
+    //     web::resource("/ws")
+    //         .route(web::get()
+    //             .guard(guard::Header("upgrade", "websocket"))
+    //             .to(ws_handler)
+    //     )
+    // )
     ;
 }
 
@@ -84,21 +85,45 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse> {
         let mut wav_data = AudioData::parse_wav_file(bytes).await.unwrap();
         transcribed = wav_data.transcribe_audio().await.unwrap();
     }
-    // Send request to get OpenAI text response
-    // let resp = get_chat_response(&transcribed, &GENERAL_CONTEXT).await?;
     
-    // log::info!("✉️ {:#?}", resp);
-    // Send a post request to get a Text to Speech 
-    // let tts_response = process_text_to_audio(&resp)
-    //     .await
-    //     .unwrap();
-
-    // Ok(
-    //     HttpResponse::Ok()
-    //     .content_type("audio/mpeg")
-    //     .body(tts_response)
-    // )
-
     Ok(HttpResponse::Ok().body(transcribed))
+
+}
+
+#[route("/api/openai-chat", method = "POST")]
+pub async fn chat_response(mut payload: Multipart) -> Result<HttpResponse> {
+    let mut transcribed = String::new();
+    while let Some(mut item) = payload.try_next().await? { 
+        let mut bytes = Vec::new();
+        // Write the content of the file of the temporary file 
+        while let Some(chunk) = item.try_next().await? { 
+            bytes.extend_from_slice(&chunk);
+        }
+        let mut wav_data = AudioData::parse_wav_file(bytes).await.unwrap();
+    
+        // Transfer audio file into a worker 
+        let transcriber = tokio::spawn(async move {
+            return wav_data.transcribe_audio().await.unwrap();
+        });
+
+        transcribed = transcriber.await.unwrap();
+
+        log::info!("{}", transcribed);
+    }
+     // Send request to get OpenAI text response
+     let resp = get_chat_response(&transcribed, &GENERAL_CONTEXT).await?;
+     log::info!("✉️ {:#?}", resp);
+     // Send a post request to get a Text to Speech 
+     let tts_response = process_text_to_audio(&resp)
+         .await
+         .unwrap();
+ 
+     Ok(
+         HttpResponse::Ok()
+         .content_type("audio/mpeg")
+         .body(tts_response)
+     )
+    
+    // Ok(HttpResponse::Ok().body(transcribed))
 
 }

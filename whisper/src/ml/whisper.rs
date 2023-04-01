@@ -1,5 +1,5 @@
 use hound::{SampleFormat, WavReader};
-use std::{path::Path, sync::Arc, io::BufReader};
+use std::{path::Path, sync::Arc, io::{BufReader, Cursor}};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::{error::Result, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}};
 use num_cpus;
@@ -22,8 +22,10 @@ impl AudioData {
     #[tracing::instrument(level= "debug")]
     pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Self> {
         log::info!("👷‍♂️ Parsing WaV FILE");
-        let reader = BufReader::new(&bytes[..]);
-        let wav_reader = WavReader::new(reader).unwrap();
+        // let reader = BufReader::new(&bytes[..]);
+        // let wav_reader = WavReader::new(reader).unwrap();
+        let mut reader = Cursor::new(&bytes);
+        let wav_reader = WavReader::new(&mut reader).unwrap();
         
         let hound::WavSpec {
             channels,
@@ -84,7 +86,7 @@ impl AudioData {
         // The decoding strategies are: 
         //  - Beam Search with 5 beams usng log probability for the score function 
         //  - Greedy decoding with best of 5 sampling. 
-        let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 0});
+        let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 5});
         
         // Output into one single segment
         params.set_single_segment(true);
@@ -98,7 +100,7 @@ impl AudioData {
         // Keep context between audio chunks 
         params.set_no_context(true);
         
-        // params.set_offset_ms(500);
+        params.set_offset_ms(500);
     
         // Supress blank outputs
         params.set_suppress_blank(true);
@@ -107,10 +109,12 @@ impl AudioData {
         params.set_speed_up(false);
     
         // Audio length in milliseconds 
-        // params.set_duration_ms(5000);
+        params.set_duration_ms(3000);
+        // params.set_duration_ms(0);
     
         // The max number of tokens per audio chunk     
-        // params.set_max_tokens(32);
+        params.set_max_tokens(32);
+        // params.set_max_tokens(0);
     
         // Partial encoder context for better performance 
         params.set_audio_ctx(0);
@@ -124,7 +128,9 @@ impl AudioData {
         params.set_temperature_inc(-1.0);
     
         // If the averate log probability is lower than this value, treat the decoding as failed 
-        params.set_logprob_thold(100.0);
+        // params.set_logprob_thold(100.0);
+        params.set_logprob_thold(-1.0);
+
     
         // Temperature to use for sampling 
         // - Sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random
