@@ -67,7 +67,11 @@ function post_analysis({
 export default post_analysis
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
-    // if (!query.data) return 
+    if (!query || typeof query.data !== 'string') { 
+        return { 
+            notFound: true
+        }
+    }
     
     const {transcript, orginalAudio, summary, tags} = JSON.parse(query.data)
     console.log(tags)
@@ -75,7 +79,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
         props: { 
             orginalAudio,
             // title,
-            summary: summary,
+            summary,
             tags,
             transcript
         },

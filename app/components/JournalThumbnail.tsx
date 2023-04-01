@@ -1,24 +1,24 @@
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 function JournalThumbnail() {
     
     const [file, setFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [loading, setloading] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
 
-    const handleAvatar = () => { 
-        if (imageUrl) return  
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        
-        input.onchange = handleFileChange;
-        input.click();
-
-    }
+    const handleAvatar = () => {
+      const fileInputRef = useRef<HTMLInputElement>(null);
+    
+      if (imageUrl) return;
+    
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -64,7 +64,13 @@ function JournalThumbnail() {
     return (
         <>
            
-            <div onClick={handleAvatar} onMouseEnter={showClearButton} >
+            <input 
+             type="file"
+             accept="image/*"
+             style={{ display: "none" }}
+             ref={fileInputRef}
+             onChange={handleFileChange}
+            >
                 {
                     imageUrl ? ( 
                     
@@ -87,7 +93,7 @@ function JournalThumbnail() {
                         </div>
                     )
                 }
-            </div>
+            </input>
            
       </>
   )
