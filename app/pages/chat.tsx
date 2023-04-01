@@ -4,6 +4,8 @@ import NavigationButtons from '../components/NavigationButtons'
 import ChatContent from '../components/pages/ChatContent'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
+import AudioControls from '../components/AudioControls'
+import ChatControls from '../components/ChatControls'
 
 function chat() {
     return (
@@ -18,10 +20,8 @@ function chat() {
 
             <main className=" justify-center flex flex-col items-center space-y-[27px]  ">
 
-            <div className="flex items-center relative right-5">
-                <div className='relative right-10'>
-                    <NavigationButtons />        
-                </div>
+            <div className="flex items-center relative right-10 space-x-5">
+                <ChatControls />       
                 <PhoneView children={<ChatContent/>} />
             </div>
             <div className='md:block hidden'>

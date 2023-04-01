@@ -4,7 +4,7 @@ import {HiOutlineAnnotation} from 'react-icons/hi'
 import { convertWav } from '../util/convertWav'
 import { useAudioRecorder } from 'react-audio-voice-recorder'
 import { useRecoilState } from 'recoil'
-import { RecordingState, TimerState } from '../atoms/atoms'
+import { AudioUrl, RecordingState, TimerState } from '../atoms/atoms'
 import formatTime from '../util/formatTime'
 import { useRouter } from 'next/router';
 import { getTextSummary } from '../util/getTextSummary'
@@ -39,10 +39,10 @@ function StartStopRecording() {
     const [stopRecord, setStopRecord] = useState(false)
     const [process, setProcess] = useState(false)
     
-    const [audioURL, setAudioURL] = useState('')
     const [loading, setLoading] = useState(false)
     const [showRecordingTime, setRecordingTime] = useRecoilState(TimerState);
     const [showRecordingState, setRecordingState] = useRecoilState(RecordingState);
+    const [showAudioUrl, setAudioUrl] = useRecoilState(AudioUrl);
 
 
     const [transcription, setTranscription] = useState('')
@@ -73,7 +73,6 @@ function StartStopRecording() {
         if (recordingBlob == null) return
         setProcess(true)
         setRecordingTime(0)
-        // saveRecordedAudio()
     }
 
     // STARTS FROM THE BEGINNING
@@ -81,7 +80,6 @@ function StartStopRecording() {
         setStopRecord(false)
         setRecord(false)
         setProcess(false)
-        // saveRecordedAudio()
         stopRecording()
     }
 
@@ -100,51 +98,25 @@ function StartStopRecording() {
         
         // Convert to Wav
         convertWav(recordingBlob)
-          // Upload to server and get the response 
           .then((resp) => {
               const formData = new FormData();
                 formData.append('audio', resp);
-                fetch("http://localhost:4001/api/upload", {
+                fetch("http://localhost:4001/api/openai-chat", {
                 method: "POST",
                 body: formData,
               })
               .then(async (response) => {
                   if (response.ok) {
-                      const url = URL.createObjectURL(recordingBlob)
-                      const data = await response.text()
-
-                      console.log(url)
-                      setAudioURL(url)
-
-                      return data
+                        const blob = await response.blob()
+                        const url = URL.createObjectURL(blob)
+                        console.log(url)
+                        // setAudioURL(url)
+                        setAudioUrl(url)
                   } else { 
                     throw new Error("Failed to get audio file")
                   }
               }) 
-              .then(async (data) => { 
-                setTranscription(data)
-
-                const [summary, tags] = await Promise.all([
-                  getTextSummary(data), 
-                  getRelatedTags(data)
-                ])
-
-                setSummary(summary)
-                setRelatedTags(tags)
-
-                const pageData = {
-                    transcript: transcription,
-                    orginalAudio: audioURL,
-                    summary: summary,
-                    tags: tags
-                }
-
-                router.push({
-                    pathname: '/post_analysis',
-                    query: {
-                      data: JSON.stringify(pageData)
-                    }
-                })
+              .then(() => { 
                 resetRecordingStates()
                 setLoading(false)
               })
@@ -156,19 +128,6 @@ function StartStopRecording() {
           })
         
     }, [recordingBlob, process])
-
-    // const getTags = async () => { 
-    //     if (transcription == null && process) return   
-
-    //     const as = await getRelatedTags(transcription)
-    //     setRelatedTags(as)
-    // }
-    // useEffect(() => { 
-    //     if (transcription == null && process) return   
-
-    //     getTags()
-    // }, [transcription, process])
-
 
       const START = () => { 
         return (
@@ -212,7 +171,7 @@ function StartStopRecording() {
 
 
 
-function AudioControls() {
+function ChatControls() {
   return (
       <div className='flex flex-col  items-center justify-between space-y-3'>
           <StartStopRecording/>
@@ -224,4 +183,4 @@ function AudioControls() {
   )
 }
 
-export default AudioControls
+export default ChatControls

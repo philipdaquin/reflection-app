@@ -9,3 +9,8 @@ export const RecordingState = atom({
     key: 'RecordingState',
     default: false,
 })
+
+export const AudioUrl = atom<string | null>({ 
+    key: 'AudioUrl',
+    default: null
+})

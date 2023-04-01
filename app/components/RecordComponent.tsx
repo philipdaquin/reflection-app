@@ -71,24 +71,31 @@ function RecordComponent() {
           convertWav(recordingBlob)
             // Upload to server and get the response 
             .then((resp) => {
+
                 const formData = new FormData();
                 formData.append('audio', resp);
-                fetch("http://localhost:4001/", {
-                method: "POST",
-                body: formData,
+                fetch("http://localhost:4001/api/upload", {
+                    method: "POST",
+                    body: formData,
                 })
                 .then(async (response) => {
+
+                    
+
+                    const url = URL.createObjectURL(resp)
+                    setAudioURL(url)
+
                     if (response.ok) {
                         const blob = await response.blob()
   
-                        let id = blob.name
-                        console.log(id)
-                        console.log(blob)
+                        // let id = blob.name
+                        // console.log(id)
+                        // console.log(blob)
   
                         // Testing purposes 
-                        const url = URL.createObjectURL(blob)
-                        setAudioURL(url)
-                        console.log(url)
+                        // const url = URL.createObjectURL(blob)
+                        // setAudioURL(url)
+                        // console.log(url)
                         // Once done, route the user to the post summary with the id
                         // router.push(`/post_analysis/${id}`)
   
@@ -110,6 +117,15 @@ function RecordComponent() {
       const handleWebSocketMessage = (message: string) => {
         console.log(`Received message: ${message}`);
       };
+
+
+      useEffect(() => {
+        if (recordingBlob == null) return
+        const url = URL.createObjectURL(recordingBlob)
+        setAudioURL(url)
+      }, [recordingBlob])
+      
+
     
       return (
         <div className='space-y-7 items-center'>
@@ -130,8 +146,12 @@ function RecordComponent() {
                 <button hidden={isCurrRecording} onClick={resetRecordingStates}>Cleared</button>
                 <button hidden={!isCurrRecording} onClick={stop}>Stop and Save</button>
             </div>
+            <div>
+                <h1 className="font-bold text-md">Server Response</h1>
+                <audio controls  autoPlay src={audioURL}></audio>
+            </div>
 
-            <AudioStreaming />
+            {/* <AudioStreaming /> */}
 
             <div>
                 <h1 className="font-bold text-md">
@@ -140,19 +160,15 @@ function RecordComponent() {
                 <AddAudioFile />
             </div>
 
-
-            {/* <div>
+{/* 
+            <div>
                 <h1 className="font-bold text-md">
                     Converted to Wav
                 </h1>
                 <audio controls  autoPlay src={micSource}></audio>
-            </div>
-
-            <div>
-                <h1 className="font-bold text-md">Server Response</h1>
-                <audio controls  autoPlay src={audioRecording}></audio>
             </div> */}
 
+    
         </div>
     );
 }

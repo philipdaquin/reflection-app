@@ -3,7 +3,8 @@ import { useAudioRecorder } from 'react-audio-voice-recorder';
 import { convertWav } from '../util/convertWav';
 import useWebSocket from 'react-use-websocket';
 
-const SERVER_URL = 'ws://localhost:4001/ws ';
+// const SERVER_URL = 'ws://localhost:4001/ws ';
+const SERVER_URL = 'ws://localhost:4002';
 
 function AudioStreaming() {
   const {

@@ -5,7 +5,8 @@ module.exports = {
     domains: [
       'www.telegraph.co.uk',
       'unsplash.com',
-      'images.unsplash.com'
+      'images.unsplash.com',
+      'cdn.discordapp.com'
     ],
   }
 }
