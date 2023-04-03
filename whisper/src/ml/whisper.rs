@@ -1,80 +1,56 @@
+use actix_multipart::Multipart;
+use bson::oid::ObjectId;
 use hound::{SampleFormat, WavReader};
+use serde::{Serialize, Deserialize};
 use std::{path::Path, sync::Arc, io::{BufReader, Cursor}};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
-use crate::{error::Result, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}};
+use crate::{error::{Result, ServerError}, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}, persistence::audio_db::{AudioDB, AudioInterface}};
 use num_cpus;
 use crate::ml::prompt::GET_TAGS;
-
+use futures_util::stream::{TryStreamExt};
+use actix_web::Result as ActixResult;
 use super::text_classification::TextClassification;
+use uuid::Uuid;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AudioData { 
-    wav_data: Option<Vec<i16>>,
-    transcription: Option<String>,
-    summary: Option<String>,
-    text_classification: Option<TextClassification>,
-    tags: Vec<String>
+    #[serde(rename = "_id")]
+    pub id: String,
+    pub transcription: Option<String>,
+    pub summary: Option<String>,
+    pub text_classification: Option<TextClassification>,
+    pub tags: Option<Vec<String>>
 }
 
 impl AudioData { 
-    /// 
-    /// Parse the audio data as a WAV file 
-    #[tracing::instrument(level= "debug")]
-    pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Self> {
-        log::info!("👷‍♂️ Parsing WaV FILE");
-        // let reader = BufReader::new(&bytes[..]);
-        // let wav_reader = WavReader::new(reader).unwrap();
-        let mut reader = Cursor::new(&bytes);
-        let wav_reader = WavReader::new(&mut reader).unwrap();
-        
-        let hound::WavSpec {
-            channels,
-            sample_rate,
-            bits_per_sample,
-            sample_format,
-        } = wav_reader.spec();
-    
-        if channels != 1 {
-            panic!("expected mono audio file");
-        }
-        if sample_format != SampleFormat::Int {
-            panic!("expected integer sample format");
-        }
-        if sample_rate != 16000 {
-            log::warn!("expected 16KHz sample rate");
-        }
-        if bits_per_sample != 16 {
-            panic!("expected 16 bits per sample");
-        }
-    
-        let wav_data = wav_reader
-            .into_samples::<i16>()
-            .map(|x| x.expect("sample"))
-            .collect::<Vec<_>>();
-        
-        let res = Self { 
-            wav_data: Some(wav_data), 
-            transcription: None,
-            summary: None,
-            text_classification: None,
-            tags: Vec::new()
-        };
-        log::info!("✅ 1. PARSING DATA");
 
-        Ok(res)
-    
+    /// Initialise AudioData by passing through Audio Data
+    /// - Parse Audio Bytes into 16 Bytes 
+    /// - Transcribe the Audio file
+    /// - Return AudioData Object
+    pub async fn new(wav: Vec<u8>) -> Result<Self> {
+        // Generate a new UUID for the item 
+        let id = uuid::Uuid::new_v4().to_string();
+        let parsed_wav = parse_wav_file(wav).await?;
+        let transcription = AudioData::transcribe_audio(parsed_wav)
+            .await
+            .map_err(|_| ServerError::MissingTranscript)
+            .unwrap();
+        
+        Ok(Self { 
+            id, 
+            transcription: Some(transcription), 
+            ..Default::default()
+        })
+
     }
-    
     ///
     /// Transcribe the given WAV FILE
     #[tracing::instrument(level= "debug")]
-    pub async fn transcribe_audio(&mut self) -> Result<String> {
+    pub async fn transcribe_audio(wav_data: Vec<i16>) -> Result<String> {
         let mut res = String::new();
     
-        if self.wav_data.is_none() { return Ok(res)}
-    
-    
-        let mut samples = whisper_rs::convert_integer_to_float_audio(&self.wav_data.as_mut().unwrap());
+        let mut samples = whisper_rs::convert_integer_to_float_audio(&wav_data);
         
         samples = whisper_rs::convert_stereo_to_mono_audio(&samples).expect("Failed to convert to mono audio");
         
@@ -162,53 +138,120 @@ impl AudioData {
     
         for i in 0..num_segments {
             let segment = ctx.full_get_segment_text(i).expect("failed to get segment");
-            let start_timestamp = ctx.full_get_segment_t0(i);
-            let end_timestamp = ctx.full_get_segment_t1(i);
+            // let start_timestamp = ctx.full_get_segment_t0(i);
+            // let end_timestamp = ctx.full_get_segment_t1(i);
             // let full_text = format!("[{} - {}]: {}", start_timestamp, end_timestamp, segment);
             res.push_str(&segment);
         }
         // Save in memory 
         log::info!("2. TRANSCRIPT {res}");
-        self.transcription = Some(res.to_string());
     
         Ok(res)
     }
+    
+    ///
+    /// Get audio summary  
+    #[tracing::instrument(level= "debug")]
+    pub async fn get_summary(&mut self) -> Result<Self> { 
+        if let Some(script) = &self.transcription { 
+            let summary = get_chat_response(script, &SUMMARISE_TEXT).await.unwrap_or_default();
+            self.summary = Some(summary);
+        } else { 
+            return Err(ServerError::MissingTranscript)
+        }
+        Ok(self.clone())
+    }
+    
+    ///
+    /// Get tags related to the passage
+    #[tracing::instrument(level= "debug")]
+    pub async fn get_tags(mut self) -> Result<Self> { 
+        if let Some(script) = &self.transcription { 
+            let resp = get_chat_response(script, &GET_TAGS).await.unwrap_or_default();
+            let res: Vec<String> = serde_json::from_str(&resp).unwrap_or_default();
+            self.tags = Some(res);
+        } else { 
+            return Err(ServerError::MissingTranscript)
+        }
+    
+        Ok(self.clone())
+    }
+    ///
+    /// Gets Sentimental analysis of transcribed text
+    #[tracing::instrument(level= "debug")]
+    pub async fn get_sentimental_analysis(&mut self) -> Result<Self> { 
+        
+        if let Some(transcript) = &self.transcription { 
+            
+            let new_analysis = TextClassification::new(&self.id)
+                .get_text_analysis(&transcript)
+                .await
+                .unwrap();
+            
+            self.text_classification = Some(new_analysis);
+        } else { 
+            return Err(ServerError::MissingTranscript)
+        }
+        Ok(self.clone())
+    }
+
+    /// 
+    /// Save object to database 
+    #[tracing::instrument(level= "debug")]
+    pub async fn save(&self) -> Result<Self> { 
+        AudioDB::add_entry(self).await
+    }
+
 }
 
-
-/// Get tags related to the passage
+/// 
+/// Parse the audio data as a WAV file 
 #[tracing::instrument(level= "debug")]
-pub async fn get_tags(transcription: Option<String>) -> Result<Vec<String>> { 
-    let mut resp = String::new();
-    if let Some(script) = &transcription { 
-        resp = get_chat_response(script, &GET_TAGS).await.unwrap_or_default();
-    }   
-    let res: Vec<String> = serde_json::from_str(&resp).unwrap_or_default();
+pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
+    log::info!("👷‍♂️ Parsing WaV FILE");
+    // let reader = BufReader::new(&bytes[..]);
+    // let wav_reader = WavReader::new(reader).unwrap();
+    let mut reader = Cursor::new(&bytes);
+    let wav_reader = WavReader::new(&mut reader).unwrap();
+    
+    let hound::WavSpec {
+        channels,
+        sample_rate,
+        bits_per_sample,
+        sample_format,
+    } = wav_reader.spec();
 
-    Ok(res)
+    if channels != 1 {
+        panic!("expected mono audio file");
+    }
+    if sample_format != SampleFormat::Int {
+        panic!("expected integer sample format");
+    }
+    if sample_rate != 16000 {
+        log::warn!("expected 16KHz sample rate");
+    }
+    if bits_per_sample != 16 {
+        panic!("expected 16 bits per sample");
+    }
+
+    let wav_data = wav_reader
+        .into_samples::<i16>()
+        .map(|x| x.expect("sample"))
+        .collect::<Vec<_>>();
+
+    Ok(wav_data)
+
 }
 
-///
-/// Get audio summary  
-#[tracing::instrument(level= "debug")]
-pub async fn get_summary(transcription: Option<String>) -> Result<String> { 
-    let mut summary = String::new();
-    if let Some(script) = &transcription { 
-       summary = get_chat_response(script, &SUMMARISE_TEXT).await.unwrap_or_default();
-    }   
-
-    Ok(summary)
-}
-///
-/// Gets Sentimental analysis of transcribed text
-#[tracing::instrument(level= "debug")]
-pub async fn get_sentimental_analysis(mut transcription: Option<String>) -> Result<TextClassification> { 
-
-    let mut new_analysis = TextClassification::default();
-        new_analysis
-        .get_text_analysis(&transcription.as_mut().unwrap())
-        .await
-        .unwrap();
-
-    Ok(new_analysis)
+/// Helper function for receiving and transcribing Audio into String
+pub async fn upload_audio(mut payload: Multipart) -> ActixResult<AudioData> { 
+    let mut bytes = Vec::new();
+    while let Some(mut item) = payload.try_next().await? { 
+        // Write the content of the file of the temporary file 
+        while let Some(chunk) = item.try_next().await? { 
+            bytes.extend_from_slice(&chunk);
+        }
+    }
+    let wav_data = AudioData::new(bytes).await.unwrap();
+    Ok(wav_data)
 }

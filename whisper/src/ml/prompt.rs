@@ -23,18 +23,21 @@ lazy_static! {
     pub static ref GET_TAGS: String = format!("Print out related tags based on the orignal passage, do not write any followup explanations. Only print out the best answers inside of an array: ");
 
     pub static ref ANALYSE_TEXT_SENTIMENT: String = format!("
-        I want you to analyse the sentiment from this passage and in your response assign each score for each label inside of the object below. 
-        do not write explanations. 
-        do not create new labels unless I told you so.
-        
-        In your response, the format should follow the structure below and you must only return this object and nothing else. 
-        
-        `{{
-            positive: 0.0,
-            neutral: 0.0,
-            negativity: 0.0
-        }}`
-        
-        The inputs are:  
+    I want you to analyse the sentiment from this passage and in your response assign each score for each label inside of the object below. 
+    do not write explanations. 
+    do not create new labels unless I told you so.
+    do not alter the `id`, `audio_ref` and `date`
+    In your response, the format should follow the structure below and you must only return this object and nothing else. 
+    
+    `{{
+        pub id: Option<ObjectId>, 
+        audio_ref: Option<Uuid>,
+        date:  `mm/dd/yy`,
+        day:  `Monday`,
+        emotion_emoji: `🤣`, 
+        average_mood: 0.0
+    }}`
+    
+    The inputs are:  
     ");
 }

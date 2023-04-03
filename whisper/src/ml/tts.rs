@@ -76,7 +76,7 @@ pub async fn process_text_to_audio(input: &str) -> Result<Vec<u8>> {
         .unwrap();
 
     // Extract the response 
-    let resp = client
+    let resp = client 
         .request(request)
         .await
         .unwrap();

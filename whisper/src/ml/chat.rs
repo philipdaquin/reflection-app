@@ -92,7 +92,7 @@ pub async fn get_chat_response(input: &str, context: &str) -> Result<String> {
         })
         .unwrap_or_default();
     
-    log::info!("{resp:#?}");
+    // log::info!("{resp:#?}");
 
     let mut response = resp.choices[0].text.to_string();
     
