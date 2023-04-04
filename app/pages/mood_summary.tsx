@@ -5,8 +5,15 @@ import NavigationButtons from '../components/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
+import { TextClassification } from '.'
+import { GetServerSideProps } from 'next'
 
-function mood_summary() {
+
+interface Props { 
+  data: TextClassification[]
+}
+
+function mood_summary({data}: Props) {
     return (
         <>
           <Head>
@@ -21,7 +28,7 @@ function mood_summary() {
                 <div className='relative right-10'>
                   <NavigationButtons />        
                 </div>
-                <PhoneView children={<MoodSummaryContents/>} />
+                <PhoneView children={<MoodSummaryContents data={data}/>} />
               </div>
               <div className='md:block hidden'>
                 <SwitchView />
@@ -35,3 +42,24 @@ function mood_summary() {
 }
 
 export default mood_summary
+
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const [response] = await Promise.all([
+    (
+      await fetch('http://localhost:4001/api/mood-summary-update')
+          .then(resp => resp.json())
+          .catch(err => { 
+            console.error(err)
+          })
+    )
+  ]) 
+
+  console.log(response)
+
+  return { 
+    props: { 
+      data: response
+    }
+  }
+}

@@ -2,6 +2,7 @@ import React from 'react'
 import MoodAreaChart from './MoodAreaChart'
 import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
 import CommonMoodContainer from './CommonMoodContainer'
+import { TextClassification } from '../pages'
 
 
 export type CommonMoodData = {  
@@ -11,9 +12,14 @@ export type CommonMoodData = {
     avgSize: number
 }
 
-export type WeeklyData = {
-    name: string,
-    mood: number
+export class WeeklyData {
+    name: string;
+    mood: number;
+
+    constructor(item: TextClassification) { 
+        this.name = item.day;
+        this.mood = item.average_mood
+    }
 }
 
 type EventData = {
@@ -127,8 +133,16 @@ const eventData: EventData[] = [
     }
 ].slice(0, 3);
 
-function MoodSummaryContents() {
+
+interface Props { 
+    data: TextClassification[]
+}
+
+function MoodSummaryContents({data}: Props) {
     
+
+    let weeklyData: WeeklyData[] = data.map((i) => new WeeklyData(i))
+
     return (
         <section className='pb-10'>
 
@@ -153,7 +167,7 @@ function MoodSummaryContents() {
 
             {/* Mood trend Graph */}
             <div className='w-full items-center pt-12'>
-                <MoodAreaChart data={data}/>
+                <MoodAreaChart data={weeklyData}/>
             </div>
 
             {/* Common Mood  */}

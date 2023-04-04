@@ -1,27 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
   Label, Line, ResponsiveContainer,  ReferenceDot, ReferenceLine } from 'recharts';
-
-type WeeklyData = {
-  name: string,
-  mood: number
-}
-
-
-
-// const gradientOffset = () => {
-//   const dataMax = Math.max(...data.map((i) => i.mood));
-//   const dataMin = Math.min(...data.map((i) => i.mood));
-
-//   if (dataMax <= 0) {
-//     return 0;
-//   }
-//   if (dataMin >= 0) {
-//     return 1;
-//   }
-
-//   return dataMax / (dataMax - dataMin);
-// };
+import { WeeklyData } from './MoodSummaryContents';
 
 
 interface Props { 

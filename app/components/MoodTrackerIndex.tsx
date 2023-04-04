@@ -1,5 +1,6 @@
 import React from 'react'
-import LineChart from './LineChart';
+import LineChart, { DataPoint } from './LineChart';
+import { TextClassification } from '../pages';
 
 
 function Emoji(average: number): string { 
@@ -18,28 +19,21 @@ function Emoji(average: number): string {
   return emoji
 }
 
+interface Props { 
+  data: TextClassification[]
+}
 
-function MoodTrackerIndex() {
-  const data = [
-    { date: "2022-01-01", mood: 2.0 },
-    { date: "2022-01-02", mood: 4.0 },
-    { date: "2022-01-03", mood: 5.0 },
-    { date: "2022-01-04", mood: 6.0 },
-    { date: "2022-01-05", mood: 4.0 },
-    { date: "2022-01-06", mood: 2.0 },
-    { date: "2022-01-07", mood: 10.0 },
-    { date: "2023-03-20", mood: 9.0   },  
-    { date: "2023-03-21", mood: 9.0   },  
-    { date: "2023-03-22", mood: 8.0   },  
-    { date: "2023-03-23", mood: 9.0   },  
-    { date: "2023-03-24", mood: 8.0   },  
-    { date: "2023-03-25", mood: 9.0   },  
-    { date: "2023-03-26", mood: 10.0  }
-  ];
+function MoodTrackerIndex({data}: Props) {
+  console.log(data)
 
-  let average = data.reduce((total, item) => total + item.mood, 0) / data.length;
-  let avgString = (average * 10.0).toString().slice(0, 5)
+  let length = data?.length
+
+  let average = data?.reduce((total, item) => total + item.average_mood, 0) / length;
+  let avgString = (average * 100.0).toString().slice(0, 5)
   let messageToUser = Emoji(average) + " " + avgString + "%"
+
+
+  const dataPoint: DataPoint[] = data?.map((i) => new DataPoint(i))
 
   return (
     <div className='flex justify-between items-center'>
@@ -53,7 +47,7 @@ function MoodTrackerIndex() {
         </div>
         <div className='w-[92px] h-[42px]'>
             {/* Insert a graph here */}
-            <LineChart data={data} />
+            <LineChart data={dataPoint} />
         </div>
     </div>
   )

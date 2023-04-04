@@ -4,6 +4,7 @@ import { convertWav } from '../util/convertWav';
 import { getRelatedTags } from '../util/getRelatedTags';
 import { getTextSummary } from '../util/getTextSummary';
 import { uploadWav } from '../util/uploadWav';
+import { AudioData } from '../pages';
 
 function AddAudioFile() {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -37,7 +38,6 @@ function AddAudioFile() {
             // }
             if (response.ok) {
 
-                console.log(response.json())
 
                 // const blob = await response.blob()
                 // const url = URL.createObjectURL(blob)
@@ -45,8 +45,12 @@ function AddAudioFile() {
                 // setAudioURL(url)
                 // setAudioUrl(url)
                 // setAudioSource(url)
-                const resp = response.body
-                console.log(resp)
+                const resp: AudioData = await response.json()
+                console.log(resp._id)
+
+                router.push({
+                    pathname: `/post_analysis/${resp._id}`,
+                })
 
           } else { 
             throw new Error("Failed to get audio file")

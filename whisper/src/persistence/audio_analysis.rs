@@ -26,12 +26,15 @@ impl TextAnalysisInterface for AnalysisDb {
     /// Retrieves items from the last 7 days 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn get_recent() -> Result<Vec<TextClassification>> {
-        let mut result = Vec::new();
+        log::info!("Retrieving recent dataset...");
+        let mut result = Vec::with_capacity(10);
         let collection = AnalysisDb::get_analysis_db();
         let today = Utc::now();
-        let seven_days_ago = today - chrono::Duration::days(7);
+        // let seven_days_ago = today - chrono::Duration::days(7);
+        let seven_days_ago = today;
         let in_bson = bson::DateTime::from_chrono(seven_days_ago);
-        let filter = doc! { "date": { "$gte": in_bson } };
+        // let filter = doc! { "date": { "$gte": in_bson } };
+        let filter = doc! { "day": "Monday" };
         
         // Get the matching document 
         let mut doc = collection.find(filter, None).await?;

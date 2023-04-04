@@ -25,7 +25,7 @@ impl TextClassification {
     pub fn new(audio_id: &str) -> Self { 
         let id = ObjectId::new();
         let date = Utc::now();
-        let day = date.weekday();
+        // let day = date.weekday();
         Self { 
             id: Some(id), 
             audio_ref: Some(audio_id.to_string()),

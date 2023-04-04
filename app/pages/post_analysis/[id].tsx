@@ -2,13 +2,15 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import React from 'react'
-import SummaryContent from '../components/pages/SummaryContent'
-import PhoneView from '../components/PhoneView'
-import PostSummaryControls from '../components/PostSummaryControls'
-import SwitchView from '../components/SwitchView'
-import { getTextSummary } from '../util/getTextSummary'
-import { GetServerSideProps, NextPage } from 'next';
-import { getRelatedTags } from '../util/getRelatedTags'
+import SummaryContent from '../../components/pages/SummaryContent'
+import PhoneView from '../../components/PhoneView'
+import PostSummaryControls from '../../components/PostSummaryControls'
+import SwitchView from '../../components/SwitchView'
+import { getTextSummary } from '../../util/getTextSummary'
+import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
+import { getRelatedTags } from '../../util/getRelatedTags'
+import { AudioData } from '..'
+import { getEntry } from '../../util/getEntry'
 
 //
 // url/post_analysis/id_url
@@ -17,7 +19,7 @@ interface Props {
     // title: string
     summary: string
     tags: string[]
-    transcript: string[]
+    transcription: string[]
 }
 
 function post_analysis({
@@ -25,7 +27,7 @@ function post_analysis({
     // title,
     summary,
     tags,
-    transcript
+    transcription
 }: Props) {
 
     const router = useRouter()
@@ -50,7 +52,7 @@ function post_analysis({
                             summary={summary}
                             tags={tags}
                             // title={}
-                            transcript={transcript}
+                            transcript={transcription}
                         />
                     }/>
                 </div>
@@ -65,23 +67,34 @@ function post_analysis({
 }
 
 export default post_analysis
-
-export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
-    if (!query || typeof query.data !== 'string') { 
-        return { 
-            notFound: true
-        }
+// @ts-ignore
+export const getServerSideProps: GetServerSideProps<Props> = async (context: GetServerSidePropsContext ) => {
+    if (!context ) { 
+      return { 
+          notFound: true
+      }
     }
-    
-    const {transcript, orginalAudio, summary, tags} = JSON.parse(query.data)
-    console.log(tags)
+
+    // @ts-ignore
+    const { id } = context.params; // get the id from the pathname
+  
+    // fetch data from your server using the id
+    const {
+        _id,
+        summary,
+        tags,
+        text_classification,
+        transcription
+    } = await getEntry(id)
+  
+    // return the data as props to the component
     return {
-        props: { 
-            orginalAudio,
-            // title,
-            summary,
-            tags,
-            transcript
-        },
+      props: {
+        orginalAudio: "",
+        // title,
+        summary,
+        tags,
+        transcription
+      }
     };
-};
+  }

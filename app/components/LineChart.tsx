@@ -1,8 +1,14 @@
 import React from 'react'
+import { TextClassification } from '../pages';
 
-interface DataPoint { 
-    date: string, 
-    mood: number
+export class DataPoint { 
+    date: string;
+    mood: number;
+
+    constructor(text: TextClassification) { 
+      this.date = text.date;
+      this.mood = text.average_mood;
+    }
 }
 
 interface Props { 

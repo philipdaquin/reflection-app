@@ -3,9 +3,14 @@ import GreetingUser from '../GreetingUser'
 import MoodTrackerIndex from '../MoodTrackerIndex'
 import RecentEntries, { AudioEntryType } from '../RecentEntries'
 import WeeklyRoundUpComp from '../WeeklyRoundUpComp'
-import { getServerSideProps } from '../../pages/post_analysis'
+import { getServerSideProps } from '../../pages/post_analysis/[id]'
+import { TextClassification } from '../../pages'
 
-function HomeContents() {
+interface Props { 
+  data: TextClassification[]
+}
+
+function HomeContents({data}: Props) {
   let list: AudioEntryType[] = [
     {
       id: 1,
@@ -32,7 +37,7 @@ function HomeContents() {
     <div className='bg-white md:w-full md:h-full w-full h-full rounded-[70px]'>
       <GreetingUser />
       <div className='mt-10'>
-        <MoodTrackerIndex />
+        <MoodTrackerIndex data={data}/>
       </div>
 
       {/* Weekly roundups  */}
@@ -49,6 +54,3 @@ function HomeContents() {
 
 export default HomeContents
 
-// async function getServerSideProps() { 
-
-// }

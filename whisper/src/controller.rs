@@ -4,7 +4,7 @@ use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
 use futures_util::stream::{TryStreamExt};
 use crate::{ml::{
     whisper::{AudioData, upload_audio}, 
-    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio}, persistence::audio_db::{AudioDB, AudioInterface}, error::ServerError};
+    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio}, persistence::{audio_db::{AudioDB, AudioInterface}, audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
 use serde_derive::{Deserialize};
 use actix_web_actors::ws;
 
@@ -16,6 +16,8 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     .service(get_text_analysis)
     .service(get_related_tags)
     .service(chat_response)
+    .service(get_mood_summary)
+    .service(get_entry)
     // .service(
     //     web::resource("/ws")
     //         .route(web::get()
@@ -136,9 +138,9 @@ pub async fn upload(payload: Multipart) -> Result<HttpResponse> {
         .await?
         .get_summary()
         .await?
-        .get_tags()
-        .await?
         .get_sentimental_analysis()
+        .await?
+        .get_tags()
         .await?
         .save()
         .await?;
@@ -168,4 +170,30 @@ pub async fn chat_response(payload: Multipart) -> Result<HttpResponse> {
         .content_type("audio/mpeg")
         .body(tts_response)
     )
+}
+///
+/// Retrieves items from the last 7 days 
+#[route("/api/mood-summary-update", method = "GET")]
+pub async fn get_mood_summary() -> Result<HttpResponse> { 
+    let res = AnalysisDb::get_recent().await?;
+    let serialized = serde_json::to_string(&res).unwrap();
+
+    log::info!("{serialized:#?}");
+
+    Ok(HttpResponse::Ok().body(serialized))
+
+}
+#[route("/api/get-entry", method = "POST")]
+pub async fn get_entry(input: web::Json<Input>) -> Result<HttpResponse> { 
+
+    let audio = AudioDB::get_entry(&input.id)
+        .await
+        .map_err(|_| ServerError::NotFound(input.id.to_string()))?;
+
+
+    log::info!("{audio:#?}");
+
+    let serialized = serde_json::to_string(&audio).unwrap();
+    Ok(HttpResponse::Ok().body(serialized))
+
 }

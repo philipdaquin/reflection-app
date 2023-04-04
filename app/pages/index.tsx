@@ -1,4 +1,4 @@
-import type { NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import PhoneView from '../components/PhoneView'
@@ -9,7 +9,30 @@ import HomeContents from '../components/pages/HomeContents'
 import AudioVisualizer from '../components/AudioVisualizer'
 
 
-const Home: NextPage = () => {
+export type TextClassification = { 
+  _id: string,
+  audio_ref: string,
+  date: string,
+  day: string,
+  emotion_emoji: string | null,
+  average_mood: number 
+}
+
+export type AudioData = { 
+  _id: string
+  transcription: string,
+  summary: string | null, 
+  text_classification: TextClassification,
+  tags: string[] | null
+}
+
+
+interface Props { 
+  data: TextClassification[]
+}
+
+
+function Home({data}: Props) {
   return (
     <>
       <Head>
@@ -25,7 +48,7 @@ const Home: NextPage = () => {
             <div className='relative right-10'>
               <NavigationButtons />        
             </div>
-            <PhoneView children={<HomeContents/>} />
+            <PhoneView children={<HomeContents data={data}/>} />
           </div>
           <div className='md:block hidden'>
             <SwitchView />
@@ -39,3 +62,23 @@ const Home: NextPage = () => {
 }
 
 export default Home
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const [response] = await Promise.all([
+    (
+      await fetch('http://localhost:4001/api/mood-summary-update')
+          .then(resp => resp.json())
+          .catch(err => { 
+            console.error(err)
+          })
+    )
+  ]) 
+
+  console.log(response)
+
+  return { 
+    props: { 
+      data: response
+    }
+  }
+}
