@@ -6,14 +6,23 @@ import BackButton from '../BackButton'
 import JournalThumbnail from '../JournalThumbnail'
 
 import {ChevronDownIcon} from '@heroicons/react/24/solid'
+import { AudioEntryType } from '../RecentEntries'
 
 
 const IMAGE_URL: string = 'https://images.unsplash.com/photo-1669264879269-e58825475223?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=764&q=80'
 
-function ThumbnailPlayer() { 
+interface Props { 
+    src: string | null | undefined
+}
+
+function ThumbnailPlayer({src}: Props) { 
+
+    if (src === null || src === undefined) src = IMAGE_URL
+
     return (
-        <div className='flex flex-col items-center space-y-4 rounded-[50px] shadow-md shadow-slate-200 border-4 border-[#FCFCFC]'>
-         <Image src={IMAGE_URL} 
+    
+    <div className='flex flex-col items-center space-y-4 rounded-[50px] shadow-md shadow-slate-200 border-4 border-[#FCFCFC]'>
+         <Image src={src} 
               className='rounded-[50px] object-fill h-[192px] w-[192px]' 
               alt='User Profile'  
               height={192}
@@ -34,10 +43,10 @@ function ShowTranscript() {
 }
 
 interface PlayerContentProps { 
-    id: string
+    entry: AudioEntryType,
 }
 
-function PlayerContents() {
+function PlayerContents({entry}: PlayerContentProps) {
   return (
     <section className='flex flex-col h-full justify-between'>
         <div className='flex flex-row items-center justify-between pb-5'>
@@ -48,20 +57,33 @@ function PlayerContents() {
         
         <div className=' w-full '>
             <div className='flex flex-col items-center space-y-[74px] pb-7'>
-                <ThumbnailPlayer />
+                <ThumbnailPlayer src={entry.thumbnailUrl}/>
                 <div className=''>
-                    <h1 className='text-[20px] font-bold text-center'>What's it like to lose a pet</h1>
+                    <h1 className='text-[20px] font-bold text-center'>{entry.title}</h1>
                     <div className='text-center justify-center items-center flex flex-row space-x-2 text-[#757575] text-[15px]'>
-                        <h1>EP 2</h1>
-                        <p>•</p>
-                        <h1>March 30, 2023</h1>
-                        <p>•</p>
-                        <h1>56 mins</h1>
+                        {entry.subtitle && (
+                            <div className='flex space-x-2'>
+                                <h1>{entry.subtitle}</h1>
+                                <p>•</p>
+                            </div>
+                        )}
+                        
+                        {entry.date && (
+                            <h1>{entry.date}</h1>
+                        )}
+
+                        {entry.duration && (
+                            <div className='flex space-x-2'>
+                                <p>•</p>
+                                <h1>{entry.duration}</h1>
+                            </div>
+                        )}
+
                     </div>
                 </div>
             </div>
             {/* media player */}
-            <AudioMediaPlayer src='https://www.youtube.com/watch?v=cTH824WnA3U' />
+            <AudioMediaPlayer src={entry.audioUrl} />
         </div>
         <ShowTranscript />
     </section>
