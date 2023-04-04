@@ -73,57 +73,57 @@ impl AudioData {
         params.set_print_timestamps(false);    
         params.set_print_special(false);
         
-        // Keep context between audio chunks 
-        params.set_no_context(true);
+        // // Keep context between audio chunks 
+        // params.set_no_context(true);
         
-        params.set_offset_ms(500);
+        // params.set_offset_ms(500);
     
-        // Supress blank outputs
-        params.set_suppress_blank(true);
+        // // Supress blank outputs
+        // params.set_suppress_blank(true);
     
-        // Speed up audio by x2 (expect reduced accuracy)
-        params.set_speed_up(false);
+        // // Speed up audio by x2 (expect reduced accuracy)
+        // params.set_speed_up(false);
     
-        // Audio length in milliseconds 
-        params.set_duration_ms(3000);
-        // params.set_duration_ms(0);
+        // // Audio length in milliseconds 
+        // params.set_duration_ms(3000);
+        // // params.set_duration_ms(0);
     
-        // The max number of tokens per audio chunk     
-        params.set_max_tokens(32);
-        // params.set_max_tokens(0);
+        // // The max number of tokens per audio chunk     
+        // params.set_max_tokens(32);
+        // // params.set_max_tokens(0);
     
-        // Partial encoder context for better performance 
-        params.set_audio_ctx(0);
-        // Non Speech
-        // If the probability of the no speech token is higher than this value AND
-        // the decoding has failed due to 'pr'
-        params.set_no_speech_thold(0.6);
+        // // Partial encoder context for better performance 
+        // params.set_audio_ctx(0);
+        // // Non Speech
+        // // If the probability of the no speech token is higher than this value AND
+        // // the decoding has failed due to 'pr'
+        // params.set_no_speech_thold(0.6);
     
-        // Temperature to increase when falling back when the decoding fails to 
-        // meet either of the thresholds elow  
-        params.set_temperature_inc(-1.0);
+        // // Temperature to increase when falling back when the decoding fails to 
+        // // meet either of the thresholds elow  
+        // params.set_temperature_inc(-1.0);
     
-        // If the averate log probability is lower than this value, treat the decoding as failed 
-        // params.set_logprob_thold(100.0);
-        params.set_logprob_thold(-1.0);
+        // // If the averate log probability is lower than this value, treat the decoding as failed 
+        // // params.set_logprob_thold(100.0);
+        // params.set_logprob_thold(-1.0);
 
     
-        // Temperature to use for sampling 
-        // - Sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random
-        //   while lower values like 0.2 will make it more focused and deterministic
-        //   If set to 0, the model will use log probability to automatically increase the temperature until certain 
-        //   thresholds are hit
-        params.set_temperature(0.0);   
+        // // Temperature to use for sampling 
+        // // - Sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random
+        // //   while lower values like 0.2 will make it more focused and deterministic
+        // //   If set to 0, the model will use log probability to automatically increase the temperature until certain 
+        // //   thresholds are hit
+        // params.set_temperature(0.0);   
     
-        // Number of threads to use during computation
-        params.set_n_threads(8);
+        // // Number of threads to use during computation
+        // params.set_n_threads(8);
     
-        // Translate the source to english 
-        params.set_translate(false);
+        // // Translate the source to english 
+        // params.set_translate(false);
         
     
-        // Spoken language
-        params.set_language(Some("en"));
+        // // Spoken language
+        // params.set_language(Some("en"));
     
         log::info!("{}", num_cpus::get());
     
@@ -155,6 +155,9 @@ impl AudioData {
     pub async fn get_summary(&mut self) -> Result<Self> { 
         if let Some(script) = &self.transcription { 
             let summary = get_chat_response(script, &SUMMARISE_TEXT).await.unwrap_or_default();
+
+            log::info!("SUMMARY: {summary}");
+
             self.summary = Some(summary);
         } else { 
             return Err(ServerError::MissingTranscript)
@@ -169,6 +172,10 @@ impl AudioData {
         if let Some(script) = &self.transcription { 
             let resp = get_chat_response(script, &GET_TAGS).await.unwrap_or_default();
             let res: Vec<String> = serde_json::from_str(&resp).unwrap_or_default();
+
+            log::info!("TAGS: {res:?}");
+
+
             self.tags = Some(res);
         } else { 
             return Err(ServerError::MissingTranscript)
@@ -188,6 +195,9 @@ impl AudioData {
                 .await
                 .unwrap();
             
+            log::info!("TAGS: {new_analysis:?}");
+
+
             self.text_classification = Some(new_analysis);
         } else { 
             return Err(ServerError::MissingTranscript)
@@ -199,6 +209,8 @@ impl AudioData {
     /// Save object to database 
     #[tracing::instrument(level= "debug")]
     pub async fn save(&self) -> Result<Self> { 
+        log::info!("✅ Saving to database");
+
         AudioDB::add_entry(self).await
     }
 

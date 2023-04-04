@@ -1,8 +1,8 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use chrono::{NaiveDateTime, Utc, DateTime};
-use crate::error::Result;
+use chrono::{NaiveDateTime, Utc, DateTime, Weekday, Datelike};
+use crate::{error::Result, persistence::audio_analysis::{AnalysisDb, TextAnalysisInterface}};
 use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT};
 
 
@@ -12,10 +12,10 @@ pub struct TextClassification {
     pub id: Option<ObjectId>, 
     #[serde(rename = "_audio_id", skip_serializing_if = "Option::is_none")]
     audio_ref: Option<String>,
-    date: DateTime<Utc>,
-    day: Option<String>,
-    emotion_emoji: Option<String>, 
-    average_mood: Option<f64> 
+    date: Option<DateTime<Utc>>,
+    day: String,
+    emotion_emoji: Option<char>, 
+    average_mood: Option<f32>
 }
 
 impl TextClassification { 
@@ -25,10 +25,11 @@ impl TextClassification {
     pub fn new(audio_id: &str) -> Self { 
         let id = ObjectId::new();
         let date = Utc::now();
+        let day = date.weekday();
         Self { 
             id: Some(id), 
             audio_ref: Some(audio_id.to_string()),
-            date,
+            date: Some(date),
             ..Default::default()
         }
     }
@@ -54,12 +55,17 @@ impl TextClassification {
         let resp = get_chat_response(&input, &ANALYSE_TEXT_SENTIMENT).await.unwrap();
         let mut classification: TextClassification = serde_json::from_str(&resp).unwrap_or_default();
         
+
+        log::info!("classification -- {classification:#?} resp--- {resp}");
+
         // The id, audioId, date remain unchanged after text classification 
         // Ensure to update the resp's id, audioId, date
         classification.id = self.id;
         classification.audio_ref = self.audio_ref.clone();
         classification.date = self.date;
 
-        Ok(classification)
+        // Save on Database 
+        let res = AnalysisDb::add_analysis(classification).await?;
+        Ok(res)
     }   
 }

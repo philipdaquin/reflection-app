@@ -33,7 +33,8 @@ impl AudioInterface for AudioDB {
         let collection = AudioDB::get_collection();
         let insert_res = collection
             .insert_one(meta, None)
-            .await?;
+            .await
+            .expect("CANT INSTALL");
         let filter = doc! {"_id": &insert_res.inserted_id};
 
         collection.find_one(filter, None)

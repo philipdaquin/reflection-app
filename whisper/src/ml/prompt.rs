@@ -27,15 +27,15 @@ lazy_static! {
     do not write explanations. 
     do not create new labels unless I told you so.
     do not alter the `id`, `audio_ref` and `date`
-    In your response, the format should follow the structure below and you must only return this object and nothing else. 
+    In your response, return a json object, the format should follow the structure below and you must only return this object and nothing else. 
     
     `{{
-        pub id: Option<ObjectId>, 
-        audio_ref: Option<Uuid>,
-        date:  `mm/dd/yy`,
-        day:  `Monday`,
-        emotion_emoji: `🤣`, 
-        average_mood: 0.0
+        \"id\": null, 
+        \"audio_ref\": null,
+        \"date\":  null,
+        \"day\":  \"Monday\",
+        \"emotion_emoji\": \"🤣\", 
+        \"average_mood\": 0.0
     }}`
     
     The inputs are:  

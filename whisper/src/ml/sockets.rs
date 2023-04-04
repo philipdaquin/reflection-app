@@ -132,7 +132,7 @@ impl Handler<WhisperTranscribe> for WebSocketSession {
         let audio_data = tokio::spawn(async move {
             log::info!("🔉 Parsing Audio Data");
             // Parse audio data
-            let mut data = AudioData::new((&msg.0).to_vec())
+            let data = AudioData::new((&msg.0).to_vec())
                 .await
                 .map_err(|err| format!("Error parsing audio data: {}", err))
                 .expect("Unexpected error");

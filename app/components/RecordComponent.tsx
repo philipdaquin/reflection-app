@@ -80,7 +80,6 @@ function RecordComponent() {
                 })
                 .then(async (response) => {
 
-                    
 
                     const url = URL.createObjectURL(resp)
                     setAudioURL(url)

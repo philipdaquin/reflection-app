@@ -7,7 +7,9 @@ use crate::{controller::{configure_service}, persistence::db::MongoDbClient};
 pub async fn new_server(port: u32) -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    let mongodb_client = MongoDbClient::establish_connection().await;
+    let mongodb_client = MongoDbClient::establish_connection()
+        .await
+        .expect("Unable to establish MongoDB connection");
 
     log::info!("🚀 Starting HTTP server on port {} ", port);
     log::info!("📭 GraphiQL playground: http://localhost:{}/graphiql", port);
