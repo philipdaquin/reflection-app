@@ -7,7 +7,7 @@ import { getServerSideProps } from '../../pages/post_analysis/[id]'
 import { TextClassification } from '../../pages'
 
 interface Props { 
-  data: TextClassification[]
+  data: TextClassification[] | null
 }
 
 function HomeContents({data}: Props) {
@@ -31,6 +31,7 @@ function HomeContents({data}: Props) {
       audioUrl: 'https://www.youtube.com/watch?v=Ke90Tje7VS0'
     }
   ];
+
 
 
   return (

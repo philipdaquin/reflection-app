@@ -10,7 +10,7 @@ import { GetServerSideProps } from 'next'
 
 
 interface Props { 
-  data: TextClassification[]
+  data: TextClassification[] | null
 }
 
 function mood_summary({data}: Props) {
@@ -51,6 +51,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
           .then(resp => resp.json())
           .catch(err => { 
             console.error(err)
+            return null
           })
     )
   ]) 

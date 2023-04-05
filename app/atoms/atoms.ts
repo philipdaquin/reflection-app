@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+import { AudioData, TextClassification } from "../pages";
 
 export const TimerState = atom({
     key: 'TimerState',
@@ -12,5 +13,11 @@ export const RecordingState = atom({
 
 export const AudioUrl = atom<string | null>({ 
     key: 'AudioUrl',
+    default: null
+})
+
+
+export const AudioSummaryAtom = atom<AudioData | null>({ 
+    key: 'AudioSummaryAtom',
     default: null
 })

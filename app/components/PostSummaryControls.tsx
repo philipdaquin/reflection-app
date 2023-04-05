@@ -3,15 +3,34 @@ import React from 'react'
 import {TbMessageChatbot} from 'react-icons/tb'
 import {CheckIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
+import { useRecoilValue } from 'recoil'
+import { AudioSummaryAtom } from '../atoms/atoms'
+import { updateEntry } from '../util/updateEntry'
 
 
 function PostSummaryControls() {
     const router = useRouter()
+    const audioData = useRecoilValue(AudioSummaryAtom);
+    
+    const updateData = async () => {
+        if (!audioData) return 
+        updateEntry(audioData)
+            .then(resp => {
+                router.push('/mood_summary')
+            })
+            .catch(e => { 
+                console.error(e)
+                throw new Error(e)
+            })
+    }
+    
+    
+    
     const CONTINUE = () => { 
         return (
             
             <div className='bg-[#4285f4] h-full items-center flex justify-center cursor-pointer rounded-full px-5 py-3'
-            onClick={() => router.push('/mood_summary')}>
+            onClick={updateData}>
                 <CheckIcon height={24} width={24} strokeWidth={2} color="white"/>
                 {/* <h1 className='text-[15px] text-white font-bold text-center'>
 

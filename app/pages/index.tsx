@@ -18,17 +18,34 @@ export type TextClassification = {
   average_mood: number 
 }
 
-export type AudioData = { 
-  _id: string
-  transcription: string,
-  summary: string | null, 
-  text_classification: TextClassification,
-  tags: string[] | null
+export class AudioData { 
+  _id: string;
+  title: string | null;
+  transcription: string;
+  summary: string | null;
+  text_classification: TextClassification;
+  tags: string[] | null;
+
+  constructor(
+    _id: string,
+    title: string | null,
+    transcription: string,
+    summary: string | null,
+    text_classification: TextClassification,
+    tags: string[] | null,
+  ) {
+    this._id = _id;
+    this.title = title;
+    this.transcription = transcription;
+    this.summary = summary;
+    this.text_classification = text_classification;
+    this.tags = tags;
+  }
 }
 
 
 interface Props { 
-  data: TextClassification[]
+  data: TextClassification[] | null
 }
 
 
@@ -70,6 +87,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
           .then(resp => resp.json())
           .catch(err => { 
             console.error(err)
+            return null
           })
     )
   ]) 

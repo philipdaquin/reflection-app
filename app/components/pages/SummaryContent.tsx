@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import AudioPlayer from '../AudioPlayer'
 import AudioSynopsys from '../AudioSynopsys'
 import BackButton from '../BackButton'
@@ -6,34 +6,69 @@ import JournalThumbnail from '../JournalThumbnail'
 import SuggestedTags from '../SuggestedTags'
 import {CgTranscript} from 'react-icons/cg'
 import PostSummaryControls from '../PostSummaryControls'
+import { AudioData } from '../../pages'
+import { useRecoilState } from 'recoil'
+import { AudioSummaryAtom } from '../../atoms/atoms'
+
+interface DownloadProps { 
+    transcript : String 
+}
+function DownloadTranscript({transcript }: DownloadProps) { 
+    const [filename, setFilename] = useState('transcript.txt');
+
+    const downloadTranscript = () => {
+        const element = document.createElement('a');
+        // @ts-ignore
+        const file = new Blob([transcript], { type: 'text/plain' });
+        element.href = URL.createObjectURL(file);
+        element.download = filename;
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    };
+    
+    return (
+        <div onClick={downloadTranscript} className='flex cursor-pointer flex-row items-center space-x-2 pt-5'>
+            <CgTranscript size={24} />
+            <h1>Save transcript</h1>
+        </div>
+    ) 
+}
 
 
 interface Props { 
-    audioUrl: string
-    // title: string
-    summary: string
-    tags: string[]
-    transcript: string[]
+    data: AudioData
 }
 
-function SummaryContent({
-    audioUrl,
-    summary,
-    tags,
-    transcript,
-}: Props) {
+function SummaryContent({data}: Props) {
 
-    const saveButton = async () => { 
-        if (tags.length == 0) return new Error("Emprty Trasncript")
-        let formData = new FormData()
-        formData.append('transcript', tags.join(","))
-        const response = await fetch("/api/upload", {
-            method: "POST",
-            body: formData,
-        });
-        const data = await response.json();
-        console.log("Upload response:", data);
-    } 
+    const { _id, title, transcription, summary, tags, text_classification } = data
+    const [editedSummary, setEditedSummary] = useState(summary)
+    const [editedTags, setEditedTags] = useState(tags)
+    const [editedTitle, setEditedTitle] = useState('Journal Title')
+    const [audioDataAtom, setAudioDataAtom] = useRecoilState(AudioSummaryAtom);
+
+
+    // const audioData = new AudioData(
+    //     _id,
+    //     editedTitle,
+    //     transcription, 
+    //     editedSummary, 
+    //     text_classification, 
+    //     editedTags
+    // );
+    // setAudioDataAtom(audioData)
+
+    const handleSummaryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEditedSummary(event.target.textContent);
+    }
+    const handleTitleChange = (event: any) => {
+        // @ts-ignore
+        const input = event.target.value ||  title 
+        if (input?.length <= 20) {
+            setEditedTitle(input);
+        }
+    }
 
     return (
         <section>
@@ -46,16 +81,22 @@ function SummaryContent({
             
             <div className='flex flex-col items-center space-y-6 pb-7'>
                 <JournalThumbnail />
-                <h1 className='text-[20px] font-bold text-center'>What's it like to lose a pet</h1>
+                <textarea
+                    value={editedTitle}
+                    onChange={handleTitleChange}
+                    className='text-[20px] font-bold text-center outline-none w-full '/>
             </div>
             {/* media player */}
-            <AudioPlayer src={audioUrl} />
+            <AudioPlayer src={""} />
             {/* Text summary */}
-            <div className='pt-[25px]'>
-                <AudioSynopsys summary={summary} />
+            <div className='pt-4'>
+                <AudioSynopsys 
+                    summary={editedSummary} 
+                    onChange={handleSummaryChange} 
+                    />
             </div>
             {/* Suggested Tags */}
-            <h1 className="text-lg font-bold pt-2">Tags</h1>
+            <h1 className="text-md font-bold pt-5">Tags</h1>
             <div className="pt-3">
                 <div className="flex flex-wrap ">
                     {tags?.map((tag, index) => (
@@ -64,10 +105,7 @@ function SummaryContent({
                 </div>
             </div>
             {/* Button to save transcript to notes + summary*/}
-            <div onClick={saveButton} className='flex cursor-pointer flex-row items-center space-x-2 pt-5'>
-                <CgTranscript size={24} />
-                <h1>Save transcript</h1>
-            </div>
+           { transcription && <DownloadTranscript transcript={transcription}/>}
         </section>
     )
 }

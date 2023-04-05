@@ -6,28 +6,17 @@ import SummaryContent from '../../components/pages/SummaryContent'
 import PhoneView from '../../components/PhoneView'
 import PostSummaryControls from '../../components/PostSummaryControls'
 import SwitchView from '../../components/SwitchView'
-import { getTextSummary } from '../../util/getTextSummary'
 import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
-import { getRelatedTags } from '../../util/getRelatedTags'
 import { AudioData } from '..'
 import { getEntry } from '../../util/getEntry'
 
-//
-// url/post_analysis/id_url
+
 interface Props { 
-    orginalAudio: string
-    // title: string
-    summary: string
-    tags: string[]
-    transcription: string[]
+    data: AudioData 
 }
 
 function post_analysis({
-    orginalAudio,
-    // title,
-    summary,
-    tags,
-    transcription
+   data
 }: Props) {
 
     const router = useRouter()
@@ -46,15 +35,7 @@ function post_analysis({
 
                 <div className="flex items-center relative right-10 space-x-5">
                     <PostSummaryControls />
-                    <PhoneView children={
-                        <SummaryContent 
-                            audioUrl={orginalAudio}
-                            summary={summary}
-                            tags={tags}
-                            // title={}
-                            transcript={transcription}
-                        />
-                    }/>
+                    <PhoneView children={<SummaryContent data={data}/>}/>
                 </div>
                 <div className='md:block hidden'>
                     <SwitchView />
@@ -79,22 +60,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context: Get
     const { id } = context.params; // get the id from the pathname
   
     // fetch data from your server using the id
-    const {
-        _id,
-        summary,
-        tags,
-        text_classification,
-        transcription
-    } = await getEntry(id)
+    const data = await getEntry(id)
   
     // return the data as props to the component
     return {
       props: {
-        orginalAudio: "",
-        // title,
-        summary,
-        tags,
-        transcription
+        data
       }
     };
   }

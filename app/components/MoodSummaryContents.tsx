@@ -135,13 +135,13 @@ const eventData: EventData[] = [
 
 
 interface Props { 
-    data: TextClassification[]
+    data: TextClassification[] | null
 }
 
 function MoodSummaryContents({data}: Props) {
     
 
-    let weeklyData: WeeklyData[] = data.map((i) => new WeeklyData(i))
+    let weeklyData: WeeklyData[] | null | undefined = data?.map((i) => new WeeklyData(i))
 
     return (
         <section className='pb-10'>
@@ -166,9 +166,13 @@ function MoodSummaryContents({data}: Props) {
             </div>
 
             {/* Mood trend Graph */}
+            { weeklyData && (
+            
             <div className='w-full items-center pt-12'>
                 <MoodAreaChart data={weeklyData}/>
             </div>
+            
+            )}
 
             {/* Common Mood  */}
             <div className='pt-[24px] space-y-3'>
