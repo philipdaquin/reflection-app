@@ -4,7 +4,7 @@ use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
 use futures_util::stream::{TryStreamExt};
 use crate::{ml::{
     whisper::{AudioData, upload_audio}, 
-    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio}, persistence::{audio_db::{AudioDB, AudioInterface}, audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
+    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio, text_classification::TextClassification}, persistence::{audio_db::{AudioDB, AudioInterface}, audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
 use serde_derive::{Deserialize};
 use actix_web_actors::ws;
 
@@ -18,6 +18,7 @@ pub fn configure_service(cfg: &mut web::ServiceConfig) {
     .service(chat_response)
     .service(get_mood_summary)
     .service(get_entry)
+    .service(update_entry)
     // .service(
     //     web::resource("/ws")
     //         .route(web::get()
@@ -189,11 +190,16 @@ pub async fn get_entry(input: web::Json<Input>) -> Result<HttpResponse> {
     let audio = AudioDB::get_entry(&input.id)
         .await
         .map_err(|_| ServerError::NotFound(input.id.to_string()))?;
-
-
     log::info!("{audio:#?}");
-
     let serialized = serde_json::to_string(&audio).unwrap();
     Ok(HttpResponse::Ok().body(serialized))
+}
 
+#[route("/api/update-entry", method = "PUT")]
+pub async fn update_entry(data: web::Json<AudioData>) -> Result<HttpResponse> { 
+    let audio = AudioDB::update_entry(&data.id, &data).await?;
+    
+    log::info!("{audio:#?}");
+    
+    Ok(HttpResponse::Ok().json(audio))
 }

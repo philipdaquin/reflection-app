@@ -1,5 +1,4 @@
 use actix_multipart::Multipart;
-use bson::oid::ObjectId;
 use hound::{SampleFormat, WavReader};
 use serde::{Serialize, Deserialize};
 use std::{path::Path, sync::Arc, io::{BufReader, Cursor}};
@@ -10,12 +9,12 @@ use crate::ml::prompt::GET_TAGS;
 use futures_util::stream::{TryStreamExt};
 use actix_web::Result as ActixResult;
 use super::text_classification::TextClassification;
-use uuid::Uuid;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AudioData { 
     #[serde(rename = "_id")]
     pub id: String,
+    pub title: Option<String>,
     pub transcription: Option<String>,
     pub summary: Option<String>,
     pub text_classification: Option<TextClassification>,

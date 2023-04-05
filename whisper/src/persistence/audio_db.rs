@@ -87,6 +87,9 @@ impl AudioInterface for AudioDB {
     /// Update entry from id 
     #[tracing::instrument(fields(id,updated_meta), level= "debug", err)]
     async fn update_entry(id: &str, updated_meta: &AudioData) -> Result<AudioData> {
+        
+        log::info!("{updated_meta:#?}");
+        
         let collection = AudioDB::get_collection();
         let filter = doc! { "_id" : id.to_owned()};
         let update = doc! { "$set" : bson::to_document(updated_meta).unwrap()};
