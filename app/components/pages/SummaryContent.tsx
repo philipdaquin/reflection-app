@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { ChangeEvent, ChangeEventHandler, useEffect, useState } from 'react'
 import AudioPlayer from '../AudioPlayer'
 import AudioSynopsys from '../AudioSynopsys'
 import BackButton from '../BackButton'
@@ -45,33 +45,56 @@ function SummaryContent({data}: Props) {
     const { _id, title, transcription, summary, tags, text_classification } = data
     const [editedSummary, setEditedSummary] = useState(summary)
     const [editedTags, setEditedTags] = useState(tags)
-    const [editedTitle, setEditedTitle] = useState('Journal Title')
-    const [audioDataAtom, setAudioDataAtom] = useRecoilState(AudioSummaryAtom);
+    const [editedTitle, setEditedTitle] = useState(title)
+    
+
+    console.log(editedSummary)
+    console.log(editedTitle)
 
 
-    // const audioData = new AudioData(
-    //     _id,
-    //     editedTitle,
-    //     transcription, 
-    //     editedSummary, 
-    //     text_classification, 
-    //     editedTags
-    // );
-    // setAudioDataAtom(audioData)
+    const audioData = new AudioData(
+        _id,
+        editedTitle,
+        transcription, 
+        editedSummary, 
+        text_classification, 
+        editedTags
+    );
+    const [updatedAudioData, setUpdatedAudioData] = useState<AudioData | null>(null)
+    useEffect(() => {
+        const updatedAudioData = new AudioData(
+            _id,
+            editedTitle,
+            transcription, 
+            editedSummary, 
+            text_classification, 
+            editedTags
+        );
+        setUpdatedAudioData(updatedAudioData);
+      }, [
+        _id,
+        editedTitle,
+        transcription, 
+        editedSummary, 
+        text_classification, 
+        editedTags
+    ]);
+    const [, setAudioDataAtom] = useRecoilState(AudioSummaryAtom);
+    
+    
+    useEffect(() => { 
+        if (updatedAudioData) setAudioDataAtom(updatedAudioData)
+    }, [updatedAudioData, setAudioDataAtom])
 
-    const handleSummaryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEditedSummary(event.target.textContent);
+    const handleSummaryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        setEditedSummary(event.target.value);
     }
-    const handleTitleChange = (event: any) => {
-        // @ts-ignore
-        const input = event.target.value ||  title 
-        if (input?.length <= 20) {
-            setEditedTitle(input);
-        }
+    const handleTitleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        setEditedTitle(event.target.value);
     }
 
     return (
-        <section>
+        <section>asdsa
             <div className='flex flex-row items-center justify-between pb-5'>
                 <BackButton link='record' />
                 <h1 className='font-bold text-[15px] text-center '>Journal Entry Summary</h1>
@@ -82,7 +105,7 @@ function SummaryContent({data}: Props) {
             <div className='flex flex-col items-center space-y-6 pb-7'>
                 <JournalThumbnail />
                 <textarea
-                    value={editedTitle}
+                    value={editedTitle || ''}
                     onChange={handleTitleChange}
                     className='text-[20px] font-bold text-center outline-none w-full '/>
             </div>

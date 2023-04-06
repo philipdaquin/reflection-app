@@ -17,7 +17,7 @@ export const AudioUrl = atom<string | null>({
 })
 
 
-export const AudioSummaryAtom = atom<AudioData | null>({ 
+export const AudioSummaryAtom = atom<AudioData>({ 
     key: 'AudioSummaryAtom',
     default: null
 })
