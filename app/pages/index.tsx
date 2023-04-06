@@ -70,7 +70,7 @@ function Home({data}: Props) {
           <div className='md:block hidden'>
             <SwitchView />
           </div>
-        {/* <RecordComponent /> */}
+        <RecordComponent />
 
         </main>
       </div>

@@ -1,14 +1,17 @@
 use actix_multipart::Multipart;
+use futures::Stream;
 use hound::{SampleFormat, WavReader};
 use serde::{Serialize, Deserialize};
+use tokio::task::JoinHandle;
 use std::{path::Path, sync::Arc, io::{BufReader, Cursor}};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::{error::{Result, ServerError}, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}, persistence::audio_db::{AudioDB, AudioInterface}};
 use num_cpus;
 use crate::ml::prompt::GET_TAGS;
-use futures_util::stream::{TryStreamExt};
-use actix_web::Result as ActixResult;
+use futures_util::stream::{TryStreamExt, StreamExt};
+use actix_web::{Result as ActixResult, HttpResponse};
 use super::text_classification::TextClassification;
+use rayon::prelude::*;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AudioData { 
@@ -31,10 +34,13 @@ impl AudioData {
         // Generate a new UUID for the item 
         let id = uuid::Uuid::new_v4().to_string();
         let parsed_wav = parse_wav_file(wav).await?;
-        let transcription = AudioData::transcribe_audio(parsed_wav)
-            .await
-            .map_err(|_| ServerError::MissingTranscript)
-            .unwrap();
+        // let transcription = AudioData::transcribe_audio(parsed_wav)
+        //     .await
+        //     .map_err(|_| ServerError::MissingTranscript)
+        //     .unwrap();
+
+        let transcription = String::new();
+
         
         Ok(Self { 
             id, 
@@ -65,71 +71,68 @@ impl AudioData {
         
         // Output into one single segment
         params.set_single_segment(true);
-    
-        
-        params.set_print_realtime(true);
-        params.set_print_progress(true);
+        params.set_print_realtime(false);
+        params.set_print_progress(false);
         params.set_print_timestamps(false);    
         params.set_print_special(false);
         
-        // // Keep context between audio chunks 
-        // params.set_no_context(true);
+        // Keep context between audio chunks 
+        params.set_no_context(true);
         
-        // params.set_offset_ms(500);
+        params.set_offset_ms(0);
+        // Supress blank outputs
+        params.set_suppress_blank(true);
     
-        // // Supress blank outputs
-        // params.set_suppress_blank(true);
+        // Speed up audio by x2 (expect reduced accuracy)
+        params.set_speed_up(true);
     
-        // // Speed up audio by x2 (expect reduced accuracy)
-        // params.set_speed_up(false);
+        // Audio length in milliseconds 
+        params.set_duration_ms(0);
     
-        // // Audio length in milliseconds 
-        // params.set_duration_ms(3000);
-        // // params.set_duration_ms(0);
-    
-        // // The max number of tokens per audio chunk     
+        // The max number of tokens per audio chunk     
         // params.set_max_tokens(32);
-        // // params.set_max_tokens(0);
+        params.set_max_tokens(32);
     
-        // // Partial encoder context for better performance 
-        // params.set_audio_ctx(0);
-        // // Non Speech
-        // // If the probability of the no speech token is higher than this value AND
-        // // the decoding has failed due to 'pr'
-        // params.set_no_speech_thold(0.6);
+        // Partial encoder context for better performance 
+        params.set_audio_ctx(0);
+        // Non Speech
+        // If the probability of the no speech token is higher than this value AND
+        // the decoding has failed due to 'pr'
+        params.set_no_speech_thold(0.6);
     
-        // // Temperature to increase when falling back when the decoding fails to 
-        // // meet either of the thresholds elow  
-        // params.set_temperature_inc(-1.0);
+        // Temperature to increase when falling back when the decoding fails to 
+        // meet either of the thresholds elow  
+        params.set_temperature_inc(-1.0);
+        params.set_temperature(0.5);
     
-        // // If the averate log probability is lower than this value, treat the decoding as failed 
-        // // params.set_logprob_thold(100.0);
-        // params.set_logprob_thold(-1.0);
+        // If the averate log probability is lower than this value, treat the decoding as failed 
+        // params.set_logprob_thold(100.0);
+        params.set_logprob_thold(-1.0);
 
     
-        // // Temperature to use for sampling 
-        // // - Sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random
-        // //   while lower values like 0.2 will make it more focused and deterministic
-        // //   If set to 0, the model will use log probability to automatically increase the temperature until certain 
-        // //   thresholds are hit
-        // params.set_temperature(0.0);   
+        // Temperature to use for sampling 
+        // - Sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random
+        //   while lower values like 0.2 will make it more focused and deterministic
+        //   If set to 0, the model will use log probability to automatically increase the temperature until certain 
+        //   thresholds are hit
+        params.set_temperature(0.0);   
     
-        // // Number of threads to use during computation
-        // params.set_n_threads(8);
+        // Number of threads to use during computation
+        params.set_n_threads(8);
     
-        // // Translate the source to english 
-        // params.set_translate(false);
+        // Translate the source to english 
+        params.set_translate(false);
         
     
-        // // Spoken language
-        // params.set_language(Some("en"));
+        // Spoken language
+        params.set_language(Some("en"));
     
         log::info!("{}", num_cpus::get());
     
         // Whisper context 
         let mut ctx = WhisperContext::new(&whisper_path.to_string_lossy()).expect("failed to open model");
         // Run the model 
-        ctx.full(params, &samples).expect("failed to convert samples");
+        ctx.full_parallel(params, &samples, 1).expect("failed to convert samples");
         
         // Get the number of generate segments
         let num_segments = ctx.full_n_segments();
@@ -137,14 +140,92 @@ impl AudioData {
     
         for i in 0..num_segments {
             let segment = ctx.full_get_segment_text(i).expect("failed to get segment");
-            // let start_timestamp = ctx.full_get_segment_t0(i);
-            // let end_timestamp = ctx.full_get_segment_t1(i);
-            // let full_text = format!("[{} - {}]: {}", start_timestamp, end_timestamp, segment);
             res.push_str(&segment);
         }
-        // Save in memory 
-        log::info!("2. TRANSCRIPT {res}");
+
+        Ok(res)
+    }
     
+    ///
+    /// Transcribe each PCM audio chunks 
+    #[tracing::instrument(level= "debug")]
+    pub async fn transcribe_pcm_chunks(samples: Vec<f32>) -> Result<String> {
+        let mut res = String::new();
+    
+        // let mut samples = whisper_rs::convert_integer_to_float_audio(&wav_data);
+        
+        // samples = whisper_rs::convert_stereo_to_mono_audio(&samples).expect("Failed to convert to mono audio");
+        
+        let path = format!("./models/{}", SPEECH_ENGINE_MODEL.to_string());
+        // Whisper Model 
+        let whisper_path = Path::new(&path);
+        
+        //
+        // The decoding strategies are: 
+        //  - Beam Search with 5 beams usng log probability for the score function 
+        //  - Greedy decoding with best of 5 sampling. 
+        let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 5});
+        
+        // Output into one single segment
+        params.set_single_segment(true);
+        params.set_print_realtime(false);
+        params.set_print_progress(false);
+        params.set_print_timestamps(false);    
+        params.set_print_special(false);
+        
+        // Keep context between audio chunks 
+        params.set_no_context(true);
+        params.set_offset_ms(0);
+        // Supress blank outputs
+        params.set_suppress_blank(true);
+        // Speed up audio by x2 (expect reduced accuracy)
+        params.set_speed_up(true);
+        // Audio length in milliseconds 
+        params.set_duration_ms(0);
+        // The max number of tokens per audio chunk     
+        // params.set_max_tokens(32);
+        params.set_max_tokens(0);
+        // Partial encoder context for better performance 
+        params.set_audio_ctx(0);
+        // Non Speech
+        // If the probability of the no speech token is higher than this value AND
+        // the decoding has failed due to 'pr'
+        params.set_no_speech_thold(0.6);
+        // Temperature to increase when falling back when the decoding fails to 
+        // meet either of the thresholds elow  
+        params.set_temperature_inc(-1.0);
+        params.set_temperature(0.5);
+        // If the averate log probability is lower than this value, treat the decoding as failed 
+        // params.set_logprob_thold(100.0);
+        params.set_logprob_thold(-1.0);
+        // Temperature to use for sampling 
+        // - Sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random
+        //   while lower values like 0.2 will make it more focused and deterministic
+        //   If set to 0, the model will use log probability to automatically increase the temperature until certain 
+        //   thresholds are hit
+        params.set_temperature(0.0);   
+        // Number of threads to use during computation
+        params.set_n_threads(8);
+        // Translate the source to english 
+        params.set_translate(false);
+        // Spoken language
+        params.set_language(Some("en"));
+    
+    
+        // Whisper context 
+        let mut ctx = WhisperContext::new(&whisper_path.to_string_lossy())
+            .expect("failed to open model");
+        // Run the model 
+        ctx.full_parallel(params, &samples, 1).expect("failed to convert samples");
+        
+        // Get the number of generate segments
+        let num_segments = ctx.full_n_segments();
+    
+        for i in 0..num_segments {
+            let segment = ctx.full_get_segment_text(i).expect("failed to get segment");
+            res.push_str(&segment);
+        }
+
         Ok(res)
     }
     
@@ -212,7 +293,6 @@ impl AudioData {
 
         AudioDB::add_entry(self).await
     }
-
 }
 
 /// 
@@ -253,16 +333,146 @@ pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
     Ok(wav_data)
 
 }
+/// 
+/// Split the audio data and divide it into smaller chunks of a fixed size and process
+/// them separately
+pub async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<Vec<f32>>> { 
+    
+    let mut reader = Cursor::new(&bytes);
+    let wav_reader = WavReader::new(&mut reader).unwrap();
+    
+    let hound::WavSpec {
+        channels,
+        sample_rate,
+        bits_per_sample,
+        sample_format,
+    } = wav_reader.spec();
+    if channels != 1 {
+        panic!("expected mono audio file");
+    }
+    if sample_format != SampleFormat::Int {
+        panic!("expected integer sample format");
+    }
+    if sample_rate != 16000 {
+        log::warn!("expected 16KHz sample rate");
+    }
+    if bits_per_sample != 16 {
+        panic!("expected 16 bits per sample");
+    }
 
+    let wav_data = wav_reader
+        .into_samples::<i16>()
+        .map(|x| x.expect("sample"))
+        .collect::<Vec<_>>();
+
+    let chunks: Vec<Vec<i16>> = wav_data.chunks(chunk_size).map(|chunk| chunk.to_vec()).collect();
+    let result = chunks
+        .into_par_iter()
+        .map(|chunk| {
+            let mut samples = whisper_rs::convert_integer_to_float_audio(&chunk);
+            samples = whisper_rs::convert_stereo_to_mono_audio(&samples)
+                .expect("Failed to convert to mono audio");
+
+            samples
+        })
+        .collect();
+    
+    Ok(result)
+}
+///
 /// Helper function for receiving and transcribing Audio into String
-pub async fn upload_audio(mut payload: Multipart) -> ActixResult<AudioData> { 
-    let mut bytes = Vec::new();
+pub async fn upload_audio(mut payload: Multipart) -> ActixResult<HttpResponse> { 
+    let mut buffer = Vec::new();
     while let Some(mut item) = payload.try_next().await? { 
+        let mut bytes = Vec::new();
         // Write the content of the file of the temporary file 
         while let Some(chunk) = item.try_next().await? { 
             bytes.extend_from_slice(&chunk);
         }
+        // Add the audio files to the buffer 
+        buffer.push(bytes);
     }
-    let wav_data = AudioData::new(bytes).await.unwrap();
-    Ok(wav_data)
+    // let wav_data = AudioData::new(bytes).await.unwrap();
+    let batch_size = 10;
+    // let mut workers = Vec::new();
+
+    for i in (0..buffer.len()).step_by(batch_size) { 
+
+        let end = usize::min(i + batch_size, buffer.len());
+        let batch = &buffer[i..end];
+        
+        // Batch without any workers
+        let fut = batch
+            .iter()
+            .map(|data| {
+                parse_wav_file(data.to_vec())
+            }
+        );
+        let results = futures::future::try_join_all(fut).await.unwrap();
+        // Process the results
+        // for data in &results { 
+        //     let transcript = AudioData::transcribe_audio(data.to_vec()).await.unwrap();
+        //     // log::info!("{transcript:?}");
+        // }
+    }
+
+    Ok(HttpResponse::Ok().into())
+}
+/// 
+/// Split the payload into multiple smaller batches, which will be processed in parallel 
+/// to reduce processing time 
+pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> { 
+    let mut buffer = Vec::new();
+    while let Some(mut item) = payload.try_next().await.unwrap() { 
+        let mut bytes = Vec::new();
+        // Write the content of the file of the temporary file 
+        while let Some(chunk) = item.try_next().await.unwrap() { 
+            bytes.extend_from_slice(&chunk);
+        }
+        // Add the audio files to the buffer 
+        buffer.push(bytes);
+
+    }
+    Ok(buffer)
+}
+/// 
+/// Process each batch to a worker and generate audio transcripts in parallel. Once all the batches have been process, 
+/// aggregate the results and send an update to the client
+pub async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> ActixResult<HttpResponse> { 
+    let chunk_size = 1024 * 1024 * 2; // 5 MB chunks of audio
+    let batch_size = 32; // 32 batches
+
+    let mut results = String::new();    
+    for batch in buffer.par_chunks(batch_size).collect::<Vec<_>>() {
+        let mut tasks = Vec::new();
+        for data in batch {
+            // Split audio data into smaller pcm chunks 
+            let data = parse_audio_into_pcm_chunks(data, chunk_size).await.unwrap();
+            
+            // Spawn a worker to transcribe the chunk 
+            for sample in data {
+                let task = tokio::spawn(async move {
+                    let res = AudioData::transcribe_pcm_chunks(sample)
+                        .await
+                        .unwrap();
+                    log::info!("{res:?}");
+                    res
+                });
+                tasks.push(task);
+            }
+        }
+        // let batch_results = futures::future::join_all(tasks).await;
+        // for result in batch_results {
+        //     results.push_str(&result.unwrap())
+        // }
+
+        for sample in tasks { 
+            let res = sample.await.unwrap();
+            log::info!("{res:?}")
+        }
+
+    }
+    log::info!("{results:?}");
+
+    Ok(HttpResponse::Ok().into())
 }
