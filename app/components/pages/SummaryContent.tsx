@@ -48,18 +48,6 @@ function SummaryContent({data}: Props) {
     const [editedTitle, setEditedTitle] = useState(title)
     
 
-    console.log(editedSummary)
-    console.log(editedTitle)
-
-
-    const audioData = new AudioData(
-        _id,
-        editedTitle,
-        transcription, 
-        editedSummary, 
-        text_classification, 
-        editedTags
-    );
     const [updatedAudioData, setUpdatedAudioData] = useState<AudioData | null>(null)
     useEffect(() => {
         const updatedAudioData = new AudioData(
