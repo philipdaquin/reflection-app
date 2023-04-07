@@ -1,9 +1,8 @@
 use actix_multipart::Multipart;
-use futures::{Stream, stream::FuturesUnordered};
+use futures::{Stream};
 use hound::{SampleFormat, WavReader};
-use parking_lot::Mutex;
 use serde::{Serialize, Deserialize};
-use std::{path::Path, sync::Arc, io::{BufReader, Cursor}};
+use std::{path::Path,  io::{BufReader, Cursor}};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::{error::{Result, ServerError}, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}, persistence::audio_db::{AudioDB, AudioInterface}};
 use num_cpus;
@@ -35,18 +34,11 @@ impl AudioData {
     /// - Parse Audio Bytes into 16 Bytes 
     /// - Transcribe the Audio file
     /// - Return AudioData Object
-    pub async fn new(wav: Vec<u8>) -> Result<Self> {
+    pub async fn new(audio_batches: Vec<Vec<u8>>) -> Result<Self> {
         // Generate a new UUID for the item 
         let id = uuid::Uuid::new_v4().to_string();
-        let parsed_wav = parse_wav_file(wav).await?;
-        // let transcription = AudioData::transcribe_audio(parsed_wav)
-        //     .await
-        //     .map_err(|_| ServerError::MissingTranscript)
-        //     .unwrap();
+        let transcription = process_chunks_with_workers(audio_batches).await?;
 
-        let transcription = String::new();
-
-        
         Ok(Self { 
             id, 
             transcription: Some(transcription), 
@@ -150,7 +142,6 @@ impl AudioData {
 
         Ok(res)
     }
-    
     ///
     /// Transcribe each PCM chunks and return a String of Streams 
     // #[tracing::instrument(level= "debug", err)]
@@ -222,8 +213,7 @@ impl AudioData {
 
         Ok(stream)
     }
-    
-
+    ///
     /// Transcribe each PCM audio chunks and return as a Single Segment 
     #[tracing::instrument(level= "debug")]
     pub async fn transcribe_pcm_chunks(samples: Vec<f32>) -> Result<String> {
@@ -305,7 +295,6 @@ impl AudioData {
 
         Ok(res)
     }
-
     ///
     /// Get audio summary  
     #[tracing::instrument(level= "debug")]
@@ -321,7 +310,6 @@ impl AudioData {
         }
         Ok(self.clone())
     }
-    
     ///
     /// Get tags related to the passage
     #[tracing::instrument(level= "debug")]
@@ -361,7 +349,6 @@ impl AudioData {
         }
         Ok(self.clone())
     }
-
     /// 
     /// Save object to database 
     #[tracing::instrument(level= "debug")]
@@ -373,7 +360,7 @@ impl AudioData {
 }
 
 /// 
-/// Parse the audio data as a WAV file 
+/// Parse a single audio data chunk directly into 16 Hz format 
 #[tracing::instrument(level= "debug")]
 pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
     log::info!("👷‍♂️ Parsing WaV FILE");
@@ -412,6 +399,7 @@ pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
 }
 /// 
 /// Split the audio data and divide it into smaller chunks of a fixed size PCM audio chunks
+#[tracing::instrument(level= "debug")]
 pub async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<Vec<f32>>> { 
     
     let mut reader = Cursor::new(&bytes);
@@ -455,62 +443,7 @@ pub async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Re
     
     Ok(result)
 }
-///
-/// Helper function for receiving and transcribing Audio into String
-pub async fn upload_audio(mut payload: Multipart) -> ActixResult<HttpResponse> { 
-    let mut buffer = Vec::new();
-    while let Some(mut item) = payload.try_next().await? { 
-        let mut bytes = Vec::new();
-        // Write the content of the file of the temporary file 
-        while let Some(chunk) = item.try_next().await? { 
-            bytes.extend_from_slice(&chunk);
-        }
-        // Add the audio files to the buffer 
-        buffer.push(bytes);
-    }
-    // let wav_data = AudioData::new(bytes).await.unwrap();
-    let batch_size = 10;
-    // let mut workers = Vec::new();
 
-    for i in (0..buffer.len()).step_by(batch_size) { 
-
-        let end = usize::min(i + batch_size, buffer.len());
-        let batch = &buffer[i..end];
-        
-        // Batch without any workers
-        let fut = batch
-            .iter()
-            .map(|data| {
-                parse_wav_file(data.to_vec())
-            }
-        );
-        let results = futures::future::try_join_all(fut).await.unwrap();
-        // Process the results
-        // for data in &results { 
-        //     let transcript = AudioData::transcribe_audio(data.to_vec()).await.unwrap();
-        //     // log::info!("{transcript:?}");
-        // }
-    }
-
-    Ok(HttpResponse::Ok().into())
-}
-/// 
-/// Split the payload into multiple smaller batches, which will be processed in parallel 
-/// to reduce processing time 
-pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> { 
-    let mut buffer = Vec::new();
-    while let Some(mut item) = payload.try_next().await.unwrap() { 
-        let mut bytes = Vec::new();
-        // Write the content of the file of the temporary file 
-        while let Some(chunk) = item.try_next().await.unwrap() { 
-            bytes.extend_from_slice(&chunk);
-        }
-        // Add the audio files to the buffer 
-        buffer.push(bytes);
-
-    }
-    Ok(buffer)
-}
 /// 
 /// Process each batch to a worker and generate audio transcripts in parallel. Once all the batches have been process, 
 /// aggregate the results and send an update to the client
@@ -554,3 +487,27 @@ pub async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String>
     Ok(results)
 }
 
+/// 
+/// Split the payload into multiple smaller batches, which will be processed in parallel 
+/// to reduce processing time 
+pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> { 
+    let mut buffer = Vec::new();
+    while let Some(mut item) = payload.try_next().await.unwrap() { 
+        let mut bytes = Vec::new();
+        // Write the content of the file of the temporary file 
+        while let Some(chunk) = item.try_next().await.unwrap() { 
+            bytes.extend_from_slice(&chunk);
+        }
+        // Add the audio files to the buffer 
+        buffer.push(bytes);
+
+    }
+    Ok(buffer)
+}
+///
+/// Helper function for receiving and initialising AudioData
+pub async fn upload_audio(payload: Multipart) -> ActixResult<AudioData> { 
+    let audio_batches = batch_into_chunks(payload).await?;
+    let wav_data = AudioData::new(audio_batches).await.unwrap();
+    Ok(wav_data)
+}

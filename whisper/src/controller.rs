@@ -1,9 +1,8 @@
 
 use actix_multipart::{Multipart};
-use actix_web::{ route, HttpResponse, guard::{self}, Result, web, HttpRequest};
-use futures_util::stream::{TryStreamExt};
+use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
 use crate::{ml::{
-    whisper::{AudioData, upload_audio, batch_into_chunks, process_chunks_with_workers}, 
+    whisper::{AudioData, upload_audio}, 
     sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio, text_classification::TextClassification}, persistence::{audio_db::{AudioDB, AudioInterface}, audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
 use serde_derive::{Deserialize};
 use actix_web_actors::ws;
@@ -135,29 +134,19 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
 /// 
 #[route("/api/upload", method = "POST")]
 pub async fn upload(payload: Multipart) -> Result<HttpResponse> {
-    // let audio = upload_audio(payload)
-    //     .await?
-    //     .get_summary()
-    //     .await?
-    //     .get_sentimental_analysis()
-    //     .await?
-    //     .get_tags()
-    //     .await?
-    //     .save()
-    //     .await?;
-
-    let audio_batches = batch_into_chunks(payload).await?;
-    
-    process_chunks_with_workers(audio_batches).await?;
-    
-
+    let audio = upload_audio(payload)
+        .await?
+        .get_summary()
+        .await?
+        .get_sentimental_analysis()
+        .await?
+        .get_tags()
+        .await?
+        .save()
+        .await?;
     // log::info!("{audio:#?}");
-    // let serialized = serde_json::to_string(&audio)?;
-    // Ok(HttpResponse::Ok().body(serialized))
-    Ok(
-        HttpResponse::Ok()
-        .into()
-    )
+    let serialized = serde_json::to_string(&audio)?;
+    Ok(HttpResponse::Ok().body(serialized))
 }
 
 ///
@@ -165,26 +154,21 @@ pub async fn upload(payload: Multipart) -> Result<HttpResponse> {
 ///  Transcribes user audio and return MMPEG back to the user 
 #[route("/api/openai-chat", method = "POST")]
 pub async fn chat_response(payload: Multipart) -> Result<HttpResponse> {
-    // let transcribed = upload_audio(payload)
-    //     .await?
-    //     .transcription
-    //     .unwrap();
-    // // Send request to get OpenAI text response
-    // let resp = get_chat_response(&transcribed, &GENERAL_CONTEXT).await?;
-    // log::info!("✉️ {:#?}", resp);
-    // // Send a post request to get a Text to Speech 
-    // let tts_response = process_text_to_audio(&resp)
-    //     .await?;
-    // Ok(
-    //     HttpResponse::Ok()
-    //     .content_type("audio/mpeg")
-    //     .body(tts_response)
-    // )
-
-
+    let transcribed = upload_audio(payload)
+        .await?
+        .transcription
+        .unwrap();
+    
+    // Send request to get OpenAI text response
+    let resp = get_chat_response(&transcribed, &GENERAL_CONTEXT).await?;
+    
+    // Send a post request to get a Text to Speech 
+    let tts_response = process_text_to_audio(&resp)
+        .await?;
     Ok(
         HttpResponse::Ok()
-        .into()
+        .content_type("audio/mpeg")
+        .body(tts_response)
     )
 }
 ///

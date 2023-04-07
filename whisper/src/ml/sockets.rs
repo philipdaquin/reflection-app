@@ -4,8 +4,6 @@ use actix::{fut, Actor, AsyncContext, StreamHandler, ActorContext, WrapFuture, C
 use actix_web::{Result, Error};
 use actix_web_actors::{ws};
 use bytes::Bytes;
-use crate::{ml::{chat::get_chat_response, prompt::GENERAL_CONTEXT}};
-use super::whisper::AudioData;
 
 use actix_http::ws::Item as WsItem;
 
@@ -129,53 +127,46 @@ impl Handler<WhisperTranscribe> for WebSocketSession {
 
     fn handle(&mut self, msg: WhisperTranscribe, ctx: &mut Self::Context) -> Self::Result {
         
-        let audio_data = tokio::spawn(async move {
-            log::info!("🔉 Parsing Audio Data");
-            // Parse audio data
-            let data = AudioData::new((&msg.0).to_vec())
-                .await
-                .map_err(|err| format!("Error parsing audio data: {}", err))
-                .expect("Unexpected error");
+        // let audio_data = tokio::spawn(async move {
+        //     log::info!("🔉 Parsing Audio Data");
+        //     // Parse audio data
+        //     let data = AudioData::new((&msg.0).to_vec())
+        //         .await
+        //         .map_err(|err| format!("Error parsing audio data: {}", err))
+        //         .expect("Unexpected error");
+        //     log::info!("🔤 Transcribing Audio using Whisper");
+        //     // Run audio data into Whisper AI
+        //     data.transcription.unwrap()
+        // });
+        // let text_task = tokio::spawn(async move {
+        //     let resp = audio_data.await.unwrap();
+        //     // Send request to get OpenAI text response
+        //     let chat_response = get_chat_response(&resp, &GENERAL_CONTEXT)
+        //         .await
+        //         .map_err(|e| format!("Error getting chat response: {e}"))
+        //         .expect("Unexpected error");
+        //     log::info!("✉️ {:#?}", resp);
+        //     // Send a post request to get a Text to Speech 
+        //     // let tts_response = process_text_to_audio(&resp)
+        //     //     .await
+        //     //     .unwrap();
+        //     chat_response
+        // });
+        // // Wait for both task to finish 
+        // let fut = async move { 
+        //     let resp = text_task.await.unwrap();
+        //     Ok(resp)
+        // };
+        // fut.into_actor(self).then(|res : Result<String, Error>, act, ctx| {
+        //     if let Ok(data) = res { 
+        //         ctx.text(data)
+        //     } else { 
+        //         ctx.close(Some(ws::CloseCode::Error.into()))
+        //     }
+        //     fut::ready(())
+        // }).wait(ctx);
 
-            log::info!("🔤 Transcribing Audio using Whisper");
-            // Run audio data into Whisper AI
-            
-            data.transcription.unwrap()
-        });
-
-
-        let text_task = tokio::spawn(async move {
-            let resp = audio_data.await.unwrap();
-            // Send request to get OpenAI text response
-            let chat_response = get_chat_response(&resp, &GENERAL_CONTEXT)
-                .await
-                .map_err(|e| format!("Error getting chat response: {e}"))
-                .expect("Unexpected error");
-            log::info!("✉️ {:#?}", resp);
-            
-            // Send a post request to get a Text to Speech 
-            // let tts_response = process_text_to_audio(&resp)
-            //     .await
-            //     .unwrap();
-            chat_response
-        });
-
-        // Wait for both task to finish 
-        let fut = async move { 
-            let resp = text_task.await.unwrap();
-            Ok(resp)
-        };
-
-        fut.into_actor(self).then(|res : Result<String, Error>, act, ctx| {
-            if let Ok(data) = res { 
-                ctx.text(data)
-            } else { 
-                ctx.close(Some(ws::CloseCode::Error.into()))
-            }
-            
-            fut::ready(())
-
-        }).wait(ctx);
+        
 
         Ok(())
 
