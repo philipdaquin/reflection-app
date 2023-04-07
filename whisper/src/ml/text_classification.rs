@@ -14,8 +14,16 @@ pub struct TextClassification {
     audio_ref: Option<String>,
     date: Option<DateTime<Utc>>,
     day: String,
+    emotion: Option<String>,
     emotion_emoji: Option<char>, 
     average_mood: Option<f32>
+}
+
+#[derive(Debug, Serialize)]
+pub struct TopMood { 
+    emoji: Option<char>,
+    emotion: Option<String>,
+    percentage: Option<f32>
 }
 
 impl TextClassification { 
@@ -25,11 +33,13 @@ impl TextClassification {
     pub fn new(audio_id: &str) -> Self { 
         let id = ObjectId::new();
         let date = Utc::now();
-        // let day = date.weekday();
+        let day = date.weekday().to_string();
+
         Self { 
             id: Some(id), 
             audio_ref: Some(audio_id.to_string()),
             date: Some(date),
+            day,
             ..Default::default()
         }
     }
@@ -68,4 +78,7 @@ impl TextClassification {
         let res = AnalysisDb::add_analysis(classification).await?;
         Ok(res)
     }   
+    pub async fn most_common_moods() -> Vec<TopMood> { 
+        todo!()
+    }
 }

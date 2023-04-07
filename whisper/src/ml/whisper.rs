@@ -14,7 +14,7 @@ use rayon::prelude::*;
 use crossbeam::channel::{unbounded};
 
 const BATCH_SIZE: usize = 32;
-const CHUNK_SIZE: usize = 1024 * 1024 * 2;
+const CHUNK_SIZE: usize = 1024 * 1024 * 3;
 const NUM_WORKERS: usize = 5;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]

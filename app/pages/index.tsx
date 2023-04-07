@@ -14,6 +14,7 @@ export type TextClassification = {
   audio_ref: string,
   date: string,
   day: string,
+  emotion: string, 
   emotion_emoji: string | null,
   average_mood: number 
 }

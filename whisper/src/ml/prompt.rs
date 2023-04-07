@@ -34,6 +34,7 @@ lazy_static! {
         \"audio_ref\": null,
         \"date\":  null,
         \"day\":  \"Monday\",
+        \"emotion\": \"Happy\",
         \"emotion_emoji\": \"🤣\", 
         \"average_mood\": 0.0
     }}`

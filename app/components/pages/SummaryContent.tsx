@@ -82,7 +82,7 @@ function SummaryContent({data}: Props) {
     }
 
     return (
-        <section>asdsa
+        <section>
             <div className='flex flex-row items-center justify-between pb-5'>
                 <BackButton link='record' />
                 <h1 className='font-bold text-[15px] text-center '>Journal Entry Summary</h1>
@@ -95,7 +95,12 @@ function SummaryContent({data}: Props) {
                 <textarea
                     value={editedTitle || ''}
                     onChange={handleTitleChange}
-                    className='text-[20px] font-bold text-center outline-none w-full '/>
+                    style={{height: "40px"}}
+                    className='text-[20px] font-bold text-center outline-none w-full bg-gray-100 rounded-2xl '/>
+
+                { !editedTitle  && <div className='text-sm text-red-500 '>
+                    Enter Journal Title 
+                </div>}
             </div>
             {/* media player */}
             <AudioPlayer src={""} />
