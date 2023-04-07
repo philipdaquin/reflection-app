@@ -144,7 +144,7 @@ pub async fn upload(payload: Multipart) -> Result<HttpResponse> {
         .await?
         .save()
         .await?;
-    // log::info!("{audio:#?}");
+    log::info!("{audio:#?}");
     let serialized = serde_json::to_string(&audio)?;
     Ok(HttpResponse::Ok().body(serialized))
 }

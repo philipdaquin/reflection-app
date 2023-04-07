@@ -2,19 +2,19 @@ use actix_multipart::Multipart;
 use futures::{Stream};
 use hound::{SampleFormat, WavReader};
 use serde::{Serialize, Deserialize};
-use std::{path::Path,  io::{BufReader, Cursor}};
+use std::{path::Path,  io::{Cursor}};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::{error::{Result, ServerError}, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}, persistence::audio_db::{AudioDB, AudioInterface}};
 use num_cpus;
 use crate::ml::prompt::GET_TAGS;
 use futures_util::stream::{TryStreamExt, StreamExt};
-use actix_web::{Result as ActixResult, HttpResponse};
+use actix_web::{Result as ActixResult};
 use super::text_classification::TextClassification;
 use rayon::prelude::*;
-use crossbeam::channel::{unbounded, Receiver, Sender};
+use crossbeam::channel::{unbounded};
 
 const BATCH_SIZE: usize = 32;
-const CHUNK_SIZE: usize = 1024 * 1024 * 1;
+const CHUNK_SIZE: usize = 1024 * 1024 * 2;
 const NUM_WORKERS: usize = 5;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -359,10 +359,11 @@ impl AudioData {
     }
 }
 
+
 /// 
 /// Parse a single audio data chunk directly into 16 Hz format 
 #[tracing::instrument(level= "debug")]
-pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
+async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
     log::info!("👷‍♂️ Parsing WaV FILE");
     // let reader = BufReader::new(&bytes[..]);
     // let wav_reader = WavReader::new(reader).unwrap();
@@ -400,7 +401,7 @@ pub async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
 /// 
 /// Split the audio data and divide it into smaller chunks of a fixed size PCM audio chunks
 #[tracing::instrument(level= "debug")]
-pub async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<Vec<f32>>> { 
+async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<Vec<f32>>> { 
     
     let mut reader = Cursor::new(&bytes);
     let wav_reader = WavReader::new(&mut reader).unwrap();
@@ -443,11 +444,10 @@ pub async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Re
     
     Ok(result)
 }
-
 /// 
 /// Process each batch to a worker and generate audio transcripts in parallel. Once all the batches have been process, 
 /// aggregate the results and send an update to the client
-pub async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> { 
+async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> { 
     let (result_producer, result_consumer) = unbounded();
     for batch in buffer.par_chunks(BATCH_SIZE).collect::<Vec<_>>() {
         for data in batch {
@@ -458,6 +458,7 @@ pub async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String>
                 let task = tokio::spawn(async move {
                     AudioData::transcribe_pcm_chunks_into_stream(sample).await.unwrap() 
                 });
+                log::info!("✅✅");
                 result_producer.send(task).unwrap();
             }
         }
@@ -468,15 +469,32 @@ pub async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String>
     for _ in 0..NUM_WORKERS { 
         let result_consumer = result_consumer.clone();
         
+        // tokio::spawn(async move { 
+        //     // Collect and print out the results from each worker
+        //     while let Ok(task) = result_consumer.try_recv() {
+        //         let stream = task.await.unwrap();
+                
+        //         log::info!("SPAWNING WORKER");
+        //         let results_clone = Arc::clone(&results); // Clone the Arc to be moved into the closure
+        //         tokio::spawn(async move {
+        //             stream.for_each(|item| async move {
+        //                 let mut results = results_clone.lock();
+        //                 results.push_str(&item);
+        //             }).await;
+        //         });
+        //     }
+        // });
         let samples = tokio::spawn(async move { 
             // Collect and print out the results from each worker
             let workers = tokio::spawn(async move { 
                 let mut samples = String::new();
-                while let Ok(task) = result_consumer.recv() {
+                while let Ok(task) = result_consumer.try_recv() {
                     let stream = task.await.unwrap();
                     let stream_collection = stream.collect::<String>().await;           
                     samples.push_str(&stream_collection);
                 }
+                log::info!("📩: {samples}");
+
                 samples
             });
             workers.await.unwrap()
@@ -484,9 +502,12 @@ pub async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String>
         let segments = samples.await.unwrap();
         results.push_str(&segments);
     }
+    log::info!("FINAL: {results}");
+
     Ok(results)
 }
 
+/// 
 /// 
 /// Split the payload into multiple smaller batches, which will be processed in parallel 
 /// to reduce processing time 
