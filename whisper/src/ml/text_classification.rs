@@ -11,20 +11,14 @@ pub struct TextClassification {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>, 
     #[serde(rename = "_audio_id", skip_serializing_if = "Option::is_none")]
-    audio_ref: Option<String>,
-    date: Option<DateTime<Utc>>,
-    day: String,
-    emotion: Option<String>,
-    emotion_emoji: Option<char>, 
-    average_mood: Option<f32>
+    pub audio_ref: Option<String>,
+    pub date: Option<DateTime<Utc>>,
+    pub day: String,
+    pub emotion: Option<String>,
+    pub emotion_emoji: Option<char>, 
+    pub average_mood: Option<f32>
 }
 
-#[derive(Debug, Serialize)]
-pub struct TopMood { 
-    emoji: Option<char>,
-    emotion: Option<String>,
-    percentage: Option<f32>
-}
 
 impl TextClassification { 
 
@@ -78,7 +72,29 @@ impl TextClassification {
         let res = AnalysisDb::add_analysis(classification).await?;
         Ok(res)
     }   
+    
+    
+    /// Aggregates the top 3 most common mood within a week 
+    #[tracing::instrument(fields(input, self), level= "debug")]
     pub async fn most_common_moods() -> Vec<TopMood> { 
         todo!()
+    }
+}
+
+
+#[derive(Debug, Serialize, Clone)]
+pub struct TopMood { 
+    emoji: Option<String>,
+    emotion: Option<String>,
+    percentage: Option<f32>
+}
+
+impl TopMood { 
+    pub fn new(emoji: Option<String>, emotion: Option<String>, percent: Option<f32>) -> Self { 
+        Self { 
+            emoji, 
+            emotion,
+            percentage: percent
+        }
     }
 }
