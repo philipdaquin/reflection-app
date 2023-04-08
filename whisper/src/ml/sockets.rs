@@ -1,5 +1,15 @@
 use std::time::{Instant, Duration};
 
+///
+/// 
+///  This feature won't be available for this time now 
+/// 
+/// 
+/// 
+/// 
+/// 
+/// 
+/// 
 use actix::{fut, Actor, AsyncContext, StreamHandler, ActorContext, WrapFuture, ContextFutureSpawner, Message, Handler, ActorFutureExt};
 use actix_web::{Result, Error};
 use actix_web_actors::{ws};

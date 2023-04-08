@@ -3,7 +3,7 @@ use actix_multipart::{Multipart};
 use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
 use crate::{ml::{
     whisper::{AudioData, upload_audio}, 
-    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio, text_classification::TextClassification}, persistence::{audio_db::{AudioDB, AudioInterface}, audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
+    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio, text_classification::TextClassification, recommendation::RecommendedActivity}, persistence::{audio_db::{AudioDB, AudioInterface}, audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
 use serde_derive::{Deserialize};
 use actix_web_actors::ws;
 
@@ -200,5 +200,46 @@ pub async fn update_entry(data: web::Json<AudioData>) -> Result<HttpResponse> {
     
     log::info!("{audio:#?}");
     
-    Ok(HttpResponse::Ok().json(audio))
+    let serialized = serde_json::to_string(&audio).unwrap();
+    Ok(HttpResponse::Ok().body(serialized))
+}
+
+/// 
+/// Generate the weekly summary for the user 
+#[route("/api/get-common-mood", method = "GET")]
+pub async fn get_common_mood() -> Result<HttpResponse> { 
+    let mood = TextClassification::get_most_common_moods().await.unwrap();
+    
+    log::info!("{mood:?}");
+    
+    let serialized = serde_json::to_string(&mood).unwrap();
+    Ok(HttpResponse::Ok().body(serialized))
+}
+
+#[route("/api/get-weekly-summary", method = "GET")]
+pub async fn get_weekly_patterns() -> Result<HttpResponse>  { 
+    let mood_patterns = TextClassification::get_weekly_patterns().await.unwrap();
+    
+    
+    let serialized = serde_json::to_string(&mood_patterns).unwrap();
+    Ok(HttpResponse::Ok().body(serialized))
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Summaries { 
+    summaries: Option<Vec<String>>
+}
+
+#[route("/api/get-weekly-recommendation", method = "POST")]
+pub async fn get_weekly_recommendation(input: web::Json<Summaries>) -> Result<HttpResponse> { 
+
+    let summaries = input.into_inner().summaries;
+
+    if summaries.is_none() {
+        return Ok(HttpResponse::NotAcceptable().into())
+    }
+    let recommendation = RecommendedActivity::get_personalised_recommendations(summaries.unwrap()).await.unwrap();
+
+    let serialized = serde_json::to_string(&recommendation).unwrap();
+    Ok(HttpResponse::Ok().body(serialized))
 }

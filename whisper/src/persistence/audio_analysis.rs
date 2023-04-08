@@ -35,10 +35,8 @@ impl TextAnalysisInterface for AnalysisDb {
         log::info!("Retrieving recent dataset...");
         let mut result = Vec::with_capacity(10);
         let collection = AnalysisDb::get_analysis_db();
-        let today = Utc::now();
-        // let seven_days_ago = today - chrono::Duration::days(7);
-        let seven_days_ago = today;
-        let in_bson = bson::DateTime::from_chrono(seven_days_ago);
+        let seven_days_ago = Utc::now() - Duration::days(7);
+        // let in_bson = bson::DateTime::from_chrono(seven_days_ago);
         // let filter = doc! { "date": { "$gte": in_bson } };
         let filter = doc! { "day": "Monday" };
         
@@ -274,6 +272,10 @@ impl TextAnalysisInterface for AnalysisDb {
 
         Ok(result)        
     }
+
+    // pub async fn save_weekly_patterns() -> Result<()> { 
+    //     todo!()
+    // }
 
 
     /// Access to collection
