@@ -12,7 +12,7 @@ function AudioSynopsys({summary, onChange}: Props) {
             <h1 className='text-md font-bold'>Summary</h1>
             <textarea className='text-[#424242] border-2 rounded-2xl bg-gray-100 p-2 w-full h-full text-[13px] outline-none' 
               onChange={onChange}
-              style={{ minHeight: '80px' }} 
+              style={{ minHeight: '200px' }} 
               value={summary || ''}
             />
         </div>

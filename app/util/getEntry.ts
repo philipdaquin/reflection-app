@@ -17,6 +17,7 @@ export async function getEntry(id: string): Promise<AudioData> {
         return body
     })
     .catch((e) => {
+        console.error(e)
         throw new Error(e)
     })
 }
