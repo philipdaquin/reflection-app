@@ -3,6 +3,7 @@ import MoodAreaChart from './MoodAreaChart'
 import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
 import CommonMoodContainer from './CommonMoodContainer'
 import { TextClassification } from '../pages'
+import { TopMood } from '../pages/mood_summary'
 
 
 export type CommonMoodData = {  
@@ -135,13 +136,15 @@ const eventData: EventData[] = [
 
 
 interface Props { 
-    data: TextClassification[] | null
+    mood_trends: TextClassification[] | null,
+    most_common_mood: TopMood[] | null, 
+
 }
 
-function MoodSummaryContents({data}: Props) {
+function MoodSummaryContents({mood_trends, most_common_mood}: Props) {
     
 
-    let weeklyData: WeeklyData[] | null | undefined = data?.map((i) => new WeeklyData(i))
+    let weeklyData: WeeklyData[] | null | undefined = mood_trends?.map((i) => new WeeklyData(i))
 
     return (
         <section className='pb-10'>
@@ -177,10 +180,11 @@ function MoodSummaryContents({data}: Props) {
             {/* Common Mood  */}
             <div className='pt-[24px] space-y-3'>
                 <h1 className='text-left font-bold text-[#757575] text-[14px]'>Most Common Moods</h1>
-                <div className='flex flex-wrap'>
+                <div className='flex flex-wrap '>
                     {
-                        moodData.map((data, k) => {
+                        most_common_mood?.map((data, k) => {
                             return (
+                                
                                 <div key={k}>
                                     <CommonMoodContainer moodData={data}/>
                                 </div> 

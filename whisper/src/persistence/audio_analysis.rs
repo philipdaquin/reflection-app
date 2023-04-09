@@ -8,18 +8,20 @@ use crate::ml::text_classification::TopMood;
 use crate::{error::Result, ml::text_classification::TextClassification};
 use super::db::MongoDbClient;
 use futures_util::TryStreamExt;
-
+use futures_util::StreamExt;
 const DB_NAME: &str = "human-assistant";
 const COLL_NAME: &str = "analysis";
 
 #[async_trait]
 pub trait TextAnalysisInterface { 
     async fn add_analysis(new_analysis: TextClassification) -> Result<TextClassification>;
-    async fn delete_analysis(id: ObjectId) -> Result<()>;
+    async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>>;
     async fn get_recent() -> Result<Vec<TextClassification>>;
     async fn get_most_common_emotions() -> Result<Vec<TopMood>>;
     async fn get_inflect_point_of_mood_in_week() -> Result<Option<TextClassification>>;
     async fn get_min_max_points_in_week() -> Result<Vec<TextClassification>>;
+    async fn delete_all_entries() -> Result<bool>;
+
     fn get_analysis_db() -> Collection<TextClassification>;
     
 }
@@ -38,7 +40,8 @@ impl TextAnalysisInterface for AnalysisDb {
         let seven_days_ago = Utc::now() - Duration::days(7);
         // let in_bson = bson::DateTime::from_chrono(seven_days_ago);
         // let filter = doc! { "date": { "$gte": in_bson } };
-        let filter = doc! { "day": "Monday" };
+        // let filter = doc! { "day": "Monday" };
+        let filter = doc! { };
         
         // Get the matching document 
         let mut doc = collection.find(filter, None).await?;
@@ -55,7 +58,9 @@ impl TextAnalysisInterface for AnalysisDb {
         log::info!("✅ Saving Analysis to database {new_analysis:#?}");
         let collection = AnalysisDb::get_analysis_db();
         let item = collection.insert_one(new_analysis, None).await?;
-        
+
+        log::info!("{item:#?}");
+
         let filter = doc! {"_id": &item.inserted_id};
 
         let res = collection.find_one(filter, None).await?.unwrap();
@@ -64,90 +69,89 @@ impl TextAnalysisInterface for AnalysisDb {
     }
     /// Delete Analysis 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
-    async fn delete_analysis(id: ObjectId) -> Result<()> {
+    async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>> {
         let collection = AnalysisDb::get_analysis_db();
 
         let filter = doc! {"_id": &id};        
         
-        collection
+        let item = collection
             .find_one_and_delete(filter, None)
-            .await?
-            .unwrap();
-        Ok(())
+            .await?;
+        Ok(item)
     }
 
     /// Aggregate the top 3 most commonly mood / emotion over the week 
     #[tracing::instrument(level= "debug", err)]
     async fn get_most_common_emotions() -> Result<Vec<TopMood>> {
         let collection = AnalysisDb::get_analysis_db();
-        
-         // Aggregate the top 3 most commonly recorded mood/emotion over the week or days
+    
+        // Aggregate the top 3 most commonly recorded mood/emotion over the week or days
         let pipeline = vec![
-            // Match documents with non-null emotion field
-            doc! {"$match": {"emotion": {"$ne": null}}},
-            // Group by emotion and day, and count the number of documents in each group
+            // Filter for documents within the last 7 days
+            doc! {
+                "$match": {
+                    // "start_week": {"$gte": Utc::now().date().naive_utc().add_signed(Duration::days(-7))}
+                    // "day": "Monday"
+
+                    "emotion": {"$ne": null},
+                    // "emoji": {"$ne": null},
+                    // "average_mood": {"$ne": null},
+
+                }
+            },
+            // Unwind the common_mood array
+            // doc! {"$unwind": "$common_mood"},
+            // Group by emotion and count the number of occurrences
             doc! {
                 "$group": {
                     "_id": {
-                        "emotion": "$emotion",
-                        "day": "$day"
+                        "emotion": "$emotion", 
+                        "emotion_emoji": "$emotion_emoji",
                     },
                     "count": {"$sum": 1}
                 }
             },
             // Sort by count in descending order
             doc! {"$sort": {"count": -1}},
-            // Group by emotion and calculate the percentage of days each emotion was recorded
-            doc! {
-                "$group": {
-                    "_id": "$_id.emotion",
-                    "days": {
-                        "$push": {
-                            "day": "$_id.day",
-                            "percentage": {
-                                "$multiply": [
-                                    {"$divide": ["$count", {"$count": "$_id.day"}]},
-                                    100
-                                ]
-                            }
-                        }
-                    },
-                    "total_count": {"$sum": "$count"}
-                }
-            },
-            // Sort by total count in descending order
-            doc! {"$sort": {"total_count": -1}},
+
+            // TESTING PURPOSES
+            // doc! {"$sort": {"count": 1}},
             // Limit to top 3 emotions
             doc! {"$limit": 3},
-            // Project only the emotion and days fields
-            doc! {"$project": {"_id": 0, "emotion": "$_id", "days": 1}},
-        ];
 
+            // Project the result to the desired format
+            doc! {
+                "$project": {
+                    "_id": 0,
+                    "emotion": "$_id.emotion",
+                    "emotion_emoji": "$_id.emotion_emoji",
+                    "count": 1
+                }
+            }
+          
+        ];
+        let options = AggregateOptions::builder().build();
+    
         // Execute the aggregation pipeline and retrieve the results 
-        let mut doc = collection.aggregate(pipeline, None).await.unwrap();
-        
-        // Calculate the total number of record  
+        let mut doc = collection.aggregate(pipeline, options).await.unwrap();
+        // Calculate the total number of records  
         let total_records = collection.count_documents(None, None).await?;
         let mut result = Vec::new();
-
+    
         // Map the aggregated results 
-        while let Some(item) = doc.try_next().await? { 
-            let count = item.get_i32("count").unwrap_or(0);
-            let percentage = count as f32 / total_records as f32 * 100.0;
-            let emotion = item
-                .get_str("emotion").map(|f| f.to_string())
-                .ok()
-                .clone();
-            let emoji = item
-                .get_str("emotion_emoji").map(|f| f.to_string())
-                .ok()
-                .clone();
+        while let Some(item) = doc.try_next().await? {
+            let count = item.get_i32("count").unwrap_or(0) as f32;
+            let percent = count / total_records as f32 * 100.0;
+            let emotion = item.get_str("emotion").unwrap_or_default().to_string();
+            let emoji = item.get_str("emotion_emoji").unwrap_or_default().to_string();
+            result.push(TopMood::new(Some(emoji), Some(emotion), Some(percent)));
+        }
+        log::info!("{result:#?}");
 
-            result.push(TopMood::new(emoji, emotion, Some(percentage)));
-       } 
-
+    
         Ok(result)
     }
+    
 
     /// Get the biggest difference in averageMood within the last 7 days 
     #[tracing::instrument(level= "debug", err)]
@@ -157,7 +161,7 @@ impl TextAnalysisInterface for AnalysisDb {
 
          // Aggregate by day and calculate average mood for each day
         let pipeline = vec![
-            doc! {"$match": {"$and": [{"date": {"$gte": seven_days_ago}}, {"emotion": {"$ne": null}}]}}, // Filter out documents with null emotion and date greater than or equal to 7 days ago
+            // doc! {"$match": {"$and": [{"date": {"$gte": seven_days_ago}}, {"emotion": {"$ne": null}}]}}, // Filter out documents with null emotion and date greater than or equal to 7 days ago
             doc! {
                 "$group": {
                     "_id": "$date",
@@ -176,7 +180,7 @@ impl TextAnalysisInterface for AnalysisDb {
         let mut cursor = collection.aggregate(pipeline, None).await?;
         while let Some(doc) = cursor.try_next().await? {
             let bson = bson::from_document(doc.clone()).unwrap();
-            let object: TextClassification = bson::from_bson(bson).unwrap();
+            let object: TextClassification = bson::from_bson(bson).unwrap_or_default();
             result.push(object);
         }
 
@@ -188,8 +192,8 @@ impl TextAnalysisInterface for AnalysisDb {
         //
         //  Calculate first_derivative, second_derivative and inflection_point 
         for i in 1..result.len() {
-            let first_derivative = result[i].average_mood.unwrap() - result[i-1].average_mood.unwrap();
-            let second_derivative = first_derivative - (result[i-1].average_mood.unwrap() - result[i-2].average_mood.unwrap());
+            let first_derivative = result[i].average_mood.unwrap_or_default() - result[i-1].average_mood.unwrap_or_default();
+            let second_derivative = first_derivative - (result[i-1].average_mood.unwrap_or_default() - result[i-2].average_mood.unwrap_or_default());
             
             if first_derivative_sign.is_none() && first_derivative != 0.0 {
                 first_derivative_sign = Some(first_derivative.signum());
@@ -276,6 +280,16 @@ impl TextAnalysisInterface for AnalysisDb {
     // pub async fn save_weekly_patterns() -> Result<()> { 
     //     todo!()
     // }
+    
+    async fn delete_all_entries() -> Result<bool> {
+        let collection = AnalysisDb::get_analysis_db();
+
+        let filter = doc! {};
+
+        collection.delete_many(filter, None).await?;
+
+        Ok(true)
+    }
 
 
     /// Access to collection

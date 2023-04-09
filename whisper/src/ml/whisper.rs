@@ -1,4 +1,5 @@
 use actix_multipart::Multipart;
+use bson::oid::ObjectId;
 use futures::{Stream};
 use hound::{SampleFormat, WavReader};
 use serde::{Serialize, Deserialize};
@@ -19,8 +20,8 @@ const NUM_WORKERS: usize = 5;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AudioData { 
-    #[serde(rename = "_id")]
-    pub id: String,
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
     pub title: Option<String>,
     pub transcription: Option<String>,
     pub summary: Option<String>,
@@ -36,11 +37,11 @@ impl AudioData {
     /// - Return AudioData Object
     pub async fn new(audio_batches: Vec<Vec<u8>>) -> Result<Self> {
         // Generate a new UUID for the item 
-        let id = uuid::Uuid::new_v4().to_string();
         let transcription = process_chunks_with_workers(audio_batches).await?;
+        let id = ObjectId::new().to_string();
 
         Ok(Self { 
-            id, 
+            id: Some(id), 
             transcription: Some(transcription), 
             ..Default::default()
         })
@@ -334,8 +335,7 @@ impl AudioData {
     pub async fn get_sentimental_analysis(&mut self) -> Result<Self> { 
         
         if let Some(transcript) = &self.transcription { 
-            
-            let new_analysis = TextClassification::new(&self.id)
+            let new_analysis = TextClassification::new(self.id.clone())
                 .get_text_analysis(&transcript)
                 .await
                 .unwrap();
@@ -349,6 +349,14 @@ impl AudioData {
         }
         Ok(self.clone())
     }
+    
+    ///
+    /// Deletes both AudioData and Analysis 
+    #[tracing::instrument(level= "debug")]
+    pub async fn delete_entry(id: ObjectId) -> Result<()> { 
+        todo!()
+    }
+    
     /// 
     /// Save object to database 
     #[tracing::instrument(level= "debug")]

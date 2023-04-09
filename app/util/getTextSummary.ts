@@ -5,7 +5,7 @@
 */
 export async function getTextSummary(input: string): Promise<string> { 
 
-    return fetch("http://localhost:4001/api/summary", {
+    return fetch("http://localhost:4001/api/audio/summary", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

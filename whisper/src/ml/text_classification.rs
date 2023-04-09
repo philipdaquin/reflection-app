@@ -1,23 +1,23 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use chrono::{NaiveDateTime, Utc, DateTime, Weekday, Datelike};
+use chrono::{NaiveDateTime, Weekday, Datelike, DateTime, Utc};
 use crate::{error::Result, persistence::audio_analysis::{AnalysisDb, TextAnalysisInterface}};
 use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT};
 
 
-
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct TopMood { 
-    emoji: Option<String>,
-    emotion: Option<String>,
-    percentage: Option<f32>
+    pub emotion: Option<String>,
+    // #[serde(rename = "emoji", skip_serializing_if = "Option::is_none")]
+    pub emotion_emoji: Option<String>,
+    pub percentage: Option<f32>
 }
 
 impl TopMood { 
-    pub fn new(emoji: Option<String>, emotion: Option<String>, percent: Option<f32>) -> Self { 
+    pub fn new(emotion_emoji: Option<String>, emotion: Option<String>, percent: Option<f32>) -> Self { 
         Self { 
-            emoji, 
+            emotion_emoji, 
             emotion,
             percentage: percent
         }
@@ -31,8 +31,10 @@ pub struct WeeklyPattern {
     
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>, 
-    start_week: DateTime<Utc>,
-    end_week: DateTime<Utc>,
+    // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    start_week: Option<NaiveDateTime>,
+    // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    end_week: Option<NaiveDateTime>,
     common_mood: Option<Vec<TopMood>>,
     inflection: Option<TextClassification>,
     min: Option<TextClassification>,
@@ -50,12 +52,14 @@ impl WeeklyPattern {
 pub struct TextClassification { 
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>, 
+    
     #[serde(rename = "_audio_id", skip_serializing_if = "Option::is_none")]
-    pub audio_ref: Option<String>,
-    pub date: Option<DateTime<Utc>>,
+    pub audio_ref: Option<ObjectId>,
+    // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
+    pub date: Option<NaiveDateTime>,
     pub day: String,
     pub emotion: Option<String>,
-    pub emotion_emoji: Option<char>, 
+    pub emotion_emoji: Option<String>, 
     pub average_mood: Option<f32>
 }
 
@@ -63,14 +67,14 @@ impl TextClassification {
 
     ///
     /// Intialise new TextClassification with updated Id, date, and audioId
-    pub fn new(audio_id: &str) -> Self { 
+    pub fn new(audio_ref: Option<String>) -> Self { 
         let id = ObjectId::new();
-        let date = Utc::now();
+        let date = Utc::now().naive_local();
         let day = date.weekday().to_string();
 
         Self { 
             id: Some(id), 
-            audio_ref: Some(audio_id.to_string()),
+            audio_ref: audio_ref.map(|a| ObjectId::parse_str(a).expect("Unable to convert String to ObjectId")),
             date: Some(date),
             day,
             ..Default::default()
@@ -106,7 +110,8 @@ impl TextClassification {
         classification.id = self.id;
         classification.audio_ref = self.audio_ref.clone();
         classification.date = self.date;
-
+        classification.day = self.day.clone();
+        
         // Save on Database 
         let res = AnalysisDb::add_analysis(classification).await?;
         Ok(res)
@@ -116,6 +121,8 @@ impl TextClassification {
     /// Aggregates the top 3 most common mood within a week 
     #[tracing::instrument(fields(input, self), level= "debug")]
     pub async fn get_most_common_moods() -> Result<Vec<TopMood>> { 
+        log::info!("✅✅✅");
+        
         let weekly = AnalysisDb::get_most_common_emotions().await.unwrap();
 
         log::info!("Common Mood: {weekly:?}");
@@ -132,17 +139,18 @@ impl TextClassification {
         let inflection = AnalysisDb::get_inflect_point_of_mood_in_week()
             .await
             .unwrap()
-            .unwrap();
+            .expect("Unable to get inflection point");
 
         // Highlight the max and min points of the user's mood 
-        let mut min_and_max = AnalysisDb::get_min_max_points_in_week()
+        let min_and_max = AnalysisDb::get_min_max_points_in_week()
             .await
-            .unwrap();
+            .unwrap_or_default();
 
-        min_and_max.push(inflection);
+        let mut res = Vec::new();
+        res.extend(min_and_max);
+        res.push(inflection);
 
-        log::info!("Mood patterns: {min_and_max:?}");
 
-        Ok(min_and_max)
+        Ok(res)
     }
 }

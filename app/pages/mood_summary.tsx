@@ -9,9 +9,9 @@ import { TextClassification } from '.'
 import { GetServerSideProps } from 'next'
 
 
-type TopMood = { 
-  emoji: string | null, 
+export type TopMood = { 
   emotion: string | null, 
+  emotion_emoji: string | null, 
   percentage: string | null
 }
 
@@ -41,7 +41,14 @@ function mood_summary({
                 <div className='relative right-10'>
                   <NavigationButtons />        
                 </div>
-                <PhoneView children={<MoodSummaryContents data={mood_trends}/>} />
+                <PhoneView children={
+                  <MoodSummaryContents 
+                  mood_trends={mood_trends}
+                  most_common_mood={most_common_mood}
+                  
+                  />
+                
+                }/>
               </div>
               <div className='md:block hidden'>
                 <SwitchView />
@@ -66,7 +73,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   ] = await Promise.all([
 
     (
-      await fetch('http://localhost:4001/api/mood-summary-update')
+      await fetch('http://localhost:4001/api/analysis/get-mood-summary')
           .then(resp => resp.json())
           .catch(err => { 
             console.error(err)
@@ -74,7 +81,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
           })
     ),
     (
-      await fetch('http://localhost:4001/api/get-common-mood')
+      await fetch('http://localhost:4001/api/analysis/get-common-mood')
           .then(resp => resp.json())
           .catch(err => { 
             console.error(err)

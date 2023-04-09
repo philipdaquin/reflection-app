@@ -7,7 +7,7 @@ export async function uploadWav(wavFile: Blob): Promise<boolean> {
     data.append('audio', wavFile, 'recording.wav')
 
     try { 
-        const resp = await fetch('http://localhost:4001/', { 
+        const resp = await fetch('http://localhost:4001/audio/upload', { 
             method: 'POST',
             body: data
         });

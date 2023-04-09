@@ -14,7 +14,7 @@ const COLL_NAME: &str = "metadata";
 pub trait AudioInterface { 
     async fn add_entry(meta: &AudioData) -> Result<AudioData>;
     async fn delete_all_entries() -> Result<()>;
-    async fn detete_one(id: &str) -> Result<()>;
+    async fn delete_one_entry(id: &str) -> Result<Option<AudioData>>;
     async fn get_entry(id: &str) -> Result<AudioData>;
     async fn update_entry(id: &str, updated_meta: &AudioData) -> Result<AudioData>;
     fn get_collection() -> Collection<AudioData>;
@@ -33,13 +33,12 @@ impl AudioInterface for AudioDB {
         let collection = AudioDB::get_collection();
         let insert_res = collection
             .insert_one(meta, None)
-            .await
-            .expect("CANT INSTALL");
+            .await?;
         let filter = doc! {"_id": &insert_res.inserted_id};
 
         collection.find_one(filter, None)
             .await?
-            .ok_or(ServerError::NotFound(format!("{}", meta.id.to_string())))
+            .ok_or(ServerError::NotFound(format!("{:?}", meta.id.to_owned())))
     }
 
     ///
@@ -56,16 +55,16 @@ impl AudioInterface for AudioDB {
     ///
     /// Delete one entry 
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn detete_one(id: &str) -> Result<()> {
+    async fn delete_one_entry(id: &str) -> Result<Option<AudioData>> {
         let collection = AudioDB::get_collection();
 
         let filter = doc! {"_id" : id};
 
-        collection.find_one_and_delete(filter, None)
+        let item = collection.find_one_and_delete(filter, None)
             .await?
             .ok_or(ServerError::NotFound(format!("{id}")))?;
 
-        Ok(())
+        Ok(Some(item))
     }
 
     ///
@@ -74,7 +73,7 @@ impl AudioInterface for AudioDB {
     async fn get_entry(id: &str) -> Result<AudioData> {
         let collection = AudioDB::get_collection();
 
-        let filter = doc! { "_id": id};
+        let filter = doc! { "_id": &id};
         
         collection
             .find_one(filter, None)

@@ -1,8 +1,8 @@
 import { AudioData } from "../pages"
 
 export async function getEntry(id: string): Promise<AudioData> { 
-
-    return fetch("http://localhost:4001/api/get-entry", {
+    console.log(id)
+    return fetch("http://localhost:4001/api/audio/get-entry", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

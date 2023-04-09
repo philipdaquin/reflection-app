@@ -25,7 +25,7 @@ function AddAudioFile() {
 
         formData.append("audio", selectedFile!);
 
-        fetch("http://localhost:4001/api/upload", {
+        fetch("http://localhost:4001/api/audio/upload", {
             method: "POST",
             body: formData,
         })

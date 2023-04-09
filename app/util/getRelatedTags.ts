@@ -4,7 +4,7 @@
 */
 export async function getRelatedTags(input: string): Promise<string[]> { 
 
-    return fetch("http://localhost:4001/api/tags", {
+    return fetch("http://localhost:4001/api/audio/tags", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

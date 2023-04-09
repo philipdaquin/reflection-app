@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import React from 'react'
-import {TbMessageChatbot} from 'react-icons/tb'
+import {TbMessageChatbot, TbTrash} from 'react-icons/tb'
 import {CheckIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
 import { useRecoilValue } from 'recoil'
 import { AudioSummaryAtom } from '../atoms/atoms'
 import { updateEntry } from '../util/updateEntry'
+import { deleteEntry } from '../util/deleteEntry'
 
 
 function PostSummaryControls() {
@@ -19,6 +20,28 @@ function PostSummaryControls() {
                 router.push('/mood_summary')
             })
             .catch(e => { 
+                console.error(e)
+                throw new Error(e)
+            })
+    }
+
+    const delete_Entry = async () => { 
+        if (!audioData) return 
+        
+
+        deleteEntry(audioData._id)
+            .then(resp => { 
+
+                // if False
+                if (!resp) { 
+                    throw new Error("Failed to delete entry")
+                }
+
+                // else 
+                // route the user back to the homepage
+                router.push('/')
+
+            }).catch(e => { 
                 console.error(e)
                 throw new Error(e)
             })
@@ -49,12 +72,27 @@ function PostSummaryControls() {
             </div>
         )
     }
+
+    const DELETE_ENTRY = () => { 
+        return (
+            <div className='cursor-pointer flex flex-row items-center px-5 h-fit py-3 space-x-2 rounded-full bg-[#E84040]'
+                onClick={delete_Entry}
+            >
+                <TbTrash size={27} color="#fff"/>
+                {/* <h1 className='text-white font-bold text-[15px]'>Send to AI</h1> */}
+            </div>
+        )
+    }
+
     
     
     return (
-        <div className='space-y-2 flex flex-col h-[250px] w-[62px] justify-between'>
+        <div className='space-y-5 flex flex-col h-[350px] w-[62px] justify-between'>
             <CONTINUE />
-            <SEND_TO_AI />
+            <div className='space-y-2'>
+                <SEND_TO_AI />
+                <DELETE_ENTRY />
+            </div>
         </div>
     )
 }

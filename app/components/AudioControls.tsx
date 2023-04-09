@@ -104,7 +104,7 @@ function StartStopRecording() {
           .then((resp) => {
               const formData = new FormData();
                 formData.append('audio', resp);
-                fetch("http://localhost:4001/api/upload", {
+                fetch("http://localhost:4001/api/audio/upload", {
                 method: "POST",
                 body: formData,
               })

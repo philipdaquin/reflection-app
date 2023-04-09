@@ -84,7 +84,7 @@ export default Home
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [response] = await Promise.all([
     (
-      await fetch('http://localhost:4001/api/mood-summary-update')
+      await fetch('http://localhost:4001/api/analysis/get-mood-summary')
           .then(resp => resp.json())
           .catch(err => { 
             console.error(err)
