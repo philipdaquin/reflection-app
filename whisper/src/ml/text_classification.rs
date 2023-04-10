@@ -24,37 +24,6 @@ impl TopMood {
     }
 }
 
-
-/// Weekly Analysis from start_week to end_week 
-#[derive(Debug, Serialize)]
-pub struct WeeklyPattern { 
-    
-    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<ObjectId>, 
-    // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
-    start_week: Option<NaiveDateTime>,
-    // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
-    end_week: Option<NaiveDateTime>,
-    common_mood: Option<Vec<TopMood>>,
-    inflection: Option<TextClassification>,
-    min: Option<TextClassification>,
-    max: Option<TextClassification>
-}
-
-impl WeeklyPattern { 
-    fn new() -> Self { 
-        
-        
-        
-        
-        
-        
-        
-        todo!()
-    }
-}
-
-
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct TextClassification { 
     // Id 
@@ -129,8 +98,8 @@ impl TextClassification {
         let res = AnalysisDb::add_analysis(classification).await?;
         Ok(res)
     }   
-    
-    
+
+    ///
     /// Aggregates the top 3 most common mood within a week 
     #[tracing::instrument(fields(input, self), level= "debug")]
     pub async fn get_most_common_moods() -> Result<Vec<TopMood>> { 
@@ -183,8 +152,11 @@ impl TextClassification {
 
         Ok(point)
     }
+
+    ///
+    /// 
     #[tracing::instrument(level= "debug")]
-    async fn get_min_point_in_week() -> Result<Option<TextClassification>> {
+    pub async fn get_min_point_in_week() -> Result<Option<TextClassification>> {
         // Collect all data points from the last seven days 
         let data_points = AnalysisDb::get_data_set_in_last_seven_days().await?;
         
@@ -209,8 +181,10 @@ impl TextClassification {
         Ok(min_point)
     }
 
+    ///
+    /// Gets the highest average mood that the user experience within the last seven days
     #[tracing::instrument(level= "debug")]
-    async fn get_max_point_in_week() -> Result<Option<TextClassification>> {
+    pub async fn get_max_point_in_week() -> Result<Option<TextClassification>> {
         // Collect all data points from the last seven days 
         let data_points = AnalysisDb::get_data_set_in_last_seven_days().await?;
         

@@ -6,6 +6,7 @@ pub mod sockets;
 pub mod text_classification;
 use lazy_static::lazy_static;
 pub mod recommendation;
+pub mod weekly_pattern;
 
 lazy_static! { 
     
