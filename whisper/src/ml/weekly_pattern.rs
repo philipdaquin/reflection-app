@@ -7,43 +7,43 @@ use crate::{error::Result, persistence::audio_db::{AudioDB, AudioInterface}};
 use super::{text_classification::{TopMood, TextClassification}, recommendation::RecommendedActivity, whisper::AudioData};
 
 #[derive(Debug, Clone, Serialize)]
-struct ImportantEvents { 
-    emoji: Option<String>,
-    title: Option<String>,
-    summary: Option<String>
+pub struct ImportantEvents { 
+    pub emoji: Option<String>,
+    pub title: Option<String>,
+    pub summary: Option<String>
 }
 
 /// Weekly Analysis from start_week to end_week 
 #[derive(Debug, Serialize, Default, Clone)]
 pub struct WeeklyAnalysis { 
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    id: Option<ObjectId>, 
+    pub id: Option<ObjectId>, 
     // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
-    start_week: Option<NaiveDate>,
+    pub start_week: Option<NaiveDate>,
     // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
-    end_week: Option<NaiveDate>,
+    pub end_week: Option<NaiveDate>,
 
     // User's common mood in the week 
-    common_mood: Option<Vec<TopMood>>,
+    pub common_mood: Option<Vec<TopMood>>,
 
     // User's change of mood 
-    inflection: Option<AudioData>,
+    pub inflection: Option<AudioData>,
 
     // User's lowest mood 
-    min: Option<AudioData>,
+    pub min: Option<AudioData>,
 
     // User's best mood 
-    max: Option<AudioData>,
+    pub max: Option<AudioData>,
     
     // Events that affected the user's emotions in the week 
-    important_events: Vec<ImportantEvents>,
+    pub important_events: Vec<ImportantEvents>,
 
     // Personalised advices to the user
-    recommendations: Option<Vec<RecommendedActivity>>,
+    pub recommendations: Option<Vec<RecommendedActivity>>,
 }
 
 impl WeeklyAnalysis { 
-    fn new() -> Self { 
+    pub fn new() -> Self { 
         let id = ObjectId::new();
         
         let now = Utc::now().naive_local();
@@ -54,13 +54,13 @@ impl WeeklyAnalysis {
 
         Self { 
             id: Some(id), 
-            start_week, 
-            end_week,
+            // start_week, 
+            // end_week,
             ..Default::default()
         }
     }
     #[tracing::instrument(level= "debug")]
-    async fn get_min_mood(&mut self) -> Result<Self> { 
+    pub async fn get_min_mood(&mut self) -> Result<Self> { 
 
         let analysis = TextClassification::get_min_point_in_week().await?;
         if let Some(text) = analysis { 
@@ -72,34 +72,50 @@ impl WeeklyAnalysis {
         Ok(self.clone())
     }
     #[tracing::instrument(level= "debug")]
-    async fn get_max_mood(&mut self) -> Result<Self> { 
+    pub async fn get_max_mood(&mut self) -> Result<Self> { 
         let analysis = TextClassification::get_max_point_in_week().await?;
         if let Some(text) = analysis { 
             let audio_ref = text.audio_ref.unwrap().to_string();
             let data = AudioDB::get_entry(&audio_ref).await?;
-            self.min = Some(data.clone());
+            self.max = Some(data.clone());
             self.add_to_important_events(&data)?;
         }
         Ok(self.clone())
     }
     #[tracing::instrument(level= "debug")]
-    async fn get_inflection_point(&mut self) -> Result<Self> { 
+    pub async fn get_inflection_point(&mut self) -> Result<Self> { 
         let analysis = TextClassification::get_weekly_inflection_point().await?;
         if let Some(text) = analysis { 
             let audio_ref = text.audio_ref.unwrap().to_string();
             let data = AudioDB::get_entry(&audio_ref).await?;
-            self.min = Some(data.clone());
+            self.inflection = Some(data.clone());
 
             self.add_to_important_events(&data)?;
         }
         Ok(self.clone())
     }
     #[tracing::instrument(level= "debug")]
-    async fn get_common_wood(&mut self) -> Result<Self> { 
+    pub async fn get_common_wood(&mut self) -> Result<Self> { 
         let top_moods = TextClassification::get_most_common_moods().await.unwrap();
         self.common_mood = Some(top_moods);
         Ok(self.clone())
     }
+
+    #[tracing::instrument(level= "debug")]
+    pub async fn generate_recommendations(&mut self) -> Result<Self> { 
+        let summaries = self.important_events
+            .clone()
+            .iter()
+            .map(|f| f.summary.clone().unwrap())
+            .collect::<Vec<String>>();
+        log::info!("{summaries:?}");
+        
+        let recom = RecommendedActivity::get_personalised_recommendations(summaries).await.unwrap();
+        self.recommendations = Some(recom);
+        Ok(self.clone())
+    }
+
+    /// Helper function 
     #[tracing::instrument(level= "debug")]
     fn add_to_important_events(&mut self, data: &AudioData) -> Result<()> {
         
@@ -129,13 +145,7 @@ impl WeeklyAnalysis {
 
         Ok(())
     }
-    #[tracing::instrument(level= "debug")]
-    async fn generate_recommendations(&mut self) -> Result<Self> { 
-        let summaries = self.important_events.clone().iter().map(|f| f.summary.clone().unwrap()).collect::<Vec<String>>();
-        let recom = RecommendedActivity::get_personalised_recommendations(summaries).await.unwrap();
-        self.recommendations = Some(recom);
-        Ok(self.clone())
-    }
+    
     
 }
 

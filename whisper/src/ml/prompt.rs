@@ -24,9 +24,14 @@ lazy_static! {
 
     pub static ref ANALYSE_TEXT_SENTIMENT: String = format!("
     I want you to analyse the sentiment from this passage and in your response assign each score for each label inside of the object below. 
-    do not write explanations. 
-    do not create new labels unless I told you so.
-    do not alter the `id`, `audio_ref` and `date`
+    
+    The rules:
+    - ONLY return a JSON object
+    - do not write explanations. 
+    - do not create new labels unless I told you so.
+    - do not alter the `id`, `audio_ref` and `date`
+    - the average_mood is between 0.0 and 1.0, where 1 is the happiest state and 0 is the saddest state
+
     In your response, return a json object, the format should follow the structure below and you must only return this object and nothing else. 
     
     `{{
@@ -60,13 +65,12 @@ lazy_static! {
 
         In your response, return an array of JSON objects , the format should follow the structure below 
         and must ONLY return this array and nothing else.
-        `
-        {{
+
+        `{{
             \"title\": \"\",
             \"emoji\": \"\",
             \"description\": \"\"
-        }}
-        `
+        }}`
         
         The summaries are:
     ");

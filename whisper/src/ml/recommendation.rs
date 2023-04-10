@@ -6,9 +6,9 @@ use super::{chat::get_chat_response, prompt::GENERATE_RECOMMENDATION};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct RecommendedActivity { 
-    title: Option<String>,
-    emoji: Option<String>,
-    description: Option<String>
+    pub title: Option<String>,
+    pub emoji: Option<String>,
+    pub description: Option<String>
 }
 
 impl RecommendedActivity { 
@@ -17,18 +17,21 @@ impl RecommendedActivity {
     /// 
     #[tracing::instrument(fields(input, self), level= "debug")]
     pub async fn get_personalised_recommendations(summaries: Vec<String>) -> Result<Vec<Self>> { 
-        
+        log::info!("{summaries:#?}");
         // Serialise the array 
-        let input = serde_json::to_string(&summaries).unwrap();
-        
+        let input = serde_json::to_string_pretty(&summaries).unwrap();
+        log::info!("{input:#?}");
         // Send context and input to OpenAI 
         let resp = get_chat_response(&input, &GENERATE_RECOMMENDATION)
             .await
             .unwrap();
 
+        log::info!("{resp:#?}");
+
         // Deserialize the result 
-        let recomm: Vec<Self> = serde_json::from_str(&resp).unwrap_or_default();
-        
+        let recomm: Vec<RecommendedActivity> = serde_json::from_str(&resp).unwrap();
+        log::info!("{recomm:#?}");
+
         Ok(recomm)
     }
 }
