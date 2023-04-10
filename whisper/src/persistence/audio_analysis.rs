@@ -1,14 +1,13 @@
-use actix_multipart::form::text::Text;
 use async_trait::async_trait;
-use chrono::{Utc, Duration};
+use chrono::{Utc, Duration, Local, TimeZone};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
 use mongodb::options::AggregateOptions;
+use crate::error::ServerError;
 use crate::ml::text_classification::TopMood;
 use crate::{error::Result, ml::text_classification::TextClassification};
 use super::db::MongoDbClient;
-use futures_util::TryStreamExt;
-use futures_util::StreamExt;
+use futures_util::{TryStreamExt, StreamExt};
 const DB_NAME: &str = "human-assistant";
 const COLL_NAME: &str = "analysis";
 
@@ -18,8 +17,7 @@ pub trait TextAnalysisInterface {
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>>;
     async fn get_recent() -> Result<Vec<TextClassification>>;
     async fn get_most_common_emotions() -> Result<Vec<TopMood>>;
-    async fn get_inflect_point_of_mood_in_week() -> Result<Option<TextClassification>>;
-    async fn get_min_max_points_in_week() -> Result<Vec<TextClassification>>;
+    async fn get_data_set_in_last_seven_days() -> Result<Vec<TextClassification>>;
     async fn delete_all_entries() -> Result<bool>;
 
     fn get_analysis_db() -> Collection<TextClassification>;
@@ -70,6 +68,7 @@ impl TextAnalysisInterface for AnalysisDb {
     /// Delete Analysis 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>> {
+        log::info!("✅ Deleting Text Classification analysis");
         let collection = AnalysisDb::get_analysis_db();
 
         let filter = doc! {"_id": &id};        
@@ -152,135 +151,58 @@ impl TextAnalysisInterface for AnalysisDb {
         Ok(result)
     }
     
-
-    /// Get the biggest difference in averageMood within the last 7 days 
+    ///
+    /// Retrieves data points from the last seven days 
     #[tracing::instrument(level= "debug", err)]
-    async fn get_inflect_point_of_mood_in_week() -> Result<Option<TextClassification>> {
+    async fn get_data_set_in_last_seven_days() -> Result<Vec<TextClassification>> {
         let collection = AnalysisDb::get_analysis_db();
-        let seven_days_ago = Utc::now() - Duration::days(7);
+        let seven_days_ago = Utc::now().naive_utc() - Duration::days(7);
+        let date_time: chrono::DateTime<Local> =  Local.from_local_datetime(&seven_days_ago).unwrap();
 
-         // Aggregate by day and calculate average mood for each day
+        let bson_date_time = bson::DateTime::from_chrono(date_time);
+
+        // Get all objects in database within the 7 days 
         let pipeline = vec![
-            // doc! {"$match": {"$and": [{"date": {"$gte": seven_days_ago}}, {"emotion": {"$ne": null}}]}}, // Filter out documents with null emotion and date greater than or equal to 7 days ago
+            // Match documents within the last 7 days
+            // doc! {
+            //     "$match": {
+            //         "date": {
+            //             "$gte": bson_date_time
+            //         }
+            //     }
+            // },
+            // Project the desired fields
             doc! {
-                "$group": {
-                    "_id": "$date",
-                    "average_mood": { "$avg": "$average_mood" }
-                }
-            },
-            doc! {
-                "$sort": {
-                    "_id": 1
+                "$project": {
+                    "_id": 1,
+                    "_audio_id": 1,
+                    "date": 1,
+                    "day": 1,
+                    "emotion": 1,
+                    "emotion_emoji": 1,
+                    "average_mood": 1
                 }
             }
         ];
-        
         // Aggregate all data points into one 
         let mut result = Vec::new();
         let mut cursor = collection.aggregate(pipeline, None).await?;
         while let Some(doc) = cursor.try_next().await? {
             let bson = bson::from_document(doc.clone()).unwrap();
             let object: TextClassification = bson::from_bson(bson).unwrap_or_default();
-            result.push(object);
-        }
 
-        // Find the inflection point by checking for the first and second derivatives changing sign
-        let mut first_derivative_sign = None;
-        let mut second_derivative_sign = None;
-        let mut inflection_point = None;
-
-        //
-        //  Calculate first_derivative, second_derivative and inflection_point 
-        for i in 1..result.len() {
-            let first_derivative = result[i].average_mood.unwrap_or_default() - result[i-1].average_mood.unwrap_or_default();
-            let second_derivative = first_derivative - (result[i-1].average_mood.unwrap_or_default() - result[i-2].average_mood.unwrap_or_default());
-            
-            if first_derivative_sign.is_none() && first_derivative != 0.0 {
-                first_derivative_sign = Some(first_derivative.signum());
-            }
-            
-            if second_derivative_sign.is_none() && second_derivative != 0.0 {
-                second_derivative_sign = Some(second_derivative.signum());
-            }
-
-            // If an inflection point is found,
-            // Break the loop and set the index to that point 
-            if let Some(first_sign) = first_derivative_sign {
-                if let Some(second_sign) = second_derivative_sign {
-                    if first_sign != first_derivative.signum() && second_sign != second_derivative.signum() {
-                        inflection_point = Some(&result[i-1]);
-                        break;
-                    }
-                }
-            }
-        }
-        // Find the textclassification with the inflection point 
-        if let Some(inflection_doc) = inflection_point {
-            let inflection_date = inflection_doc.id;
-            // Find the TextClassification document with the inflection index within the last 7 days
-            let inflection_textclassification = collection
-                .find_one(doc! {"$and": [{"date": inflection_date}, {"date": {"$gte": seven_days_ago}}]}, None)
-                .await?;
-
-            Ok(inflection_textclassification)
-        } else {
-            Ok(None)
-        }
-        
-    }
-
-    /// Get the min and max TextClassification objects within the last 7 days 
-    async fn get_min_max_points_in_week() -> Result<Vec<TextClassification>> {
-        let collection = AnalysisDb::get_analysis_db();
-        let start_of_week = Utc::now() - Duration::days(7);
-        let end_of_week = Utc::now();
-
-        let pipeline = vec![
-            doc! {"$match": {
-                "date": {
-                    "$gte": start_of_week,
-                    "$lte": end_of_week
-                },
-                "emotion": {"$ne": null},
-                "average_mood": {"$ne": null}
-            }},
-            doc! {"$sort": {"average_mood": 1}},
-            doc! {"$group": {
-                "_id": null,
-                "min": {"$first": "$$ROOT"},
-                "max": {"$last": "$$ROOT"}
-            }},
-            doc! {"$project": {
-                "_id": 0,
-                "min": 1,
-                "max": 1
-            }},
-        ];
-
-        // Execute the aggregation pipeline and retrieve the results 
-        let mut cursor = collection.aggregate(pipeline, None).await.unwrap();
-        let mut result = Vec::new();
-        
-        while let Some(item) = cursor.try_next().await? { 
-            if let Some(doc)  = item.get("min").unwrap().as_document() { 
-                let bson = bson::from_document(doc.clone()).unwrap();
-                let object: TextClassification = bson::from_bson(bson).unwrap();
+            // Ensure the average mood of each object is non null
+            if object.average_mood.is_some() { 
                 result.push(object);
-            } 
-            if let Some(doc)  = item.get("max").unwrap().as_document() { 
-                let bson = bson::from_document(doc.clone()).unwrap();
-                let object: TextClassification = bson::from_bson(bson).unwrap();
-                result.push(object);
-            } 
-        } 
+            }
+        }
+        log::info!("DATA WITHIN THE LAST 7 DAYS: {result:?}");
 
-        Ok(result)        
+        Ok(result)
     }
-
-    // pub async fn save_weekly_patterns() -> Result<()> { 
-    //     todo!()
-    // }
-    
+    ///
+    /// Cleans out the collection 
+    #[tracing::instrument(level= "debug", err)]
     async fn delete_all_entries() -> Result<bool> {
         let collection = AnalysisDb::get_analysis_db();
 
@@ -290,8 +212,7 @@ impl TextAnalysisInterface for AnalysisDb {
 
         Ok(true)
     }
-
-
+    ///
     /// Access to collection
     fn get_analysis_db() -> Collection<TextClassification> { 
        MongoDbClient::get_collection::<TextClassification>(COLL_NAME, DB_NAME)

@@ -59,6 +59,8 @@ pub async fn get_common_mood() -> Result<HttpResponse> {
 /// 
 #[route("/api/analysis/get-weekly-summary", method = "GET")]
 pub async fn get_weekly_patterns() -> Result<HttpResponse>  { 
+    // let mood_patterns = TextClassification::get_weekly_patterns().await.unwrap();
+    // log::info!("{mood_patterns:?}");
     let mood_patterns = TextClassification::get_weekly_patterns().await.unwrap();
     log::info!("{mood_patterns:?}");
     

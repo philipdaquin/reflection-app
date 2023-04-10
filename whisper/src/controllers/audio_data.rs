@@ -208,17 +208,25 @@ pub async fn delete_all_audio_entries() -> Result<HttpResponse> {
 }
 
 ///
-/// Delete Both Text Analysis and Audio Data  
+/// Delete all records on AudioData including TextClassification Data 
 #[route("/api/audio/delete-entry", method = "DELETE")]
 pub async fn delete_audio_entry(input: web::Json<Input>) -> Result<HttpResponse> { 
+    
     let id = match &input.id { 
         Some(i) => i,
         None => return Ok(HttpResponse::BadRequest().into())
     };
 
     let audio = AudioDB::delete_one_entry(id).await?;
+    
+    if let Some(text) = audio.and_then(|analysis| analysis.text_classification)  { 
+        log::info!("🏃‍♂️");
+        
+        let bson = text.id.expect("Unable to read id for TextClassification");
+        AnalysisDb::delete_one_analysis(bson).await.unwrap();
+    } 
          
-    Ok(HttpResponse::Ok().json(audio))
+    Ok(HttpResponse::Ok().into())
     
 }
 
