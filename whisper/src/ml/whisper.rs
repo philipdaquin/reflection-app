@@ -2,8 +2,9 @@ use actix_multipart::Multipart;
 use bson::oid::ObjectId;
 use futures::{Stream};
 use hound::{SampleFormat, WavReader};
+use parking_lot::{Mutex};
 use serde::{Serialize, Deserialize};
-use std::{path::Path,  io::{Cursor}};
+use std::{path::Path,  io::{Cursor}, thread, sync::Arc};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
 use crate::{error::{Result, ServerError}, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}, persistence::audio_db::{AudioDB, AudioInterface}};
 use num_cpus;
@@ -14,8 +15,21 @@ use super::text_classification::TextClassification;
 use rayon::prelude::*;
 use crossbeam::channel::{unbounded};
 
-const BATCH_SIZE: usize = 32;
-const CHUNK_SIZE: usize = 1024 * 1024 * 3;
+
+const BATCH_SIZE: usize = 64;
+
+// const CHUNK_SIZE: usize = 1024 * 1024 * 3;
+
+// Process audio data in chunks of 5 seconds * 44100 samples/second * 2 channels * 2 bytes/sample = 882000 bytes
+const CHUNK_SIZE: usize = 882000;
+
+// 4 Seconds
+// const CHUNK_SIZE: usize = 705600;
+
+// 3 Seconds
+// const CHUNK_SIZE: usize = 529200;
+
+
 const NUM_WORKERS: usize = 5;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -116,7 +130,7 @@ impl AudioData {
         params.set_temperature(0.0);   
     
         // Number of threads to use during computation
-        params.set_n_threads(8);
+        params.set_n_threads(i32::min(8, num_cpus::get() as i32));
     
         // Translate the source to english 
         params.set_translate(false);
@@ -146,7 +160,7 @@ impl AudioData {
     ///
     /// Transcribe each PCM chunks and return a String of Streams 
     // #[tracing::instrument(level= "debug", err)]
-    pub async fn transcribe_pcm_chunks_into_stream(samples: Vec<f32>) -> Result<impl Stream<Item = String>> {
+    pub fn transcribe_pcm_chunks_into_stream(samples: Vec<f32>) -> Result<impl Stream<Item = String>> {
         
         let stream = async_stream::stream! {
             let path = format!("./models/{}", SPEECH_ENGINE_MODEL.to_string());
@@ -157,10 +171,10 @@ impl AudioData {
             //  - Greedy decoding with best of 5 sampling. 
             let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 5});
             // Output into one single segment
-            params.set_single_segment(false);
+            params.set_single_segment(true);
             params.set_print_realtime(false);
             params.set_print_progress(false);
-            params.set_print_timestamps(false);    
+            params.set_print_timestamps(true);    
             params.set_print_special(false);
             // Keep context between audio chunks 
             params.set_no_context(true);
@@ -175,14 +189,16 @@ impl AudioData {
             // params.set_max_tokens(32);
             params.set_max_tokens(0);
             // Partial encoder context for better performance 
-            params.set_audio_ctx(0);
+            params.set_audio_ctx(768);
             // Non Speech
             // If the probability of the no speech token is higher than this value AND
             // the decoding has failed due to 'pr'
             params.set_no_speech_thold(0.6);
             // Temperature to increase when falling back when the decoding fails to 
             // meet either of the thresholds elow  
-            params.set_temperature_inc(0.2);
+            //
+            // **Disable temperature fallback 
+            params.set_temperature_inc(-1.0);
             params.set_temperature(0.5);
             // If the averate log probability is lower than this value, treat the decoding as failed 
             // params.set_logprob_thold(100.0);
@@ -208,6 +224,8 @@ impl AudioData {
             let num_segments = ctx.full_n_segments();
             for i in 0..num_segments {
                 let segment = ctx.full_get_segment_text(i).expect("failed to get segment");
+                
+                log::info!("{segment}");
                 yield segment;
             }
         };
@@ -409,7 +427,7 @@ async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
 /// 
 /// Split the audio data and divide it into smaller chunks of a fixed size PCM audio chunks
 #[tracing::instrument(level= "debug")]
-async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<Vec<f32>>> { 
+fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<Vec<f32>>> { 
     
     let mut reader = Cursor::new(&bytes);
     let wav_reader = WavReader::new(&mut reader).unwrap();
@@ -444,8 +462,7 @@ async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result
         .map(|chunk| {
             let mut samples = whisper_rs::convert_integer_to_float_audio(&chunk);
             samples = whisper_rs::convert_stereo_to_mono_audio(&samples)
-                .expect("Failed to convert to mono audio");
-
+                    .expect("Failed to convert to mono audio");
             samples
         })
         .collect();
@@ -457,62 +474,62 @@ async fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result
 /// aggregate the results and send an update to the client
 async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> { 
     let (result_producer, result_consumer) = unbounded();
+    
+    // Temp. solution to ordering to segment
+    // let mut index = Arc::new(Mutex::new(0));
+    
     for batch in buffer.par_chunks(BATCH_SIZE).collect::<Vec<_>>() {
-        for data in batch {
-            // Split audio data into smaller pcm chunks 
-            let data = parse_audio_into_pcm_chunks(data, CHUNK_SIZE).await.unwrap();
-            // Spawn a worker to transcribe each PCM chunk
-            for sample in data {
-                let task = tokio::spawn(async move {
-                    AudioData::transcribe_pcm_chunks_into_stream(sample).await.unwrap() 
-                });
-                log::info!("✅✅");
-                result_producer.send(task).unwrap();
+        // Performs a fork join style thread work,
+        // Rayon Scope ensures that all threads spawned for each batch of data will be terminated before we move on 
+        // to the next batch of data 
+        rayon::scope(|s|  { 
+            for data in batch {
+                // Split audio data into smaller pcm chunks 
+                let data = parse_audio_into_pcm_chunks(data, CHUNK_SIZE).unwrap();
+                // Spawn a worker to transcribe each PCM chunk
+                for (index, sample) in data.into_iter().enumerate() {
+                    let result_producer = result_producer.clone();
+                    s.spawn(move |_| {
+                        let task = AudioData::transcribe_pcm_chunks_into_stream(sample).unwrap();
+                        log::info!("✅✅");
+                        result_producer.send((task, index)).unwrap();
+                    });
+                }
             }
-        }
+        });
     }
+    let mut results = Vec::new();
 
-    let mut results = String::new();
     // Spawn multiple workers to consume tasks from the receiver and process them concurrently 
     for _ in 0..NUM_WORKERS { 
         let result_consumer = result_consumer.clone();
-        
-        // tokio::spawn(async move { 
-        //     // Collect and print out the results from each worker
-        //     while let Ok(task) = result_consumer.try_recv() {
-        //         let stream = task.await.unwrap();
-                
-        //         log::info!("SPAWNING WORKER");
-        //         let results_clone = Arc::clone(&results); // Clone the Arc to be moved into the closure
-        //         tokio::spawn(async move {
-        //             stream.for_each(|item| async move {
-        //                 let mut results = results_clone.lock();
-        //                 results.push_str(&item);
-        //             }).await;
-        //         });
-        //     }
-        // });
-        let samples = tokio::spawn(async move { 
-            // Collect and print out the results from each worker
-            let workers = tokio::spawn(async move { 
-                let mut samples = String::new();
-                while let Ok(task) = result_consumer.try_recv() {
-                    let stream = task.await.unwrap();
-                    let stream_collection = stream.collect::<String>().await;           
-                    samples.push_str(&stream_collection);
-                }
-                log::info!("📩: {samples}");
-
-                samples
-            });
-            workers.await.unwrap()
+        // Spawn multiple workers to collect the results 
+        let workers = tokio::spawn(async move { 
+            let mut samples = Vec::new();
+            while let Ok((task, i)) = result_consumer.try_recv() {
+                let stream_collection = task.collect::<String>().await;           
+                samples.push((i, stream_collection));
+            }
+            samples
         });
-        let segments = samples.await.unwrap();
-        results.push_str(&segments);
+        // Collect all results 
+        let segment = workers.await.unwrap();
+        results.extend(segment.into_iter().map(|f| f));
     }
-    log::info!("FINAL: {results}");
 
-    Ok(results)
+    let mut res = String::new();
+    
+    if result_consumer.is_empty() { 
+        results.sort_unstable();
+        let s = results
+            .into_iter()
+            .map(|f| f.1)
+            .collect::<String>();
+
+        res.push_str(&s);
+    }
+    
+    Ok(res)
 }
 
 /// 
