@@ -145,10 +145,7 @@ impl TextClassification {
 
         // Find the inflection point within the datapoint 
         let point = find_inflection_point(data_points);
-
         log::info!("{point:#?}");
-        // Search datapoint in DB
-        // let inflection = AnalysisDb::get_inflect_point_of_mood_in_week(point).await?;
 
         Ok(point)
     }

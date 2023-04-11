@@ -51,9 +51,8 @@ lazy_static! {
         I want you to generate an Array of JSON objects with three personalised recommendations for activities or 
         practices that may help improve their mood, such as exercise, mindfulness or socialising BASED on each summaries below.
         
-
         The rules:
-        - ONLY return the ARRAY of JSON objects.
+        - ONLY return the json objects as your response.
         - do not write explainations.
         - do not write new variables, or intro.
         - do not provide any opening sentences in your response.
@@ -61,15 +60,15 @@ lazy_static! {
         - emoji should represent the activity or recommendation.
         - provide concrete actionable description with few usage of emojis where appropriate.
         - each object must be unique
-
+        - Don't generating the response until you reach the end of the JSON 
 
         In your response, return an array of JSON objects , the format should follow the structure below 
         and must ONLY return this array and nothing else.
 
-        `{{
-            \"title\": \"\",
-            \"emoji\": \"\",
-            \"description\": \"\"
+        `{{ 
+            \"title\": \"Test\", 
+            \"emoji\": \"🛏️\", 
+            \"description\": \"Test\" 
         }}`
         
         The summaries are:

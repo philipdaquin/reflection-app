@@ -4,7 +4,7 @@ use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
 use bson::oid::ObjectId;
 use crate::{ml::{
     text_classification::TextClassification, recommendation::RecommendedActivity, weekly_pattern::WeeklyAnalysis},
-    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
+    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::WeeklyAnalysisDB}, error::ServerError};
 use serde_derive::{Deserialize};
 
 use super::Input;
@@ -17,7 +17,6 @@ pub fn configure_analysis_service(cfg: &mut web::ServiceConfig) {
     .service(get_mood_summary)
     .service(get_common_mood)
     .service(get_weekly_patterns)
-    .service(get_weekly_summary)
     .service(delete_all_entries_analysis)
     .service(delete_entry)
     .service(get_weekly_recommendation)
@@ -70,28 +69,7 @@ pub async fn get_weekly_patterns() -> Result<HttpResponse>  {
 }
 
 
-///
-/// 
-#[route("/api/analysis/get-weekly-summary", method = "GET")]
-pub async fn get_weekly_summary() -> Result<HttpResponse> { 
-
-    let weekly_summary = WeeklyAnalysis::new()
-        .get_min_mood()
-        .await?
-        .get_max_mood()
-        .await?
-        .get_inflection_point()
-        .await?
-        .get_common_wood()
-        .await?
-        .generate_recommendations()
-        .await?;
-
-    log::info!("✅✅✅✅ {weekly_summary:#?}");
-
-    let serialized = serde_json::to_string(&weekly_summary).unwrap();
-    Ok(HttpResponse::Ok().body(serialized))
-}
+   
 
 #[derive(Deserialize, Debug)]
 pub struct Summaries { 

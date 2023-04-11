@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use hyper_tls::HttpsConnector;
 use lazy_static::lazy_static;
 use serde_derive::{Deserialize, Serialize};
@@ -32,6 +34,7 @@ struct OAIRequest<'a> {
     prompt: &'a str,
     temperature: f32, 
     max_tokens: u32,
+    stop: String 
 }
 
 
@@ -50,7 +53,9 @@ pub async fn get_chat_response(input: &str, context: &str) -> Result<String> {
     //     If sad, add pauses in the form of '...' to make the message more human.";
 
     let https = HttpsConnector::new();
-    let client = Client::builder().build(https);
+    let client = Client::builder()
+        .http2_keep_alive_timeout(Duration::from_secs(60))
+        .build(https);
     
     // Construct the API endpoint URL
     let endpoint_url = format!("https://api.openai.com/v1/engines/{}/completions", ENGINE.to_string());
@@ -64,7 +69,8 @@ pub async fn get_chat_response(input: &str, context: &str) -> Result<String> {
     let oi_request = OAIRequest {
         prompt,
         temperature: 0.5,
-        max_tokens: 100,
+        max_tokens: 256,
+        stop: format!("stop")
     };
 
     let body = Body::from(serde_json::to_vec(&oi_request)?);
@@ -92,7 +98,7 @@ pub async fn get_chat_response(input: &str, context: &str) -> Result<String> {
         })
         .unwrap_or_default();
     
-    // log::info!("{resp:#?}");
+    log::info!("CHATGPT RESPONSE: {resp:#?}");
 
     let mut response = resp.choices[0].text.to_string();
     

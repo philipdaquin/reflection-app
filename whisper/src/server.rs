@@ -1,7 +1,7 @@
 
 use actix_web::{ middleware::Logger, App, HttpServer, web};
 use actix_cors::Cors;
-use crate::{persistence::db::MongoDbClient, controllers::{audio_data::configure_audio_services, ws::configure_ws_service, audio_analysis::configure_analysis_service}};
+use crate::{persistence::db::MongoDbClient, controllers::{audio_data::configure_audio_services, ws::configure_ws_service, audio_analysis::configure_analysis_service, weekly_controller::configure_weekly_analysis_service}};
 
 
 pub async fn new_server(port: u32) -> std::io::Result<()> {
@@ -18,8 +18,9 @@ pub async fn new_server(port: u32) -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(mongodb_client.clone()))
-            .configure(configure_audio_services)
+            .configure(configure_weekly_analysis_service)
             .configure(configure_analysis_service)
+            .configure(configure_audio_services)
             .configure(configure_ws_service)
             .wrap(Cors::permissive())
             .wrap(Logger::default())

@@ -1,12 +1,12 @@
 use bson::oid::ObjectId;
 use chrono::{NaiveDateTime, Utc, Datelike, NaiveDate, Weekday};
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
-use crate::{error::Result, persistence::audio_db::{AudioDB, AudioInterface}};
+use crate::{error::Result, persistence::{audio_db::{AudioDB, AudioInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}};
 
 use super::{text_classification::{TopMood, TextClassification}, recommendation::RecommendedActivity, whisper::AudioData};
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ImportantEvents { 
     pub emoji: Option<String>,
     pub title: Option<String>,
@@ -14,7 +14,7 @@ pub struct ImportantEvents {
 }
 
 /// Weekly Analysis from start_week to end_week 
-#[derive(Debug, Serialize, Default, Clone)]
+#[derive(Debug, Serialize, Default, Clone, Deserialize)]
 pub struct WeeklyAnalysis { 
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>, 
@@ -54,8 +54,8 @@ impl WeeklyAnalysis {
 
         Self { 
             id: Some(id), 
-            // start_week, 
-            // end_week,
+            start_week, 
+            end_week,
             ..Default::default()
         }
     }
@@ -109,9 +109,9 @@ impl WeeklyAnalysis {
             .map(|f| f.summary.clone().unwrap())
             .collect::<Vec<String>>();
         log::info!("{summaries:?}");
-        
         let recom = RecommendedActivity::get_personalised_recommendations(summaries).await.unwrap();
         self.recommendations = Some(recom);
+        
         Ok(self.clone())
     }
 
@@ -144,6 +144,15 @@ impl WeeklyAnalysis {
         }
 
         Ok(())
+    }
+
+    /// 
+    /// Saves current weekly analysis to database 
+    pub async fn save(&self) -> Result<Self> { 
+        
+        // Ensure to save at the end of the week 
+        
+        WeeklyAnalysisDB::add_analysis(self).await
     }
     
     

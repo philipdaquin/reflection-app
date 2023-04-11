@@ -3,7 +3,6 @@ use chrono::{Utc, Duration, Local, TimeZone};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
 use mongodb::options::AggregateOptions;
-use crate::error::ServerError;
 use crate::ml::text_classification::TopMood;
 use crate::{error::Result, ml::text_classification::TextClassification};
 use super::db::MongoDbClient;
@@ -17,14 +16,65 @@ pub trait TextAnalysisInterface {
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>>;
     async fn get_recent() -> Result<Vec<TextClassification>>;
     async fn get_most_common_emotions() -> Result<Vec<TopMood>>;
-    async fn get_data_set_in_last_seven_days() -> Result<Vec<TextClassification>>;
     async fn delete_all_entries() -> Result<bool>;
-
     fn get_analysis_db() -> Collection<TextClassification>;
     
 }
 #[derive(Debug)]
 pub struct AnalysisDb;
+
+impl AnalysisDb { 
+    ///
+    /// Retrieves data points from the last seven days 
+    #[tracing::instrument(level= "debug", err)]
+    pub async fn get_data_set_in_last_seven_days() -> Result<Vec<TextClassification>> {
+        let collection = AnalysisDb::get_analysis_db();
+        let seven_days_ago = Utc::now().naive_utc() - Duration::days(7);
+        let date_time: chrono::DateTime<Local> =  Local.from_local_datetime(&seven_days_ago).unwrap();
+
+        let bson_date_time = bson::DateTime::from_chrono(date_time);
+
+        // Get all objects in database within the 7 days 
+        let pipeline = vec![
+            // Match documents within the last 7 days
+            // doc! {
+            //     "$match": {
+            //         "date": {
+            //             "$gte": bson_date_time
+            //         }
+            //     }
+            // },
+            // Project the desired fields
+            doc! {
+                "$project": {
+                    "_id": 1,
+                    "_audio_id": 1,
+                    "date": 1,
+                    "day": 1,
+                    "emotion": 1,
+                    "emotion_emoji": 1,
+                    "average_mood": 1
+                }
+            }
+        ];
+        // Aggregate all data points into one 
+        let mut result = Vec::new();
+        let mut cursor = collection.aggregate(pipeline, None).await?;
+        while let Some(doc) = cursor.try_next().await? {
+            let bson = bson::from_document(doc.clone()).unwrap();
+            let object: TextClassification = bson::from_bson(bson).unwrap_or_default();
+
+            // Ensure the average mood of each object is non null
+            if object.average_mood.is_some() { 
+                result.push(object);
+            }
+        }
+        log::info!("DATA WITHIN THE LAST 7 DAYS: {result:?}");
+
+        Ok(result)
+    }
+}
+
 
 #[async_trait]
 impl TextAnalysisInterface for AnalysisDb { 
@@ -151,55 +201,6 @@ impl TextAnalysisInterface for AnalysisDb {
         Ok(result)
     }
     
-    ///
-    /// Retrieves data points from the last seven days 
-    #[tracing::instrument(level= "debug", err)]
-    async fn get_data_set_in_last_seven_days() -> Result<Vec<TextClassification>> {
-        let collection = AnalysisDb::get_analysis_db();
-        let seven_days_ago = Utc::now().naive_utc() - Duration::days(7);
-        let date_time: chrono::DateTime<Local> =  Local.from_local_datetime(&seven_days_ago).unwrap();
-
-        let bson_date_time = bson::DateTime::from_chrono(date_time);
-
-        // Get all objects in database within the 7 days 
-        let pipeline = vec![
-            // Match documents within the last 7 days
-            // doc! {
-            //     "$match": {
-            //         "date": {
-            //             "$gte": bson_date_time
-            //         }
-            //     }
-            // },
-            // Project the desired fields
-            doc! {
-                "$project": {
-                    "_id": 1,
-                    "_audio_id": 1,
-                    "date": 1,
-                    "day": 1,
-                    "emotion": 1,
-                    "emotion_emoji": 1,
-                    "average_mood": 1
-                }
-            }
-        ];
-        // Aggregate all data points into one 
-        let mut result = Vec::new();
-        let mut cursor = collection.aggregate(pipeline, None).await?;
-        while let Some(doc) = cursor.try_next().await? {
-            let bson = bson::from_document(doc.clone()).unwrap();
-            let object: TextClassification = bson::from_bson(bson).unwrap_or_default();
-
-            // Ensure the average mood of each object is non null
-            if object.average_mood.is_some() { 
-                result.push(object);
-            }
-        }
-        log::info!("DATA WITHIN THE LAST 7 DAYS: {result:?}");
-
-        Ok(result)
-    }
     ///
     /// Cleans out the collection 
     #[tracing::instrument(level= "debug", err)]
