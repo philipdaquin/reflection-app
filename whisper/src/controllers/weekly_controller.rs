@@ -4,7 +4,7 @@ use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
 use bson::oid::ObjectId;
 use crate::{ml::{
     text_classification::TextClassification, recommendation::RecommendedActivity, weekly_pattern::WeeklyAnalysis},
-    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::WeeklyAnalysisDB}, error::ServerError};
+    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}, error::ServerError};
 use serde_derive::{Deserialize};
 
 use super::Input;
@@ -58,4 +58,10 @@ pub async fn get_weekly_summary() -> Result<HttpResponse> {
     // Save to database
 }
 
- 
+ ///
+/// Deletes all entries in Analysis DB
+#[route("/api/weekly/delete-all", method = "DELETE")]
+pub async fn delete_all_entries_analysis() -> Result<HttpResponse> { 
+    let _ = WeeklyAnalysisDB::delete_all_entries().await?;
+    Ok(HttpResponse::Ok().body("Successfully deleted all items!"))
+}
