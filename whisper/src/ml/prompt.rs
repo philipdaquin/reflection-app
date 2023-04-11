@@ -18,9 +18,33 @@ lazy_static! {
         Keep it in one paragraph. 
     ");
 
-    pub static ref SUMMARISE_TEXT: String = format!("Summarise the text below, do not write any followup explainations. Only print out the text summary: ");
+    pub static ref SUMMARISE_TEXT: String = format!("
+    Summarise the input as a synopsis. Write it in as if you are reflecting back to yourself.
+
+    The rules: 
+    - Write it in past tense and in second person point of view.
+    - do not write any followup explainations. 
+    - Only print out the text summary.
     
-    pub static ref GET_TAGS: String = format!("Print out related tags based on the orignal passage, do not write any followup explanations. Only print out the best answers inside of an array: ");
+    The inputs are: 
+    ");
+    
+    pub static ref GET_TAGS: String = format!("
+    Generate up to seven related tags as an Array of strings based on the original input.
+
+    The rules:
+    - ONLY return an array of Strings and nothing else.
+    - do not write explanations or any opening lines. 
+    - ONLY return the array of json objects as your response.
+    In your response, return a json object, the format should follow the structure below and you must only return this object and nothing else. 
+
+    {{
+        \"response\":  [\"Heartbreak\", \"Sadness\", \"Loneliness\", \"Moving On\", \"Memories\", \"Love\", \"Starting Over\"]
+    }}
+
+
+    The inputs are:
+    ");
 
     pub static ref ANALYSE_TEXT_SENTIMENT: String = format!("
     I want you to analyse the sentiment from this passage and in your response assign each score for each label inside of the object below. 
@@ -34,7 +58,7 @@ lazy_static! {
 
     In your response, return a json object, the format should follow the structure below and you must only return this object and nothing else. 
     
-    `{{
+    {{
         \"id\": null, 
         \"audio_ref\": null,
         \"date\":  null,
@@ -42,7 +66,7 @@ lazy_static! {
         \"emotion\": \"Happy\",
         \"emotion_emoji\": \"🤣\", 
         \"average_mood\": 0.0
-    }}`
+    }}
     
     The inputs are:  
     ");
@@ -65,11 +89,11 @@ lazy_static! {
         In your response, return an array of JSON objects , the format should follow the structure below 
         and must ONLY return this array and nothing else.
 
-        `{{ 
+        {{ 
             \"title\": \"Test\", 
             \"emoji\": \"🛏️\", 
             \"description\": \"Test\" 
-        }}`
+        }}
         
         The summaries are:
     ");

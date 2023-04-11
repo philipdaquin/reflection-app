@@ -13,3 +13,8 @@ pub struct Input {
     pub id: Option<String>
 }
 
+// Temporary 
+#[derive(Deserialize, Debug, Clone, Default)]
+pub struct TagResponse { 
+    pub response: Vec<String>
+}

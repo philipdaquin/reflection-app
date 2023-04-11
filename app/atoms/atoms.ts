@@ -21,3 +21,8 @@ export const AudioSummaryAtom = atom<AudioData | null>({
     key: 'AudioSummaryAtom',
     default: null
 })
+
+export const AverageWeeklyIndex = atom<string | null>({
+    key: 'AverageWeeklyIndex',
+    default: null
+})

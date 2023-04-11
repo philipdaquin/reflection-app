@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import LineChart, { DataPoint } from './LineChart';
 import { TextClassification } from '../typings';
+import { useRecoilState } from 'recoil';
+import { AverageWeeklyIndex } from '../atoms/atoms';
 
 const defaultDataPoint: DataPoint[] = [
   { date: "2022-01-01", mood: 0.1 },
@@ -19,7 +21,7 @@ const defaultDataPoint: DataPoint[] = [
   { date: "2023-03-26", mood: 0.0 }
 ];
 
-function Emoji(average: number): string { 
+export function Emoji(average: number): string { 
   let emoji = ""
   if (average <= 2) {
     emoji = "😔";
@@ -35,6 +37,22 @@ function Emoji(average: number): string {
   return emoji
 }
 
+/*
+  Calculates the current Average Mood of the Week
+*/
+export function getAverageMoodWeek(data: TextClassification[] | null) : string { 
+  let length = data?.length;
+
+  //@ts-ignore
+  let average: number | null | undefined = data?.reduce((total, item) => total + item.average_mood, 0) / length;
+  let avgString = (average ? (average * 100.0).toString().slice(0, 5) : '0');
+  let messageToUser = Emoji(average || 0) + " " + avgString + "%";
+
+
+  return messageToUser
+}
+
+
 interface Props { 
   data: TextClassification[] | null
 }
@@ -42,33 +60,38 @@ interface Props {
 function MoodTrackerIndex({data}: Props) {
   console.log(data)
 
-  let length = data?.length;
+  let messageToUser = getAverageMoodWeek(data)
+// Save global variable 
+// const [showAverageWeeklyIndex, setAverageWeeklyIndex] = useRecoilState(AverageWeeklyIndex)
+// useEffect(() => {
+//   if (average)
+//     setAverageWeeklyIndex(messageToUser)
+// }, [average])
 
-//@ts-ignore
-let average: number | null | undefined = data?.reduce((total, item) => total + item.average_mood, 0) / length;
-let avgString = (average ? (average * 100.0).toString().slice(0, 5) : '0');
-let messageToUser = Emoji(average || 0) + " " + avgString + "%";
 
 const dataPoint: DataPoint[] | null | undefined = data?.map((i) => new DataPoint(i)) || defaultDataPoint;
 
-   
-
 
   return (
-    <div className='flex justify-between items-center'>
-        <div className='flex flex-col space-y-2'>
+    <>
+    <div className='flex justify-between items-start'>
+        <div className='flex flex-col space-y-2 '>
             <div className='text-4xl font-bold text-left relative right-2 text-[#424242] '>
                 {messageToUser}
             </div>
+            
             <div className='font-bold text-[14px] text-[#757575]'>
                 Current Mood Index
             </div>
         </div>
-        <div className='w-[92px] h-[42px]'>
+        <div className='w-[120px] h-[42px] relative bottom-7'>
             {/* Insert a graph here */}
           <LineChart data={dataPoint}/>
         </div>
+        
     </div>
+    
+    </>
   )
 }
 

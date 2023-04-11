@@ -8,6 +8,7 @@ import NavigationButtons from '../components/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import AudioVisualizer from '../components/AudioVisualizer'
 import { TextClassification } from '../typings'
+import { getMoodSummary } from '../util/getMoodSummary'
 
 
 
@@ -50,14 +51,7 @@ export default Home
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [response] = await Promise.all([
-    (
-      await fetch('http://localhost:4001/api/analysis/get-mood-summary')
-          .then(resp => resp.json())
-          .catch(err => { 
-            console.error(err)
-            return null
-          })
-    )
+      ( await getMoodSummary() ),
   ]) 
 
   console.log(response)

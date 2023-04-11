@@ -6,7 +6,7 @@ use parking_lot::{Mutex};
 use serde::{Serialize, Deserialize};
 use std::{path::Path,  io::{Cursor}, thread, sync::Arc};
 use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
-use crate::{error::{Result, ServerError}, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}, persistence::audio_db::{AudioDB, AudioInterface}};
+use crate::{error::{Result, ServerError}, ml::{SPEECH_ENGINE_MODEL, chat::get_chat_response, prompt::SUMMARISE_TEXT}, persistence::audio_db::{AudioDB, AudioInterface}, controllers::TagResponse};
 use num_cpus;
 use crate::ml::prompt::GET_TAGS;
 use futures_util::stream::{TryStreamExt, StreamExt};
@@ -334,13 +334,10 @@ impl AudioData {
     #[tracing::instrument(level= "debug")]
     pub async fn get_tags(mut self) -> Result<Self> { 
         if let Some(script) = &self.transcription { 
-            let resp = get_chat_response(script, &GET_TAGS).await.unwrap_or_default();
-            let res: Vec<String> = serde_json::from_str(&resp).unwrap_or_default();
-
+            let resp = get_chat_response(script, &GET_TAGS).await.unwrap();
+            let res: TagResponse = serde_json::from_str(&resp).unwrap_or_default();
             log::info!("TAGS: {res:?}");
-
-
-            self.tags = Some(res);
+            self.tags = Some(res.response);
         } else { 
             return Err(ServerError::MissingTranscript)
         }

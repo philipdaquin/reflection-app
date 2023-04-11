@@ -3,6 +3,9 @@ import MoodAreaChart from './MoodAreaChart'
 import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
 import CommonMoodContainer from './CommonMoodContainer'
 import { TextClassification, WeeklyData, WeeklySummary } from '../typings'
+import { AverageWeeklyIndex } from '../atoms/atoms'
+import { useRecoilValue } from 'recoil'
+import { getAverageMoodWeek } from './MoodTrackerIndex'
 
 
 // const data: WeeklyData[] = [
@@ -105,12 +108,15 @@ interface Props {
 }
 
 function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
-    
     const most_common_mood = weekly_summary?.common_mood || []
     const eventData = weekly_summary?.important_events || []
     const recommendedActivities = weekly_summary?.recommendations || []
 
     const weeklyData: WeeklyData[] | null | undefined = mood_graph?.map((i) => new WeeklyData(i))
+    
+    // const weeklyIndex = useRecoilValue(AverageWeeklyIndex);
+    // console.log(weeklyIndex)
+    const weeklyIndex = getAverageMoodWeek(mood_graph)
 
     return (
         <section className='pb-10'>
@@ -124,7 +130,7 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
                     Weekly Mood Score
                 </h1>
                 <div className='flex justify-between items-center'>
-                    <h1 className='text-[30px] font-bold'>😆 80.2%</h1>
+                    <h1 className='text-[30px] font-bold'>{weeklyIndex || ''}</h1>
                     <div className='flex items-center space-x-1'>
                         <ArrowDownCircleIcon height={20} width={20} color="#757575"/>
                         <p className='text-center text-[#757575] text-[12px]'>
@@ -169,10 +175,11 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
                         eventData.map((v) => { 
                             return (
                                 <div className='flex flex-row space-x-2 items-start'>
-                                    <div className='text-[30px] px-2 py-1 bg-[#F5F5F5] rounded-lg '>{v.emoji}</div>
+                                    <div className='text-[30px] px-2 py-1 bg-[#F5F5F5] rounded-2xl w-[53px] h-[53px] flex justify-center'>{v.emoji}</div>
                                     <div>
                                         <h1 className='text-[#424242] font-bold text-[15px] text-left'>{v.title}</h1>
-                                        <p className='text-[12px] text-[#424242] '>{v.summary.slice(0, 45)}</p>
+                                        {/* <p className='text-[12px] text-[#424242] '>{v.summary.slice(0, 45)}</p> */}
+                                        <p className='text-[12px] text-[#424242] '>{v.summary}</p>
                                     </div>
                                 </div>
                             )
@@ -187,8 +194,8 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
                     {
                         recommendedActivities.map((v) => { 
                             return (
-                                <div className='flex flex-row space-x-2 items-start'>
-                                    <div className='text-[30px] px-2 py-1 bg-[#F5F5F5] rounded-lg '>{v.emoji}</div>
+                                <div className='flex flex-row space-x-2 items-start '>
+                                    <div className='text-[30px] px-2 py-1 bg-[#F5F5F5] rounded-2xl h-[53px] w-[53px] items-center flex justify-center'>{v.emoji}</div>
                                     <div>
                                         <h1 className='text-[#424242] font-bold text-[15px] text-left'>{v.title}</h1>
                                         <p className='text-[12px] text-[#424242] '>{v.description}</p>
