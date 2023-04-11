@@ -6,7 +6,7 @@ import BackButton from '../BackButton'
 import JournalThumbnail from '../JournalThumbnail'
 
 import {ChevronDownIcon} from '@heroicons/react/24/solid'
-import { AudioEntryType } from '../RecentEntries'
+import { AudioEntryType } from '../../typings'
 
 
 const IMAGE_URL: string = 'https://images.unsplash.com/photo-1669264879269-e58825475223?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=764&q=80'

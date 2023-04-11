@@ -1,7 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
   Label, Line, ResponsiveContainer,  ReferenceDot, ReferenceLine } from 'recharts';
-import { WeeklyData } from './MoodSummaryContents';
+import { WeeklyData } from '../typings';
 
 
 interface Props { 

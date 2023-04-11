@@ -1,10 +1,9 @@
 import React from 'react'
-import { CommonMoodData } from './MoodSummaryContents'
-import { TopMood } from '../pages/mood_summary'
+import { CommonMoodData, TopMood } from '../typings'
 
 
 interface Props { 
-    moodData: TopMood 
+    moodData: CommonMoodData 
 }
 function CommonMoodContainer({moodData}: Props) {
 

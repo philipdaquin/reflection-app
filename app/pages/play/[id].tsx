@@ -5,9 +5,9 @@ import PlayerContents from '../../components/pages/PlayerContents'
 import PhoneView from '../../components/PhoneView'
 import SwitchView from '../../components/SwitchView'
 import { useRouter } from 'next/router'
-import { AudioEntryType } from '../../components/RecentEntries'
 import { GetServerSideProps } from 'next'
 import { utimes } from 'fs'
+import { AudioEntryType } from '../../typings'
 
 interface Props { 
   entry: AudioEntryType

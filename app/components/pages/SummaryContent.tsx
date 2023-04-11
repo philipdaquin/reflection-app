@@ -6,9 +6,9 @@ import JournalThumbnail from '../JournalThumbnail'
 import SuggestedTags from '../SuggestedTags'
 import {CgTranscript} from 'react-icons/cg'
 import PostSummaryControls from '../PostSummaryControls'
-import { AudioData } from '../../pages'
 import { useRecoilState } from 'recoil'
 import { AudioSummaryAtom } from '../../atoms/atoms'
+import {AudioData}  from '../../typings'
 
 interface DownloadProps { 
     transcript : String 

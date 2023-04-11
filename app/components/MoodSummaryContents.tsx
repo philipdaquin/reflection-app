@@ -2,113 +2,115 @@ import React from 'react'
 import MoodAreaChart from './MoodAreaChart'
 import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
 import CommonMoodContainer from './CommonMoodContainer'
-import { CommonMoodData, EventData, RecommendedActivity, TextClassification, TopMood, WeeklyData } from '../typings'
+import { TextClassification, WeeklyData, WeeklySummary } from '../typings'
 
 
+// const data: WeeklyData[] = [
+//     { name: 'M', mood: 4 },
+//     { name: 'Tu', mood: 3 },
+//     { name: 'W', mood: 0 },
+//     { name: 'Th', mood: 10 },
+//     { name: 'F', mood: 7 },
+//     { name: 'Sa', mood: 4 },
+//     { name: 'Su', mood: 10 },
+// ];
 
-const data: WeeklyData[] = [
-    { name: 'M', mood: 4 },
-    { name: 'Tu', mood: 3 },
-    { name: 'W', mood: 0 },
-    { name: 'Th', mood: 10 },
-    { name: 'F', mood: 7 },
-    { name: 'Sa', mood: 4 },
-    { name: 'Su', mood: 10 },
-];
+// const moodData: CommonMoodData[] = [
+//     {
+//       emotion_emoji: '😊',
+//       emotion: 'Happy',
+//       percentage: 3.5,
+//     },
+//     {
+//       emotion_emoji: '😔',
+//       emotion: 'Sad',
+//       percentage: 2.1,
+//     },
+//     {
+//       emotion_emoji: '😐',
+//       emotion: 'Neutral',
+//       percentage: 2.8,
+//     },
+//     {
+//       emotion_emoji: '😃',
+//       emotion: 'Excited',
+//       percentage: 4.2,
+//     },
+//     {
+//       emotion_emoji: '😴',
+//       emotion: 'Tired',
+//       percentage: 1.9,
+//     },
+// ].slice(0, 3);
 
-const moodData: CommonMoodData[] = [
-    {
-      emotion_emoji: '😊',
-      emotion: 'Happy',
-      percentage: 3.5,
-    },
-    {
-      emotion_emoji: '😔',
-      emotion: 'Sad',
-      percentage: 2.1,
-    },
-    {
-      emotion_emoji: '😐',
-      emotion: 'Neutral',
-      percentage: 2.8,
-    },
-    {
-      emotion_emoji: '😃',
-      emotion: 'Excited',
-      percentage: 4.2,
-    },
-    {
-      emotion_emoji: '😴',
-      emotion: 'Tired',
-      percentage: 1.9,
-    },
-].slice(0, 3);
+// const recommendedActivities: RecommendedActivity[] = [
+//     {
+//         title: "Exercise",
+//         description: "Going for a run or doing a quick workout can help release endorphins, which can improve your mood and reduce stress levels.",
+//         emoji: "🏃‍♀️"
+//     },
+//     {
+//         title: "Mindfulness",
+//         description: "Taking a few minutes to focus on your breath and observe your thoughts can help you feel more calm and centered.",
+//         emoji: "🧘"
+//     },
+//     {
+//         title: "Socializing",
+//         description: "Connecting with friends or loved ones can provide a sense of support and belonging, which can boost your mood and reduce feelings of loneliness.",
+//         emoji: "👥"
+//     },
+//     {
+//         title: "Gratitude",
+//         description: "Taking time to appreciate the good things in your life can help shift your focus away from negative thoughts and improve your overall outlook.",
+//         emoji: "🙏"
+//     },
+//     {
+//         title: "Creativity",
+//         description: "Engaging in a creative activity, such as painting or writing, can help you express yourself and tap into positive emotions.",
+//         emoji: "🎨"
+//     }
+// ].slice(0, 3);
 
-const recommendedActivities: RecommendedActivity[] = [
-    {
-        title: "Exercise",
-        description: "Going for a run or doing a quick workout can help release endorphins, which can improve your mood and reduce stress levels.",
-        emoji: "🏃‍♀️"
-    },
-    {
-        title: "Mindfulness",
-        description: "Taking a few minutes to focus on your breath and observe your thoughts can help you feel more calm and centered.",
-        emoji: "🧘"
-    },
-    {
-        title: "Socializing",
-        description: "Connecting with friends or loved ones can provide a sense of support and belonging, which can boost your mood and reduce feelings of loneliness.",
-        emoji: "👥"
-    },
-    {
-        title: "Gratitude",
-        description: "Taking time to appreciate the good things in your life can help shift your focus away from negative thoughts and improve your overall outlook.",
-        emoji: "🙏"
-    },
-    {
-        title: "Creativity",
-        description: "Engaging in a creative activity, such as painting or writing, can help you express yourself and tap into positive emotions.",
-        emoji: "🎨"
-    }
-].slice(0, 3);
-
-const eventData: EventData[] = [
-    {
-        title: "Gratitude",
-        summary: "Today I'm feeling so grateful for my family and friends who have supported me throughout my life.",
-        emoji: "🙏"
-    },
-    {
-        title: "Self-reflection",
-        summary: "I've been thinking a lot about my goals and what I want to achieve in the next few months.",
-        emoji: "🤔"
-    },
-    {
-        title: "Mindfulness",
-        summary: "I spent some time meditating this morning and it really helped me to feel more centered and focused.",
-        emoji: "🧘"
-    },
-    {
-        title: "Emotional release",
-        summary: "I had a really tough day today and I just needed to let it all out. Talking about my feelings in my journal helped me to feel better.",
-        emoji: "😔"
-    },
-    {
-        title: "Inspiration",
-        summary: "I listened to a great podcast today that really inspired me to try something new.",
-        emoji: "💡"
-    }
-].slice(0, 3);
+// const eventData: EventData[] = [
+//     {
+//         title: "Gratitude",
+//         summary: "Today I'm feeling so grateful for my family and friends who have supported me throughout my life.",
+//         emoji: "🙏"
+//     },
+//     {
+//         title: "Self-reflection",
+//         summary: "I've been thinking a lot about my goals and what I want to achieve in the next few months.",
+//         emoji: "🤔"
+//     },
+//     {
+//         title: "Mindfulness",
+//         summary: "I spent some time meditating this morning and it really helped me to feel more centered and focused.",
+//         emoji: "🧘"
+//     },
+//     {
+//         title: "Emotional release",
+//         summary: "I had a really tough day today and I just needed to let it all out. Talking about my feelings in my journal helped me to feel better.",
+//         emoji: "😔"
+//     },
+//     {
+//         title: "Inspiration",
+//         summary: "I listened to a great podcast today that really inspired me to try something new.",
+//         emoji: "💡"
+//     }
+// ].slice(0, 3);
 
 interface Props { 
-    mood_trends: TextClassification[] | null,
-    most_common_mood: TopMood[] | null, 
+    mood_graph: TextClassification[] | null,
+    weekly_summary: WeeklySummary | null
 }
 
-function MoodSummaryContents({mood_trends, most_common_mood}: Props) {
+function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
     
+    const most_common_mood = weekly_summary?.common_mood || []
+    const eventData = weekly_summary?.important_events || []
+    const recommendedActivities = weekly_summary?.recommendations || []
 
-    let weeklyData: WeeklyData[] | null | undefined = mood_trends?.map((i) => new WeeklyData(i))
+    const weeklyData: WeeklyData[] | null | undefined = mood_graph?.map((i) => new WeeklyData(i))
 
     return (
         <section className='pb-10'>

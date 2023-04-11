@@ -11,7 +11,7 @@ export type TextClassification = {
     average_mood: number 
   }
   
-  export class AudioData { 
+export class AudioData { 
     _id: string;
     title: string | null;
     transcription: string;
@@ -19,7 +19,7 @@ export type TextClassification = {
     text_classification: TextClassification;
     tags: string[] | null;
   
-    constructor(
+  constructor(
       _id: string,
       title: string | null,
       transcription: string,
@@ -35,7 +35,7 @@ export type TextClassification = {
       this.tags = tags;
     }
   }
-  export type AudioEntryType = { 
+export type AudioEntryType = { 
     id: number,
     title: string,
     subtitle: string,
@@ -70,7 +70,7 @@ export type RecommendedActivity = {
 export type CommonMoodData = {  
     emotion: string,
     emotion_emoji: string, 
-    percentage: float
+    percentage: number
 }
 
 export class WeeklyData {

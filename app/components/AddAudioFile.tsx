@@ -4,7 +4,7 @@ import { convertWav } from '../util/convertWav';
 import { getRelatedTags } from '../util/getRelatedTags';
 import { getTextSummary } from '../util/getTextSummary';
 import { uploadWav } from '../util/uploadWav';
-import { AudioData } from '../pages';
+import { AudioData } from '../typings';
 
 function AddAudioFile() {
     const [selectedFile, setSelectedFile] = useState(null);

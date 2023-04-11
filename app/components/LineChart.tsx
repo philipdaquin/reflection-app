@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextClassification } from '../pages';
+import { TextClassification } from '../typings';
 
 export class DataPoint { 
     date: string;

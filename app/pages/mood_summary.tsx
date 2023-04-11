@@ -6,20 +6,20 @@ import HomeContents from '../components/pages/HomeContents'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
 import { GetServerSideProps } from 'next'
-import { TextClassification, TopMood } from '../typings'
+import { TextClassification, TopMood, WeeklySummary } from '../typings'
+import { getMoodSummary } from '../util/getMoodSummary'
+import { getWeeklySummary } from '../util/getWeeklySummary'
 
 
 
 interface Props { 
-  mood_trends: TextClassification[] | null,
-  most_common_mood: TopMood[] | null, 
-  mood_pattern: TextClassification[] | null
+  mood_graph: TextClassification[] | null,
+  weekly_summary: WeeklySummary | null
 }
 
 function mood_summary({
-  mood_trends, 
-  most_common_mood,
-  mood_pattern
+  mood_graph, 
+  weekly_summary
 }: Props) {
     return (
         <>
@@ -37,9 +37,8 @@ function mood_summary({
                 </div>
                 <PhoneView children={
                   <MoodSummaryContents 
-                  mood_trends={mood_trends}
-                  most_common_mood={most_common_mood}
-                  
+                  mood_graph={mood_graph}
+                  weekly_summary={weekly_summary}
                   />
                 
                 }/>
@@ -60,55 +59,17 @@ export default mood_summary
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [
-    mood_trends, 
-    most_common_mood, 
-    // mood_patterns, 
-    // recommendations
+    mood_graph, 
+    weekly_summary
   ] = await Promise.all([
-
-    (
-      await fetch('http://localhost:4001/api/analysis/get-mood-summary')
-          .then(resp => resp.json())
-          .catch(err => { 
-            console.error(err)
-            return null
-          })
-    ),
-    (
-      await fetch('http://localhost:4001/api/analysis/get-common-mood')
-          .then(resp => resp.json())
-          .catch(err => { 
-            console.error(err)
-            return null
-          })
-    ),
-    // (
-    //   await fetch('http://localhost:4001/api/weekly/get-weekly-summary')
-    //       .then(resp => resp.json())
-    //       .catch(err => { 
-    //         console.error(err)
-    //         return null
-    //       })
-    // ),
-    // (
-    //   await fetch('http://localhost:4001/api/get-weekly-recommendation')
-    //       .then(resp => resp.json())
-    //       .catch(err => { 
-    //         console.error(err)
-    //         return null
-    //       })
-    // ),
-  
-
+    ( await getMoodSummary() ),
+    ( await getWeeklySummary() )
   ]) 
-
-  console.log(most_common_mood)
 
   return { 
     props: { 
-      mood_trends,
-      most_common_mood, 
-      mood_patterns: null
+      mood_graph,
+      weekly_summary
     }
   }
 }

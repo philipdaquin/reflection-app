@@ -1,6 +1,6 @@
 import React from 'react'
 import LineChart, { DataPoint } from './LineChart';
-import { TextClassification } from '../pages';
+import { TextClassification } from '../typings';
 
 const defaultDataPoint: DataPoint[] = [
   { date: "2022-01-01", mood: 0.1 },

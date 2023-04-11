@@ -7,8 +7,8 @@ import PhoneView from '../../components/PhoneView'
 import PostSummaryControls from '../../components/PostSummaryControls'
 import SwitchView from '../../components/SwitchView'
 import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
-import { AudioData } from '..'
 import { getEntry } from '../../util/getEntry'
+import { AudioData } from '../../typings'
 
 
 interface Props { 
