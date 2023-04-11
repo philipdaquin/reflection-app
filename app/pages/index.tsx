@@ -7,42 +7,9 @@ import SwitchView from '../components/SwitchView'
 import NavigationButtons from '../components/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import AudioVisualizer from '../components/AudioVisualizer'
+import { TextClassification } from '../typings'
 
 
-export type TextClassification = { 
-  _id: string,
-  audio_ref: string,
-  date: string,
-  day: string,
-  emotion: string, 
-  emotion_emoji: string | null,
-  average_mood: number 
-}
-
-export class AudioData { 
-  _id: string;
-  title: string | null;
-  transcription: string;
-  summary: string | null;
-  text_classification: TextClassification;
-  tags: string[] | null;
-
-  constructor(
-    _id: string,
-    title: string | null,
-    transcription: string,
-    summary: string | null,
-    text_classification: TextClassification,
-    tags: string[] | null,
-  ) {
-    this._id = _id;
-    this.title = title;
-    this.transcription = transcription;
-    this.summary = summary;
-    this.text_classification = text_classification;
-    this.tags = tags;
-  }
-}
 
 
 interface Props { 

@@ -1,4 +1,4 @@
-import { AudioData } from "../pages"
+import { AudioData } from "../typings"
 
 export async function getEntry(id: string): Promise<AudioData> { 
     console.log(id)

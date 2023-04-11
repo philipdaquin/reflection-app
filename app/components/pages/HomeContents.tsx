@@ -1,10 +1,10 @@
 import React from 'react'
 import GreetingUser from '../GreetingUser'
 import MoodTrackerIndex from '../MoodTrackerIndex'
-import RecentEntries, { AudioEntryType } from '../RecentEntries'
+import RecentEntries from '../RecentEntries'
 import WeeklyRoundUpComp from '../WeeklyRoundUpComp'
 import { getServerSideProps } from '../../pages/post_analysis/[id]'
-import { TextClassification } from '../../pages'
+import { AudioEntryType, TextClassification } from '../../typings'
 
 interface Props { 
   data: TextClassification[] | null

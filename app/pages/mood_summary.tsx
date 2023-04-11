@@ -5,15 +5,9 @@ import NavigationButtons from '../components/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
-import { TextClassification } from '.'
 import { GetServerSideProps } from 'next'
+import { TextClassification, TopMood } from '../typings'
 
-
-export type TopMood = { 
-  emotion: string | null, 
-  emotion_emoji: string | null, 
-  percentage: string | null
-}
 
 
 interface Props { 
@@ -89,7 +83,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
           })
     ),
     // (
-    //   await fetch('http://localhost:4001/api/get-weekly-summary')
+    //   await fetch('http://localhost:4001/api/weekly/get-weekly-summary')
     //       .then(resp => resp.json())
     //       .catch(err => { 
     //         console.error(err)

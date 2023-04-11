@@ -1,16 +1,8 @@
 import React from 'react'
 import AudioEntry from './AudioEntry'
 import Link from 'next/link'
+import { AudioEntryType } from '../typings'
 
-export type AudioEntryType = { 
-    id: number,
-    title: string,
-    subtitle: string,
-    date: string,
-    duration: number,
-    thumbnailUrl: string,
-    audioUrl: string
-}
 
 interface Props { 
   entries: AudioEntryType[]
