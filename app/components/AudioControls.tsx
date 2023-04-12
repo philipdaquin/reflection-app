@@ -9,6 +9,8 @@ import formatTime from '../util/formatTime'
 import { useRouter } from 'next/router';
 import { getTextSummary } from '../util/getTextSummary'
 import { getRelatedTags } from '../util/getRelatedTags'
+import useAudioRecording from '../hooks/AudioRecorder'
+import { uploadAudioRecording } from '../util/uploadAudioRecording'
 interface Props { 
   icon: any
 }
@@ -49,7 +51,16 @@ function StartStopRecording() {
     const [summary, setSummary] = useState<string>('')
     const [relatedTags, setRelatedTags] = useState<string[] | null>(null)
 
+    // Beta test 
+    // const {
+    //   audioBlob, 
+    //   audioUrl, 
+    //   is_recording, 
+    //   startRecording, 
+    //   stopRecording
+    // } = useAudioRecording()
     const router = useRouter();
+
 
     // START THE RECORDING
     const start = () => {   
@@ -95,79 +106,33 @@ function StartStopRecording() {
     // Next, if all ok, reset Recording states to default 
     useEffect(() => { 
         if (!process) return 
+        console.log("Processing")
+        // if (recordingBlob == null) return 
         if (recordingBlob == null) return 
         setLoading(true)
-        
-        // Convert to Wav
         convertWav(recordingBlob)
-          // Upload to server and get the response 
-          .then((resp) => {
-              const formData = new FormData();
-                formData.append('audio', resp);
-                fetch("http://localhost:4001/api/audio/upload", {
-                method: "POST",
-                body: formData,
-              })
-              .then(async (response) => {
-                  if (response.ok) {
-                      const url = URL.createObjectURL(recordingBlob)
-                      const data = await response.text()
-
-                      console.log(url)
-                      setAudioURL(url)
-
-                      return data
-                  } else { 
-                    throw new Error("Failed to get audio file")
-                  }
-              }) 
-              .then(async (data) => { 
-                setTranscription(data)
-
-                const [summary, tags] = await Promise.all([
-                  getTextSummary(data), 
-                  getRelatedTags(data)
-                ])
-
-                setSummary(summary)
-                setRelatedTags(tags)
-
-                const pageData = {
-                    transcript: transcription,
-                    orginalAudio: audioURL,
-                    summary: summary,
-                    tags: tags
+        .then((resp) => 
+          uploadAudioRecording(resp)
+            .then( (data) => { 
+                
+                if (data) {
+  
+                  router.push({
+                      pathname: `/post_analysis/${data._id}`,
+                      
+                  })
+                  resetRecordingStates()
+                  setLoading(false)
                 }
-
-                router.push({
-                    pathname: '/post_analysis',
-                    query: {
-                      data: JSON.stringify(pageData)
-                    }
-                })
-                resetRecordingStates()
-                setLoading(false)
-              })
-              .catch((error) => {
-                setLoading(false)
-                resetRecordingStates()
-                throw new Error(error)
-              });
-          })
-        
+            })
+        )
+        .catch((error) => {
+          setLoading(false)
+          resetRecordingStates()
+          throw new Error(error)
+        })
+            
     }, [recordingBlob, process])
-
-    // const getTags = async () => { 
-    //     if (transcription == null && process) return   
-
-    //     const as = await getRelatedTags(transcription)
-    //     setRelatedTags(as)
-    // }
-    // useEffect(() => { 
-    //     if (transcription == null && process) return   
-
-    //     getTags()
-    // }, [transcription, process])
 
 
       const START = () => { 

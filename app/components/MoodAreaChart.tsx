@@ -34,7 +34,7 @@ const CustomizedLabel: React.FC = () => (
                 <defs>
                   <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#ff7d45" stopOpacity={0.91}/>
-                    <stop offset="95%" stopColor="rgba(255, 184, 0, 0.38)" stopOpacity={1}/>
+                    <stop offset="95%" stopColor="rgba(255, 184, 0, 0.38)" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#ff7d45" stopOpacity={0.91}/>
@@ -69,11 +69,9 @@ const CustomizedLabel: React.FC = () => (
                 <ReferenceLine 
                   x={minData?.name}
                   x2={minData?.name}
-
                   r={7} 
                   stroke="#000" 
                   strokeDasharray="3 3" />
-
 
 
 

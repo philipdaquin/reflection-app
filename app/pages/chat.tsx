@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
-import NavigationButtons from '../components/NavigationButtons'
+import NavigationButtons from '../components/navigation/NavigationButtons'
 import ChatContent from '../components/pages/ChatContent'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
@@ -15,8 +15,8 @@ function chat() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         
-        <div className="md:bg-[#EEEEEE] bg-white duration-500  flex min-h-screen flex-col 
-        items-center justify-center ">
+        <div className="md:bg-[#EEEEEE] bg-white  flex 
+        md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
 
             <main className=" justify-center flex flex-col items-center space-y-[27px]  ">
 

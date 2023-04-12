@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
-import NavigationButtons from '../../components/NavigationButtons'
+import NavigationButtons from '../../components/navigation/NavigationButtons'
 import PlayerContents from '../../components/pages/PlayerContents'
 import PhoneView from '../../components/PhoneView'
 import SwitchView from '../../components/SwitchView'
@@ -25,8 +25,8 @@ function play({entry}: Props) {
             <link rel="icon" href="/favicon.ico" />
           </Head>
           
-          <div className="md:bg-[#EEEEEE] bg-white duration-700  flex min-h-screen flex-col 
-            items-center justify-center md:py-2 py-14">
+          <div className="md:bg-[#EEEEEE] bg-white  flex 
+            md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
             <main className=" justify-center flex flex-col items-center space-y-[27px] ">
     
               <div className="flex items-center relative right-5">

@@ -54,7 +54,7 @@ function LineChart({data}: Props) {
     //   </svg>
     // );
     // create path definition for the area graph
-    const path = `M${points[0]} C${points.join(" ")} L${points[points.length - 1]} Z`;
+    const path = `M${points[0]} C${points.slice(0).join(" ")} L${points[points.length - 1]} Z`;
 
     return (
       <svg viewBox={`0 0 ${data.length * 11} ${height  }`} width="100%" height={height}>

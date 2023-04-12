@@ -14,12 +14,18 @@ export async function uploadAudioRecording(wavFile: Blob): Promise<AudioData> {
       body: formData,
     })
     .then(async (response) => {
-        const audioData = await response.json() as AudioData
-        console.log(audioData)
-        return audioData
+
+        if (response.ok) { 
+            const audioData = await response.json() as AudioData
+            console.log(audioData)
+            return audioData
+        } else { 
+          throw new Error("Failed to get audio file")
+        }
+
     })
     .catch((e) => { 
         console.error(e)
-        throw new Error("Failed to upload audio file")
+        throw new Error(e)
     }) 
 }

@@ -3,7 +3,7 @@ import React from 'react'
 import { useAudioRecorder } from 'react-audio-voice-recorder'
 import AudioControls from '../components/AudioControls'
 import AudioVisualizer from '../components/AudioVisualizer'
-import NavigationButtons from '../components/NavigationButtons'
+import NavigationButtons from '../components/navigation/NavigationButtons'
 import ChatContent from '../components/pages/ChatContent'
 import RecordContent from '../components/pages/RecordContent'
 import PhoneView from '../components/PhoneView'
@@ -19,8 +19,8 @@ function record() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <div className="md:bg-[#EEEEEE] bg-white duration-500 transition-all flex min-h-screen flex-col 
-         items-center justify-center md:py-2 py-14">
+        <div className="md:bg-[#EEEEEE] bg-white  flex 
+            md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
             <main className=" justify-center flex flex-col items-center space-y-[27px] ">
                 <div className="flex items-center relative right-10 space-x-5">
                     <AudioControls />       

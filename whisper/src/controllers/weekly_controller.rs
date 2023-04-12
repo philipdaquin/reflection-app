@@ -14,6 +14,7 @@ use super::Input;
 pub fn configure_weekly_analysis_service(cfg: &mut web::ServiceConfig) { 
     cfg
     .service(get_weekly_summary)
+    .service(delete_all_entries_analysis)
     ;
 }
 

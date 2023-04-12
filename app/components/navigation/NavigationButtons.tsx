@@ -22,7 +22,7 @@ function Button({icon, routerName}: Props) {
 function NavigationButtons() {
     return (
       // <div className='flex flex-col space-y-3 p-2 h-[244px]  justify-between items-center w-[53px]  space-x-1 rounded-[20px] bg-white shadow-xl'>
-      <div className='flex flex-col space-y-3'>
+      <div className='flex md:flex-col space-y-3 md:items-center md'>
         <Button 
           routerName=''
           icon={<HomeIcon height={24} width={24} color="white"/>}/>
