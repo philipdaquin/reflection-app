@@ -49,46 +49,46 @@ interface ApiProps {
 
         setValue(apiKeyValue);
     };
-    
 
+    
     return (
       <ul
-        tabIndex={1}
-        className="px-4 py-4 dropdown-content dropdown-open bg-white shadow rounded-box flex flex-col w-[358px]"
+        tabIndex={0}
+        className="px-4 py-4 dropdown-content bg-white shadow rounded-box flex flex-col w-[358px]"
       >
-        <div className="font-bold text-sm text-left">
-          Enter {title} API Key
-        </div>
+            <div className="font-bold text-sm text-left">
+            Enter {title} API Key
+            </div>
 
-        <p className="text-xs">
-          Your API Key is stored locally in your browser.
-        </p>
-        
-        <div className="pt-7 space-y-3">
-            <Link
-                href={`${redirectLink}`}
-                className="hover:border-b-[1px] pb-1 h-4 hover:border-b-[#71a0ee] cursor-pointer w-fit text-xs flex flex-wrap space-x-1 items-center text-[#71a0ee]"
-            >
-                <a target="_blank" rel="noopener noreferrer">
-                Get your API Key from {title}
-                </a>
-                <ArrowUpRightIcon height={14} width={14} color="#71a0ee" />
-            </Link>
+            <p className="text-xs">
+            Your API Key is stored locally in your browser.
+            </p>
+            
+            <div className="pt-7 space-y-3">
+                <Link
+                    href={`${redirectLink}`}
+                    className="hover:border-b-[1px] pb-1 h-4 hover:border-b-[#71a0ee] cursor-pointer w-fit text-xs flex flex-wrap space-x-1 items-center text-[#71a0ee]"
+                >
+                    <a target="_blank" rel="noopener noreferrer">
+                    Get your API Key from {title}
+                    </a>
+                    <ArrowUpRightIcon height={14} width={14} color="#71a0ee" />
+                </Link>
 
-            <input
-                value={apiKeyValue}
-                onChange={changeApiKey}
-                type="password"
-                className="py-2 tracking-widest text-[#bdbdbd] outline-none px-4 w-full rounded-[11px] bg-[#f5f5f5]"
-            />
-            <button
-                onClick={saveApiKey}
-                className={`${isDirty ? 'bg-[#5d5fef]' : 'bg-[#e0e0e0]'} w-full py-2 rounded-lg items-center flex justify-center text-white font-bold rounded-[11px]'`}
-                disabled={!isDirty}
-            >
-                Save
-            </button>
-        </div>
+                <input
+                    value={apiKeyValue}
+                    onChange={changeApiKey}
+                    type="password"
+                    className="py-2 tracking-widest text-[#bdbdbd] outline-none px-4 w-full rounded-[11px] bg-[#f5f5f5]"
+                />
+                <button
+                    onClick={saveApiKey}
+                    className={`${isDirty ? 'bg-[#5d5fef]' : 'bg-[#e0e0e0]'} w-full py-2 rounded-lg items-center flex justify-center text-white font-bold rounded-[11px]'`}
+                    disabled={!isDirty}
+                >
+                    Save
+                </button>
+            </div>
       </ul>
     );
   }
@@ -106,34 +106,18 @@ function SettingSlot({title, savedValue, component}: SettingsProps) {
     const openAIDrop = () => {
         setOpenAiToggle(!openAIToggle);
     };
-
-    //     useEffect(() => {
-    //         const handleClickOutside = (event: any) => {
-    //             //@ts-ignore
-    //             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-    //                 setOpenAiToggle(false);
-    //             }
-    //         };
-    //         window.addEventListener("click", handleClickOutside);
-    //         return () => {
-    //             window.removeEventListener("click", handleClickOutside);
-    //         };
-    //   }, [dropdownRef]);
-
-    
     return (
         <>  
             <div 
                 // ref={dropdownRef}
                 onClick={openAIDrop} 
-                className='dropdown mr-1 dropdown-right cursor-pointer rounded-[11px] w-[180px] hover:bg-[#F5F5F5]  py-3 flex flex-col '>
-                <label tabIndex={1} className='text-[#505050] text-[13px] text-left w-full'>{title}</label>
+                className='dropdown dropdown-right cursor-pointer rounded-[11px] w-[180px] hover:bg-[#F5F5F5] py-3 flex flex-col '>
+                <label tabIndex={0} className='text-[#505050] text-[13px] text-left w-full '>{title}</label>
                 { savedValue && <input readOnly={true} type='password' className='outline-none text-xs bg-inherit w-full text-[#BDBDBD] tracking-widest font-light' value={savedValue}/>}
             </div>  
             
-                {
-                    openAIToggle && component
-                }
+                { openAIToggle && component }
+
         </>
     )
 }
@@ -214,7 +198,7 @@ function SettingsToggle() {
                                         </div>
                                     )
                                 ) : (
-                                    <div className='w-full font-bold cursor-pointer text-gray-600 bg-gray-300 py-3 rounded-[11px] text-xs items-center flex justify-center'>
+                                    <div className='w-full cursor-default font-bold text-gray-600 bg-gray-300 py-3 rounded-[11px] text-xs items-center flex justify-center'>
                                         Enter API Keys 
                                     </div> 
                                     
