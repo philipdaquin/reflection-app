@@ -10,6 +10,7 @@ import AudioVisualizer from '../components/AudioVisualizer'
 import { TextClassification } from '../typings'
 import { getMoodSummary } from '../util/getMoodSummary'
 import SettingsButtons from '../components/SettingsButtons'
+import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY } from '../hooks/useLocalStorage'
 
 
 
@@ -31,7 +32,6 @@ function Home({data}: Props) {
         md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
 
 
-
         <main className="justify-center flex flex-col items-center space-y-[27px]">
           <div className="flex items-center relative right-5 h-full">
             <div className='relative right-10 hidden md:block'>
@@ -49,7 +49,7 @@ function Home({data}: Props) {
 
         {/* Settings / Footer  */}
         <div className="flex-grow"></div>
-        <div className='relative bottom-10'>
+        <div className='relative bottom-10 md:block hidden '>
           <SettingsButtons />
         </div>
 

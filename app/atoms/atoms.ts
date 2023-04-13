@@ -1,5 +1,6 @@
 import { atom } from "recoil";
 import { AudioData } from "../typings";
+import { ELEVEN_LABS_KEY, OPENAI_KEY } from "../components/SettingsButtons";
 
 export const TimerState = atom({
     key: 'TimerState',
@@ -24,5 +25,21 @@ export const AudioSummaryAtom = atom<AudioData | null>({
 
 export const AverageWeeklyIndex = atom<string | null>({
     key: 'AverageWeeklyIndex',
+    default: null
+})
+export const ElevenLabsApiKey = atom<string | null>({
+    key: 'eleven_labs_api_key',
+    default: null
+})
+export const OpenAIApiKey = atom<string | null>({
+    key: 'openai_api_key',
+    default: null
+})
+export const ElevenLabsApiValue = atom<string | null>({
+    key: 'eleven_labs_api_value',
+    default: null
+})
+export const OpenAIApiValue = atom<string | null>({
+    key: 'openai_api_value',
     default: null
 })

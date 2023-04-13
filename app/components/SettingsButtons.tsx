@@ -1,113 +1,227 @@
-import React, { useState } from 'react'
-import {Cog8ToothIcon} from '@heroicons/react/24/outline'
+import React, { ChangeEvent, ReactEventHandler, ReactHTMLElement, useEffect, useMemo, useRef, useState } from 'react'
+import {Cog8ToothIcon, ArrowUpRightIcon} from '@heroicons/react/24/outline'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import useLocalStorage, { deleteLocalStorage } from '../hooks/useLocalStorage'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
+
+
+export const ELEVEN_LABS_KEY: string = "eleven_labs_api_key"
+const ELEVEN_LABS_LINK = 'https://beta.elevenlabs.io/subscription'
+
+
+export const OPENAI_KEY: string = "openai_api_key"
+const OPENAPI_LINK= 'https://platform.openai.com/account/api-keys'
 
 
 
+interface ApiProps {
+    title: string;
+    redirectLink: string;
+    apiKeyName: string;
+  }
+  
+  export function AddAPIKeys({
+    title,
+    redirectLink,
+    apiKeyName,
+  }: ApiProps) {
+    
 
-function AddOpenAiModal() { 
+
+    const [storedValue, setValue] = useLocalStorage(apiKeyName, null);
+    const [apiKeyValue, setApiKeyValue] = useState(storedValue ?? '');
+    const [isDirty, setIsDirty] = useState(false);
+  
+    const changeApiKey = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setApiKeyValue(e.target.value);
+      setIsDirty(e.target.value !== storedValue);
+    };
+
+    const [elevenLabs, setelevenLabs] = useRecoilState(ElevenLabsApiKey);
+    const [openAi, setopenAi] = useRecoilState(OpenAIApiKey);
+
+    const saveApiKey = () => {
+
+        if (apiKeyName === OPENAI_KEY ) setopenAi(apiKeyValue)
+        if (apiKeyName === ELEVEN_LABS_KEY) setelevenLabs(apiKeyValue)
+
+        setValue(apiKeyValue);
+    };
+    
+
     return (
-        <div className='cursor-pointer rounded-[11px] w-[180px] h-full bg-black  px-2 py-3 flex flex-wrap '>
-            HELLO WORLD
+      <ul
+        tabIndex={1}
+        className="px-4 py-4 dropdown-content dropdown-open bg-white shadow rounded-box flex flex-col w-[358px]"
+      >
+        <div className="font-bold text-sm text-left">
+          Enter {title} API Key
         </div>
-    )
-}
-function AddElevenLabs() { 
-    return (
-        <div className='cursor-pointer rounded-[11px] w-[180px] h-full  hover:bg-[#F5F5F5] px-2 py-3 flex flex-wrap '>
-            HELLO WORLD
-        </div>
-    )
-}
 
+        <p className="text-xs">
+          Your API Key is stored locally in your browser.
+        </p>
+        
+        <div className="pt-7 space-y-3">
+            <Link
+                href={`${redirectLink}`}
+                className="hover:border-b-[1px] pb-1 h-4 hover:border-b-[#71a0ee] cursor-pointer w-fit text-xs flex flex-wrap space-x-1 items-center text-[#71a0ee]"
+            >
+                <a target="_blank" rel="noopener noreferrer">
+                Get your API Key from {title}
+                </a>
+                <ArrowUpRightIcon height={14} width={14} color="#71a0ee" />
+            </Link>
+
+            <input
+                value={apiKeyValue}
+                onChange={changeApiKey}
+                type="password"
+                className="py-2 tracking-widest text-[#bdbdbd] outline-none px-4 w-full rounded-[11px] bg-[#f5f5f5]"
+            />
+            <button
+                onClick={saveApiKey}
+                className={`${isDirty ? 'bg-[#5d5fef]' : 'bg-[#e0e0e0]'} w-full py-2 rounded-lg items-center flex justify-center text-white font-bold rounded-[11px]'`}
+                disabled={!isDirty}
+            >
+                Save
+            </button>
+        </div>
+      </ul>
+    );
+  }
 
 interface SettingsProps { 
     title: string, 
-    savedMessage: string,
+    savedValue: string | null | undefined,
+    component: any
 }
-function SettingSlot({title, savedMessage}: SettingsProps) { 
+function SettingSlot({title, savedValue, component}: SettingsProps) { 
     
-    
+    const [openAIToggle, setOpenAiToggle] = useState(false)
+    const dropdownRef = useRef(null);
+
+    const openAIDrop = () => {
+        setOpenAiToggle(!openAIToggle);
+    };
+
+    //     useEffect(() => {
+    //         const handleClickOutside = (event: any) => {
+    //             //@ts-ignore
+    //             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    //                 setOpenAiToggle(false);
+    //             }
+    //         };
+    //         window.addEventListener("click", handleClickOutside);
+    //         return () => {
+    //             window.removeEventListener("click", handleClickOutside);
+    //         };
+    //   }, [dropdownRef]);
+
     
     return (
         <>  
-            <div className='dropdown dropdown-right cursor-pointer rounded-[11px] w-[180px] hover:bg-[#F5F5F5] px-2 py-3 flex flex-col '>
-                <label tabIndex={0} className=' text-[#505050] text-[13px] text-left w-full'>{title}</label>
-                <input readOnly={true} type='password' className='outline-none text-xs bg-inherit w-full text-[#BDBDBD] tracking-widest font-light' value={savedMessage}/>
+            <div 
+                // ref={dropdownRef}
+                onClick={openAIDrop} 
+                className='dropdown mr-1 dropdown-right cursor-pointer rounded-[11px] w-[180px] hover:bg-[#F5F5F5]  py-3 flex flex-col '>
+                <label tabIndex={1} className='text-[#505050] text-[13px] text-left w-full'>{title}</label>
+                { savedValue && <input readOnly={true} type='password' className='outline-none text-xs bg-inherit w-full text-[#BDBDBD] tracking-widest font-light' value={savedValue}/>}
             </div>  
-           
+            
+                {
+                    openAIToggle && component
+                }
         </>
     )
 }
 
-
-function ShowSettings() { 
-    const [openAIToggle, setOpenAiToggle] = useState(false)
-    const openAIDrop = () => {setOpenAiToggle(!openAIToggle)}
-
-    // return (
-    //     <>  
-    //     <div className='flex relative space-x-4 flex-row'>
-    //     <div className=''>
-    //             {/* {openAIToggle && } */}
-    //         </div>
-           
-    //         <div className='bg-white dropdown dropdown-top absolute rounded-[20px] py-2 space-y-2 shadow-xl px-2 bottom-14'>
-    //         <AddOpenAiModal/>
-
-    //             <div onClick={openAIDrop}>
-    //                 <SettingSlot 
-    //                     savedMessage='asdasdasdas' 
-    //                     title='Open AI API Key'
-    //                 />
-    //             </div>
-    //             <SettingSlot 
-    //                 savedMessage='asdsdasdasda' 
-    //                 title='Eleven Labs API Key'
-    //             />
-
-    //             <div className='cursor-pointer rounded-[11px] w-[180px] hover:bg-[#F5F5F5] px-2 py-2 flex flex-wrap '>
-    //                 <p className='text-[#505050] text-[13px] text-left w-full'>User</p>
-    //                 <p className='text-xs bg-inherit w-full text-[#BDBDBD] '>Anonymous</p>
-    //             </div>  
-                
-    //             <div className='w-full p-2 rounded-full px-4'>
-    //                 <hr />
-    //             </ div>
-                
-    //             <div className='w-full font-bold cursor-pointer text-white bg-[#FF4545] py-3 rounded-[11px] text-xs items-center flex justify-center'>
-    //                 Delete Session Data
-    //             </div>
-    //         </div>
-            
-           
-    //     </div>
-    //     </>
-    // )
-
-    return (
-
-        <div>
-            
-        </div>
-    )
-
-}
-
-
 function SettingsToggle() { 
     const [toggle, setToggle] = useState(false)
-
-
     const openDrop = () =>  setToggle(!toggle)  
 
+    const elevenLabs = useRecoilValue(ElevenLabsApiKey);
+    const openAi = useRecoilValue(OpenAIApiKey);
+
+    const [deleted, setDeleted] = useState(false)
+
+
+    const [elevenLabsState, setelevenLabs] = useRecoilState(ElevenLabsApiKey);
+    const [openAiState, setopenAi] = useRecoilState(OpenAIApiKey);
+
+    const deleteAllKeys = () => {
+
+        let res = deleteLocalStorage()
+        setDeleted(res)
+        setopenAi(null)
+        setelevenLabs(null)
+    }
+    console.log("asdojasdoajs", elevenLabs, openAi)
+
+    useEffect(() => {
+        if (elevenLabs || openAi)  setDeleted(false)
+        console.log("asdojasdoajs", elevenLabs, openAi)
+    }, [openAi, elevenLabs])
     return (
         <>  
             <div className='flex flex-col'>
+                {/* {toggle && <ShowSettings/> } */}
+                <div className='cursor-pointer dropdown dropdown-top' >
+                    <label tabIndex={0} className="btn btn-link" onClick={openDrop}>
+                        <Cog8ToothIcon height={24} width={24} color={`${toggle ? 'black' : '#757575'} `} />
+                    </label>
+                    <ul tabIndex={0} className=" dropdown-content p-2 mb-5 menu active shadow bg-base-100 rounded-box">
+                        <li>
+                            <SettingSlot 
+                                savedValue={elevenLabs} 
+                                title='Eleven Labs API Key'
+                                component={
+                                    <AddAPIKeys
+                                        redirectLink={ELEVEN_LABS_LINK}
+                                        title='Eleven Labs'
+                                        apiKeyName={ELEVEN_LABS_KEY}
+                                    />
+                                }
+                            />
+                        </li>
+                        <li>
+                            <SettingSlot 
+                                savedValue={openAi}
+                                title='OpenAI API Key'
+                                component={
+                                    <AddAPIKeys
+                                        redirectLink={OPENAPI_LINK}
+                                        title='OpenAI'
+                                        apiKeyName={OPENAI_KEY}
+                                    />
+                                }
+                            />
+                        </li>
+                        <li className='mt-5'>
+                            {   
 
-                {toggle && <ShowSettings/> }
-
-                <div className='cursor-pointer' onClick={openDrop}>
-                    <Cog8ToothIcon height={24} width={24} color={`${toggle ? 'black' : '#757575'} `} />
+                                (elevenLabs || openAi) ? (
+                                    deleted ? (
+                                        <div className='w-full font-bold cursor-pointer text-white bg-green-500 py-3 rounded-[11px] text-xs items-center flex justify-center'>
+                                            Keys successfully deleted
+                                        </div> 
+    
+                                    ) : (
+                                        <div onClick={deleteAllKeys} className='w-full font-bold cursor-pointer text-white bg-[#FF4545] py-3 rounded-[11px] text-xs items-center flex justify-center'>
+                                            Delete Session Data
+                                        </div>
+                                    )
+                                ) : (
+                                    <div className='w-full font-bold cursor-pointer text-gray-600 bg-gray-300 py-3 rounded-[11px] text-xs items-center flex justify-center'>
+                                        Enter API Keys 
+                                    </div> 
+                                    
+                                )
+                            }
+                        </li>
+                    </ul>
                 </div>
             </div>
         </>
@@ -129,3 +243,4 @@ function SettingsButtons() {
 }
 
 export default SettingsButtons
+
