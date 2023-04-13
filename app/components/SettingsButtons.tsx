@@ -159,6 +159,7 @@ function SettingsToggle() {
                     <ul tabIndex={0} className=" dropdown-content p-2 mb-5 menu active shadow bg-base-100 rounded-box">
                         <li>
                             <SettingSlot 
+                                
                                 savedValue={elevenLabs} 
                                 title='Eleven Labs API Key'
                                 component={

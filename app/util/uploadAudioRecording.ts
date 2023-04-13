@@ -3,7 +3,7 @@ import { AudioData } from "../typings";
 // Send the WAV fle to the server 
 export async function uploadAudioRecording(wavFile: Blob): Promise<AudioData> {
 
-
+    
     console.log("Unploading to server")
 
     const formData = new FormData();

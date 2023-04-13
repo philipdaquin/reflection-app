@@ -1,6 +1,11 @@
+import { getOpenAPIKey } from "../hooks/useLocalStorage";
 
 // Send the WAV fle to the server 
 export async function uploadWav(wavFile: Blob): Promise<boolean> {
+
+    const openAPI = getOpenAPIKey()
+    
+
 
     const data = new FormData();
 
@@ -9,7 +14,9 @@ export async function uploadWav(wavFile: Blob): Promise<boolean> {
     try { 
         const resp = await fetch('http://localhost:4001/audio/upload', { 
             method: 'POST',
-            body: data
+            body: JSON.stringify({
+                
+            })
         });
 
         if (resp.ok) console.log('File uploaded successfully')

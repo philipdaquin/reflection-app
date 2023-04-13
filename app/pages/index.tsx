@@ -10,7 +10,7 @@ import AudioVisualizer from '../components/AudioVisualizer'
 import { TextClassification } from '../typings'
 import { getMoodSummary } from '../util/getMoodSummary'
 import SettingsButtons from '../components/SettingsButtons'
-import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY } from '../hooks/useLocalStorage'
+import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, initialiseAPIKeys } from '../hooks/useLocalStorage'
 
 
 
@@ -21,6 +21,10 @@ interface Props {
 
 
 function Home({data}: Props) {
+
+  // Start API keys 
+  initialiseAPIKeys()
+
   return (
     <>
       <Head>

@@ -62,3 +62,26 @@ export function deleteLocalStorage(): boolean {
     return false;
   }
 }
+
+export function initialiseAPIKeys() { 
+  const [elevenLabsState, setelevenLabs] = useRecoilState(ElevenLabsApiKey);
+  const [openAiState, setopenAi] = useRecoilState(OpenAIApiKey);
+
+
+  const [OpenValue, ] = useLocalStorage(OPENAI_KEY, null);
+  const [ElevenValue, ] = useLocalStorage(ELEVEN_LABS_KEY, null);
+  
+  setelevenLabs(OpenValue)
+  setopenAi(ElevenValue)
+}
+
+// 
+export function getOpenAPIKey(): string | null { 
+  const [key, setKey] = useLocalStorage(OPENAI_KEY, null)
+  return key
+}
+// 
+export function getElevenLabsAPIKey(): string | null { 
+  const [key, setKey] = useLocalStorage(ELEVEN_LABS_KEY, null)
+  return key
+}
