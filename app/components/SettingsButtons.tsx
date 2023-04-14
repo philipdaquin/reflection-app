@@ -33,7 +33,8 @@ interface ApiProps {
     const [storedValue, setValue] = useLocalStorage(apiKeyName, null);
     const [apiKeyValue, setApiKeyValue] = useState(storedValue ?? '');
     const [isDirty, setIsDirty] = useState(false);
-  
+    const [isSaved, setIsSaved] = useState(false)
+
     const changeApiKey = (e: React.ChangeEvent<HTMLInputElement>) => {
       setApiKeyValue(e.target.value);
       setIsDirty(e.target.value !== storedValue);
@@ -48,6 +49,10 @@ interface ApiProps {
         if (apiKeyName === ELEVEN_LABS_KEY) setelevenLabs(apiKeyValue)
 
         setValue(apiKeyValue);
+
+        setIsSaved(true)
+        // TEMPORARY TO SOLVE THE ISSUE IMMEDIATELY
+        location.reload()
     };
 
     
@@ -81,6 +86,11 @@ interface ApiProps {
                     type="password"
                     className="py-2 tracking-widest text-[#bdbdbd] outline-none px-4 w-full rounded-[11px] bg-[#f5f5f5]"
                 />
+
+                {isSaved && ( 
+                    <span className="text-green-500 text-xs">API key saved successfully!</span>
+                )}
+
                 <button
                     onClick={saveApiKey}
                     className={`${isDirty ? 'bg-[#5d5fef]' : 'bg-[#e0e0e0]'} w-full py-2 rounded-lg items-center flex justify-center text-white font-bold rounded-[11px]'`}
@@ -139,15 +149,21 @@ function SettingsToggle() {
 
         let res = deleteLocalStorage()
         setDeleted(res)
-        setopenAi(null)
-        setelevenLabs(null)
+   
     }
-    console.log("asdojasdoajs", elevenLabs, openAi)
+ 
 
     useEffect(() => {
-        if (elevenLabs || openAi)  setDeleted(false)
-        console.log("asdojasdoajs", elevenLabs, openAi)
-    }, [openAi, elevenLabs])
+
+        if (deleted) { 
+            setelevenLabs(null)
+            setopenAi(null)
+            location.reload()
+        } else if (openAiState || elevenLabsState) { 
+            setDeleted(false)
+        }
+    }, [deleted, elevenLabsState, openAiState])
+
     return (
         <>  
             <div className='flex flex-col'>
