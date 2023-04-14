@@ -32,6 +32,7 @@ impl ElevenLabsClient {
             .unwrap()
             .to_str()
             .map_err(|_| ServerError::Unauthorized)
+            .map_err(|_| ServerError::MissingElevenLabsKey)
             .unwrap();
     
         // Store the current API key on singleton 

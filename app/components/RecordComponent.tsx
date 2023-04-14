@@ -1,6 +1,6 @@
 import React, { ChangeEvent, HtmlHTMLAttributes, HTMLInputTypeAttribute, useEffect, useState } from 'react'
 import { convertWav } from '../util/convertWav';
-import { uploadWav } from '../util/uploadWav';
+import { uploadWav } from '../util/uploadChatRecording';
 import AddAudioFile from './AddAudioFile';
 import AudioStreaming from './AudioStreaming';
 import { useAudioRecorder } from 'react-audio-voice-recorder';

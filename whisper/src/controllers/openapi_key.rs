@@ -32,6 +32,7 @@ impl OpenAIClient {
             .unwrap()
             .to_str()
             .map_err(|_| ServerError::Unauthorized)
+            .map_err(|_| ServerError::MissingOpenAIAPIKey)
             .unwrap();
     
         // Store the current API key on singleton 

@@ -15,7 +15,7 @@ use crate::{ml::{
     // controllers::{OpenAICLient, OPENAI_KEY}
 };
 
-use super::Input;
+use super::{Input, eleven_labs::ElevenLabsClient};
 
 
 ///
@@ -135,8 +135,9 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
 } 
 
 
-/// An API endpoint that accepts user audio and settings for OpenAi response 
 /// 
+/// REQUIRES: OPENAI CLIENT 
+/// An API endpoint that accepts user audio and settings for OpenAi response 
 #[route("/api/audio/upload", method = "POST")]
 pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
 
@@ -165,8 +166,8 @@ pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse
 pub async fn chat_response(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
     
     // Initialise eleven labs client and open ai client 
-    // let _ = ElevenLabsClient::set_key(req).await?;
-    // let _ = OpenAIClient::set_key(req).await?;
+    let _ = ElevenLabsClient::set_key(req.to_owned()).await?;
+    let _ = OpenAIClient::set_key(req).await?;
     
     let transcribed = upload_audio(payload)
         .await?

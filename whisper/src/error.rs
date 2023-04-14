@@ -43,6 +43,12 @@ pub enum ServerError {
     #[error("A server error occurred")]
     DatabaseError,
     
+    #[error("Missing Open AI API Key")]
+    MissingOpenAIAPIKey,
+
+    #[error("Missing Eleven Labs API Key")]
+    MissingElevenLabsKey,
+    
 }
 
 

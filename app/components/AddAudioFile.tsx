@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { convertWav } from '../util/convertWav';
 import { getRelatedTags } from '../util/getRelatedTags';
 import { getTextSummary } from '../util/getTextSummary';
-import { uploadWav } from '../util/uploadWav';
+import { uploadWav } from '../util/uploadChatRecording';
 import { AudioData } from '../typings';
 
 function AddAudioFile() {

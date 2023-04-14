@@ -57,7 +57,7 @@ function Home({data}: Props) {
           <SettingsButtons />
         </div>
 
-        {/* <RecordComponent /> */}
+        <RecordComponent />
       </div>
     </>
   )
