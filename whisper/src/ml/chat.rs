@@ -8,7 +8,7 @@ use actix_web::{Result};
 use hyper::{header, Body, Client, Request, body::{aggregate, Buf}};
 use dotenv::dotenv;
 
-use crate::ml::{ENGINE};
+use crate::{ml::{ENGINE}, controllers::openapi_key::OpenAIClient};
 
 #[derive(Debug, Deserialize, Default)]
 struct ChatAIChoices { 
@@ -60,7 +60,8 @@ pub async fn get_chat_response(input: &str, context: &str) -> Result<String> {
     // Construct the API endpoint URL
     let endpoint_url = format!("https://api.openai.com/v1/engines/{}/completions", ENGINE.to_string());
     // Construct the request body 
-    let token = std::env::var("OPENAI_API_KEY").expect("Missing Open AI Token");
+    // let token = std::env::var("OPENAI_API_KEY").expect("Missing Open AI Token");
+    let token = OpenAIClient::get_key();
     let header = format!("Bearer {}", token);
     let prompt = &format!("{} ### {}", context, input);
     // let prompt = input;

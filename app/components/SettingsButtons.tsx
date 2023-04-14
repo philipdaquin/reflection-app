@@ -134,7 +134,7 @@ function SettingSlot({title, savedValue, component}: SettingsProps) {
 
 function SettingsToggle() { 
     const [toggle, setToggle] = useState(false)
-    const openDrop = () =>  setToggle(!toggle)  
+    const openDrop = () => { setToggle(!toggle) }
 
     const elevenLabs = useRecoilValue(ElevenLabsApiKey);
     const openAi = useRecoilValue(OpenAIApiKey);
@@ -175,7 +175,6 @@ function SettingsToggle() {
                     <ul tabIndex={0} className=" dropdown-content p-2 mb-5 menu active shadow bg-base-100 rounded-box">
                         <li>
                             <SettingSlot 
-                                
                                 savedValue={elevenLabs} 
                                 title='Eleven Labs API Key'
                                 component={
@@ -188,7 +187,7 @@ function SettingsToggle() {
                             />
                         </li>
                         <li>
-                            <SettingSlot 
+                            <SettingSlot
                                 savedValue={openAi}
                                 title='OpenAI API Key'
                                 component={
@@ -242,6 +241,16 @@ function SettingsButtons() {
     </div>
   )
 }
+
+function checkAndCloseDropDown(e: any){
+	let targetEl = e.currentTarget;
+	if(targetEl && targetEl.matches(':focus')){
+		setTimeout(function(){
+			targetEl.blur();
+		}, 0);
+	}
+}
+
 
 export default SettingsButtons
 

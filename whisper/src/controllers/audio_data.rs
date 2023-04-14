@@ -3,7 +3,17 @@ use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
 use bson::oid::ObjectId;
 use crate::{ml::{
     whisper::{AudioData, upload_audio}, 
-    sockets::{WebSocketSession}, prompt::GENERAL_CONTEXT, chat::get_chat_response, tts::process_text_to_audio, text_classification::TextClassification, recommendation::RecommendedActivity}, persistence::{audio_db::{AudioDB, AudioInterface}, audio_analysis::{AnalysisDb, TextAnalysisInterface}}, error::ServerError};
+    sockets::{WebSocketSession}, 
+    prompt::GENERAL_CONTEXT, 
+    chat::get_chat_response, 
+    tts::process_text_to_audio, 
+    text_classification::TextClassification, 
+    recommendation::RecommendedActivity},
+    persistence::{audio_db::{AudioDB, AudioInterface}, 
+    audio_analysis::{AnalysisDb, TextAnalysisInterface}}, 
+    error::ServerError, controllers::openapi_key::OpenAIClient, 
+    // controllers::{OpenAICLient, OPENAI_KEY}
+};
 
 use super::Input;
 
@@ -128,7 +138,11 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
 /// An API endpoint that accepts user audio and settings for OpenAi response 
 /// 
 #[route("/api/audio/upload", method = "POST")]
-pub async fn upload(payload: Multipart) -> Result<HttpResponse> {
+pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
+
+    // Initialise OpenAIClient
+    let _ = OpenAIClient::set_key(req).await?;
+
     let audio = upload_audio(payload)
         .await?
         .get_summary()
@@ -148,7 +162,12 @@ pub async fn upload(payload: Multipart) -> Result<HttpResponse> {
 ///  Allows for 1 on 1 chat with the user with AI
 ///  Transcribes user audio and return MMPEG back to the user 
 #[route("/api/audio/openai-chat", method = "POST")]
-pub async fn chat_response(payload: Multipart) -> Result<HttpResponse> {
+pub async fn chat_response(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
+    
+    // Initialise eleven labs client and open ai client 
+    // let _ = ElevenLabsClient::set_key(req).await?;
+    // let _ = OpenAIClient::set_key(req).await?;
+    
     let transcribed = upload_audio(payload)
         .await?
         .transcription
