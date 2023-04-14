@@ -10,7 +10,7 @@ export async function getCommonMood(): Promise<TopMood[]> {
     })
     .then(async (resp) => { 
         const body = await resp.json() as TopMood[]
-        console.log(body)
+        // console.log(body)
         return body
     })
     .catch((e) => {

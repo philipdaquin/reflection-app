@@ -29,7 +29,7 @@ impl ElevenLabsClient {
         let open_api_key = req
             .headers()
             .get("X-API-KEY-ELEVENLABS")
-            .unwrap()
+            .expect("Unabled to find ELEVEN LABS API KEY")
             .to_str()
             .map_err(|_| ServerError::Unauthorized)
             .map_err(|_| ServerError::MissingElevenLabsKey)

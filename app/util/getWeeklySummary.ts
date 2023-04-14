@@ -14,7 +14,7 @@ export async function getWeeklySummary(): Promise<WeeklySummary> {
     })
     .then(async (resp) => { 
         const body = await resp.json() as WeeklySummary
-        console.log(body)
+        // console.log(body)
         return body
     })
     .catch((e) => {

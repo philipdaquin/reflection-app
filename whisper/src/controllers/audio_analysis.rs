@@ -48,7 +48,7 @@ pub async fn get_mood_summary() -> Result<HttpResponse> {
 pub async fn get_common_mood() -> Result<HttpResponse> { 
     let mood = TextClassification::get_most_common_moods().await.unwrap();
     
-    log::info!("{mood:?}");
+    // log::info!("{mood:?}");
     
     let serialized = serde_json::to_string(&mood).unwrap();
     Ok(HttpResponse::Ok().body(serialized))

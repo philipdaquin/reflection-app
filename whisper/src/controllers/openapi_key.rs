@@ -21,15 +21,19 @@ impl From<String> for OpenAIClient {
     }
 }
 
-
+///
+/// 
+/// 
 impl OpenAIClient { 
     ///
     /// Sets the new API key for Open AI Client 
+    #[tracing::instrument(level= "debug")]
     pub async fn set_key(req: HttpRequest) -> Result<&'static Self> {
+        
         let open_api_key = req
             .headers()
             .get("X-API-KEY-OPENAI")
-            .unwrap()
+            .expect("Unabled to find OPEN API KEY")
             .to_str()
             .map_err(|_| ServerError::Unauthorized)
             .map_err(|_| ServerError::MissingOpenAIAPIKey)

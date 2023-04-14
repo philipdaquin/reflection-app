@@ -58,7 +58,7 @@ interface Props {
 }
 
 function MoodTrackerIndex({data}: Props) {
-  console.log(data)
+  // console.log(data)
 
   let messageToUser = getAverageMoodWeek(data)
 // Save global variable 

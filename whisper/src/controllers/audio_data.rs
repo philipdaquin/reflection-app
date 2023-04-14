@@ -1,5 +1,5 @@
 use actix_multipart::{Multipart};
-use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
+use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
 use bson::oid::ObjectId;
 use crate::{ml::{
     whisper::{AudioData, upload_audio}, 
@@ -140,7 +140,12 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
 /// An API endpoint that accepts user audio and settings for OpenAi response 
 #[route("/api/audio/upload", method = "POST")]
 pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
+    log::info!("✅✅ Initialising the key");
+    
+    let header = req.headers();
 
+    let auth_header = header.get(header::AUTHORIZATION);
+    
     // Initialise OpenAIClient
     let _ = OpenAIClient::set_key(req).await?;
 

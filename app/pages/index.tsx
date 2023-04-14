@@ -10,7 +10,11 @@ import AudioVisualizer from '../components/AudioVisualizer'
 import { TextClassification } from '../typings'
 import { getMoodSummary } from '../util/getMoodSummary'
 import SettingsButtons from '../components/SettingsButtons'
-import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, initialiseAPIKeys } from '../hooks/useLocalStorage'
+import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, 
+  // initialiseAPIKeys 
+} from '../hooks/useLocalStorage'
+import { useRecoilState } from 'recoil'
+import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
 
 
 
@@ -70,7 +74,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
       ( await getMoodSummary() ),
   ]) 
 
-  console.log(response)
+  // console.log(response)
 
   return { 
     props: { 
@@ -78,3 +82,48 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     }
   }
 }
+
+
+export function initialiseAPIKeys() { 
+  const [elevenLabsState, setelevenLabs] = useRecoilState(ElevenLabsApiKey);
+  const [openAiState, setopenAi] = useRecoilState(OpenAIApiKey);
+  const [OpenValue, ] = useLocalStorage(OPENAI_KEY, null);
+  const [ElevenValue, ] = useLocalStorage(ELEVEN_LABS_KEY, null);
+  setelevenLabs(OpenValue)
+  setopenAi(ElevenValue)
+}
+
+// 
+export function getOpenAPIKey(): string | null { 
+  const [key, setKey] = useLocalStorage(OPENAI_KEY, null)
+
+  
+  return key
+}
+// 
+export function getElevenLabsAPIKey(): string | null { 
+  const [key, setKey] = useLocalStorage(ELEVEN_LABS_KEY, null)
+  return key
+}
+
+
+
+/*
+  Deletes the values under these keys
+*/
+export function deleteLocalStorage(): boolean {
+  const keysToDelete = [OPENAI_KEY, ELEVEN_LABS_KEY];
+
+  try {
+    keysToDelete.forEach(key => {
+      localStorage.removeItem(key);
+    });
+
+    console.log("Successfully deleted all keys");
+    return true;
+  } catch (error) {
+    console.error("Failed to delete local storage keys:", error);
+    return false;
+  }
+}
+

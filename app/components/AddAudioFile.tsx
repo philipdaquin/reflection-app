@@ -3,8 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { convertWav } from '../util/convertWav';
 import { getRelatedTags } from '../util/getRelatedTags';
 import { getTextSummary } from '../util/getTextSummary';
-import { uploadWav } from '../util/uploadChatRecording';
+import { uploadChatRecording } from '../util/uploadChatRecording';
 import { AudioData } from '../typings';
+import useLocalStorage from '../hooks/useLocalStorage';
+import { OPENAI_KEY } from './SettingsButtons';
+import { getOpenAPIKey } from '../pages';
 
 function AddAudioFile() {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -19,15 +22,28 @@ function AddAudioFile() {
     const [relatedTags, setRelatedTags] = useState<string[] | null>(null)
     const [object, setObject] = useState('')
     // const transcription = "I can feel the weight of everything you're carrying right now. Losing your mother and feeling stuck in a job you hate can make it feel like life is just piling on the struggles. I want you to know that it's okay to feel overwhelmed and uncertain. These are incredibly challenging circumstances to navigate. It might be helpful to take some time to reflect on what you truly want out of life, and what[3000 - 6000]:  make progress towards that. Remember, you're not alone. There are people who care about you and want to support you through this difficult time. You deserve to find happiness and fulfillment, even in the midst of all this pain. Don't give up on yourself, and don't hesitate to reach out for help when you need it. I'm here for you, my friend."
+    
+    
+    const [apiKey, setApiKey] = useLocalStorage<string | null>(OPENAI_KEY, null) 
+    
     const handleFormSubmit = (e: any) => {
         e.preventDefault();
         const formData = new FormData();
 
         formData.append("audio", selectedFile!);
+        if (apiKey === null) throw new Error("Failed to get Open AI key")
 
+
+        console.log(apiKey)
+
+        const headers = {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'multipart/form-data'
+          }
         fetch("http://localhost:4001/api/audio/upload", {
             method: "POST",
             body: formData,
+            headers
         })
         .then(async (response) => {
             // if (response.ok) {
@@ -37,8 +53,6 @@ function AddAudioFile() {
             //     throw new Error("Failed to get audio file ")
             // }
             if (response.ok) {
-
-
                 // const blob = await response.blob()
                 // const url = URL.createObjectURL(blob)
                 // console.log(url)
@@ -46,7 +60,7 @@ function AddAudioFile() {
                 // setAudioUrl(url)
                 // setAudioSource(url)
                 const resp: AudioData = await response.json()
-                console.log(resp._id)
+                // console.log(resp._id)
 
                 router.push({
                     pathname: `/post_analysis/${resp._id}`,

@@ -2,9 +2,10 @@ import React, { ChangeEvent, ReactEventHandler, ReactHTMLElement, useEffect, use
 import {Cog8ToothIcon, ArrowUpRightIcon} from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import useLocalStorage, { deleteLocalStorage } from '../hooks/useLocalStorage'
+import useLocalStorage from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
+import { deleteLocalStorage } from '../pages'
 
 
 export const ELEVEN_LABS_KEY: string = "eleven_labs_api_key"
@@ -30,7 +31,7 @@ interface ApiProps {
     
 
 
-    const [storedValue, setValue] = useLocalStorage(apiKeyName, null);
+    const [storedValue, setValue] = useLocalStorage<string | null>(apiKeyName, null);
     const [apiKeyValue, setApiKeyValue] = useState(storedValue ?? '');
     const [isDirty, setIsDirty] = useState(false);
     const [isSaved, setIsSaved] = useState(false)

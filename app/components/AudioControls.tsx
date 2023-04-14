@@ -9,7 +9,7 @@ import formatTime from '../util/formatTime'
 import { useRouter } from 'next/router';
 import { getTextSummary } from '../util/getTextSummary'
 import { getRelatedTags } from '../util/getRelatedTags'
-import useAudioRecording from '../hooks/AudioRecorder'
+import useAudioRecording from '../hooks/useAudioRecording'
 import { uploadAudioRecording } from '../util/uploadAudioRecording'
 interface Props { 
   icon: any

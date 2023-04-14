@@ -35,11 +35,3 @@ export const OpenAIApiKey = atom<string | null>({
     key: 'openai_api_key',
     default: null
 })
-export const ElevenLabsApiValue = atom<string | null>({
-    key: 'eleven_labs_api_value',
-    default: null
-})
-export const OpenAIApiValue = atom<string | null>({
-    key: 'openai_api_value',
-    default: null
-})

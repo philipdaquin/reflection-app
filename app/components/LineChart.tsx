@@ -17,7 +17,7 @@ interface Props {
 
 function LineChart({data}: Props) {
 
-    console.log(data)
+    // console.log(data)
 
     let height = data.length > 7 ? 96 : 42; // adjust height based on number of data points
     let moodValues = data.map((item) => item.mood); // extract mood values from data
