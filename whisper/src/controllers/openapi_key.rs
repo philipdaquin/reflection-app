@@ -28,19 +28,19 @@ impl OpenAIClient {
     ///
     /// Sets the new API key for Open AI Client 
     #[tracing::instrument(level= "debug")]
-    pub async fn set_key(req: HttpRequest) -> Result<&'static Self> {
+    pub async fn set_key(key: &str) -> Result<&'static Self> {
         
-        let open_api_key = req
-            .headers()
-            .get("X-API-KEY-OPENAI")
-            .expect("Unabled to find OPEN API KEY")
-            .to_str()
-            .map_err(|_| ServerError::Unauthorized)
-            .map_err(|_| ServerError::MissingOpenAIAPIKey)
-            .unwrap();
+        // let open_api_key = req
+        //     .headers()
+        //     .get("X-API-KEY-OPENAI")
+        //     .expect("Unabled to find OPEN API KEY")
+        //     .to_str()
+        //     .map_err(|_| ServerError::Unauthorized)
+        //     .map_err(|_| ServerError::MissingOpenAIAPIKey)
+        //     .unwrap();
     
         // Store the current API key on singleton 
-        let key = OpenAIClient::from(open_api_key.to_string());
+        let key = OpenAIClient::from(key.to_string());
         let _ = OPENAI_KEY.set(key);
         Ok(OPENAI_KEY.get().unwrap())
     }

@@ -1,6 +1,6 @@
 use actix_multipart::Multipart;
 use bson::oid::ObjectId;
-use futures::{Stream};
+use futures::{Stream, AsyncWriteExt};
 use hound::{SampleFormat, WavReader};
 use parking_lot::{Mutex};
 use serde::{Serialize, Deserialize};
@@ -16,7 +16,7 @@ use rayon::prelude::*;
 use crossbeam::channel::{unbounded};
 
 
-const BATCH_SIZE: usize = 64;
+const BATCH_SIZE: usize = 1024;
 
 // const CHUNK_SIZE: usize = 1024 * 1024 * 3;
 
@@ -45,11 +45,19 @@ pub struct AudioData {
 
 impl AudioData { 
 
+    ///
+    /// 
+    /// Upload as a single chunk
+    pub async fn new(bytes: Vec<u8>) -> Result<Self> { 
+        todo!()
+    }
+
+    /// Upload audio into multiple batches 
     /// Initialise AudioData by passing through Audio Data
     /// - Parse Audio Bytes into 16 Bytes 
     /// - Transcribe the Audio file
     /// - Return AudioData Object
-    pub async fn new(audio_batches: Vec<Vec<u8>>) -> Result<Self> {
+    pub async fn new_batch(audio_batches: Vec<Vec<u8>>) -> Result<Self> {
         // Generate a new UUID for the item 
         let transcription = process_chunks_with_workers(audio_batches).await?;
         let id = ObjectId::new().to_string();
@@ -59,7 +67,6 @@ impl AudioData {
             transcription: Some(transcription), 
             ..Default::default()
         })
-
     }
     ///
     /// Transcribe the given WAV FILE
@@ -472,29 +479,24 @@ fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<V
 async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> { 
     let (result_producer, result_consumer) = unbounded();
     
-    // Temp. solution to ordering to segment
-    // let mut index = Arc::new(Mutex::new(0));
-    
-    for batch in buffer.par_chunks(BATCH_SIZE).collect::<Vec<_>>() {
-        // Performs a fork join style thread work,
-        // Rayon Scope ensures that all threads spawned for each batch of data will be terminated before we move on 
-        // to the next batch of data 
-        rayon::scope(|s|  { 
-            for data in batch {
-                // Split audio data into smaller pcm chunks 
-                let data = parse_audio_into_pcm_chunks(data, CHUNK_SIZE).unwrap();
-                // Spawn a worker to transcribe each PCM chunk
-                for (index, sample) in data.into_iter().enumerate() {
-                    let result_producer = result_producer.clone();
-                    s.spawn(move |_| {
-                        let task = AudioData::transcribe_pcm_chunks_into_stream(sample).unwrap();
-                        log::info!("✅✅");
-                        result_producer.send((task, index)).unwrap();
-                    });
-                }
+    // Performs a fork join style thread work,
+    // Rayon Scope ensures that all threads spawned for each batch of data will be terminated before we move on 
+    // to the next batch of data 
+    rayon::scope(|s|  { 
+        for data in buffer {
+            // Split audio data into smaller pcm chunks 
+            let data = parse_audio_into_pcm_chunks(&data, CHUNK_SIZE).unwrap();
+            // Spawn a worker to transcribe each PCM chunk
+            for (index, sample) in data.into_iter().enumerate() {
+                let result_producer = result_producer.clone();
+                s.spawn(move |_| {
+                    let task = AudioData::transcribe_pcm_chunks_into_stream(sample).unwrap();
+                    log::info!("✅✅");
+                    result_producer.send((task, index)).unwrap();
+                });
             }
-        });
-    }
+        }
+    });
     let mut results = Vec::new();
 
     // Spawn multiple workers to consume tasks from the receiver and process them concurrently 
@@ -533,24 +535,51 @@ async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> {
 /// 
 /// Split the payload into multiple smaller batches, which will be processed in parallel 
 /// to reduce processing time 
-pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> { 
-    let mut buffer = Vec::new();
+pub async fn upload_single_chunk(mut payload: Multipart) -> Result<Vec<u8>> { 
+    let mut bytes = Vec::new();
     while let Some(mut item) = payload.try_next().await.unwrap() { 
-        let mut bytes = Vec::new();
         // Write the content of the file of the temporary file 
         while let Some(chunk) = item.try_next().await.unwrap() { 
-            bytes.extend_from_slice(&chunk);
+            bytes.write_all(&chunk).await?;
         }
-        // Add the audio files to the buffer 
-        buffer.push(bytes);
-
     }
-    Ok(buffer)
+    Ok(bytes)
 }
+
+/// 
+/// 
+/// Split the payload into multiple smaller batches, which will be processed in parallel 
+/// to reduce processing time 
+pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> { 
+    let mut bytes = Vec::new();
+    while let Some(mut item) = payload.try_next().await.unwrap() { 
+        // Write the content of the file of the temporary file 
+        while let Some(chunk) = item.try_next().await.unwrap() { 
+            bytes.write_all(&chunk).await?;
+        }
+    }
+    // Add the audio files to the buffer 
+    let chunks = bytes.clone()
+        .par_chunks(BATCH_SIZE)
+        .map(|f| f.to_vec())
+        .collect::<Vec<_>>();
+
+    Ok(chunks)
+}
+
 ///
-/// Helper function for receiving and initialising AudioData
-pub async fn upload_audio(payload: Multipart) -> ActixResult<AudioData> { 
+/// Helper function for uploading payload into multiple batches
+pub async fn batch_upload_audio(payload: Multipart) -> ActixResult<AudioData> { 
     let audio_batches = batch_into_chunks(payload).await?;
+    let wav_data = AudioData::new_batch(audio_batches).await.unwrap();
+    Ok(wav_data)
+}
+
+/// 
+/// Helper function for uploading payload into a single chunk
+/// Returns AudioData
+pub async fn upload_audio(payload: Multipart) -> ActixResult<AudioData> { 
+    let audio_batches = upload_single_chunk(payload).await?;
     let wav_data = AudioData::new(audio_batches).await.unwrap();
     Ok(wav_data)
 }

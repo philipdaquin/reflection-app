@@ -56,7 +56,7 @@ pub async fn get_common_mood() -> Result<HttpResponse> {
 
 ///
 /// 
-/// 
+/// Gets weekly patterns based on the last 3 entries 
 #[route("/api/analysis/get-weekly-patterns", method = "GET")]
 pub async fn get_weekly_patterns() -> Result<HttpResponse>  { 
     // let mood_patterns = TextClassification::get_weekly_patterns().await.unwrap();
@@ -67,9 +67,6 @@ pub async fn get_weekly_patterns() -> Result<HttpResponse>  {
     let serialized = serde_json::to_string(&mood_patterns).unwrap();
     Ok(HttpResponse::Ok().body(serialized))
 }
-
-
-   
 
 #[derive(Deserialize, Debug)]
 pub struct Summaries { 

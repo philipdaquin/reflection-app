@@ -2,7 +2,7 @@ use actix_multipart::{Multipart};
 use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
 use bson::oid::ObjectId;
 use crate::{ml::{
-    whisper::{AudioData, upload_audio}, 
+    whisper::{AudioData, upload_audio, batch_upload_audio}, 
     sockets::{WebSocketSession}, 
     prompt::GENERAL_CONTEXT, 
     chat::get_chat_response, 
@@ -23,6 +23,7 @@ use super::{Input, eleven_labs::ElevenLabsClient};
 pub fn configure_audio_services(cfg: &mut web::ServiceConfig) { 
     cfg
     .service(upload)
+    .service(batch_upload)
     .service(get_text_summary)
     .service(get_text_analysis)
     .service(get_related_tags)
@@ -136,18 +137,19 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
 
 
 /// 
-/// REQUIRES: OPENAI CLIENT 
+/// REQUIRES: Bearer - apikey
 /// An API endpoint that accepts user audio and settings for OpenAi response 
 #[route("/api/audio/upload", method = "POST")]
 pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
     log::info!("✅✅ Initialising the key");
     
-    let header = req.headers();
-
-    let auth_header = header.get(header::AUTHORIZATION);
-    
-    // Initialise OpenAIClient
-    let _ = OpenAIClient::set_key(req).await?;
+    if let Some(api_key) = req.headers().get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()) { 
+        let key = api_key.strip_prefix("Bearer ").unwrap_or("");
+        // Initialise OpenAIClient
+        let _ = OpenAIClient::set_key(key).await?;
+    } else { 
+        return Ok(HttpResponse::Unauthorized().finish().into());
+    }
 
     let audio = upload_audio(payload)
         .await?
@@ -164,15 +166,59 @@ pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse
     Ok(HttpResponse::Ok().body(serialized))
 }
 
+#[route("/api/audio/batch-upload", method = "POST")]
+pub async fn batch_upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> { 
+    if let Some(api_key) = req.headers().get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()) { 
+        let key = api_key.strip_prefix("Bearer ").unwrap_or("");
+        // Initialise OpenAIClient
+        let _ = OpenAIClient::set_key(key).await?;
+    } else { 
+        return Ok(HttpResponse::Unauthorized().finish().into());
+    }
+
+    let audio = batch_upload_audio(payload)
+        .await?
+        .get_summary()
+        .await?
+        .get_sentimental_analysis()
+        .await?
+        .get_tags()
+        .await?
+        .save()
+        .await?;
+    log::info!("{audio:#?}");
+    let serialized = serde_json::to_string(&audio)?;
+    Ok(HttpResponse::Ok().body(serialized))
+
+}
+
+
 ///
 ///  Allows for 1 on 1 chat with the user with AI
+/// 
+///     X-API-KEY-OPENAI
+///     X-API-KEY-ELEVENLABS
+/// 
 ///  Transcribes user audio and return MMPEG back to the user 
 #[route("/api/audio/openai-chat", method = "POST")]
 pub async fn chat_response(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
     
     // Initialise eleven labs client and open ai client 
-    let _ = ElevenLabsClient::set_key(req.to_owned()).await?;
-    let _ = OpenAIClient::set_key(req).await?;
+
+
+    if let Some(openai) = req.headers()
+        .get("X-API-KEY-OPENAI")
+        .and_then(|v| v.to_str().ok())
+    { 
+        let _ = OpenAIClient::set_key(openai).await?;
+    }
+    
+    if let Some(elevenlabs) = req.headers()
+        .get("X-API-KEY-ELEVENLABS")
+        .and_then(|v| v.to_str().ok()) 
+    { 
+        let _ = ElevenLabsClient::set_key(elevenlabs).await?;
+    }
     
     let transcribed = upload_audio(payload)
         .await?

@@ -25,18 +25,10 @@ impl From<String> for ElevenLabsClient {
 impl ElevenLabsClient { 
     ///
     /// Sets the new API key for Open AI Client 
-    pub async fn set_key(req: HttpRequest) -> Result<&'static Self> {
-        let open_api_key = req
-            .headers()
-            .get("X-API-KEY-ELEVENLABS")
-            .expect("Unabled to find ELEVEN LABS API KEY")
-            .to_str()
-            .map_err(|_| ServerError::Unauthorized)
-            .map_err(|_| ServerError::MissingElevenLabsKey)
-            .unwrap();
-    
+    pub async fn set_key(key: &str) -> Result<&'static Self> {
         // Store the current API key on singleton 
-        let key = ElevenLabsClient::from(open_api_key.to_string());
+        let key = ElevenLabsClient::from(key.to_string());
+        
         let _ = ELEVEN_LABS_API_KEY.set(key);
         Ok(ELEVEN_LABS_API_KEY.get().unwrap())
     }
