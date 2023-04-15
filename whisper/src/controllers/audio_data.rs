@@ -143,7 +143,7 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
 pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
     log::info!("✅✅ Initialising the key");
     
-    if let Some(api_key) = req.headers().get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()) { 
+    if let Some(api_key) = req.headers().get("Authorization").and_then(|v| v.to_str().ok()) { 
         let key = api_key.strip_prefix("Bearer ").unwrap_or("");
         // Initialise OpenAIClient
         let _ = OpenAIClient::set_key(key).await?;

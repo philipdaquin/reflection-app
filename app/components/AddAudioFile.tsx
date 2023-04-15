@@ -30,17 +30,16 @@ function AddAudioFile() {
         e.preventDefault();
         const formData = new FormData();
 
-        formData.append("audio", selectedFile!);
+        formData.append("audio.wav", selectedFile!);
         if (apiKey === null) throw new Error("Failed to get Open AI key")
 
 
         console.log(apiKey)
 
         const headers = {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        fetch("http://localhost:4001/api/audio/upload", {
+            "Authorization": `Bearer ${apiKey}`,
+        };
+        fetch("http://localhost:4001/api/audio/batch-upload", {
             method: "POST",
             body: formData,
             headers

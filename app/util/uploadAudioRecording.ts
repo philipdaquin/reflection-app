@@ -16,9 +16,8 @@ export async function uploadAudioRecording(wavFile: Blob): Promise<AudioData> {
     console.log("APIKEY", apiKey)
 
     const headers = {
-      'Authorization': apiKey,
-      // 'Content-Type': 'application/json'
-    }
+      'Authorization': `Bearer ${apiKey}`,
+    };
 
     return fetch("http://localhost:4001/api/audio/upload", {
       method: "POST",

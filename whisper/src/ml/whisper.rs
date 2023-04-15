@@ -16,9 +16,9 @@ use rayon::prelude::*;
 use crossbeam::channel::{unbounded};
 
 
-const BATCH_SIZE: usize = 1024;
+const BATCH_SIZE: usize = 64;
 
-// const CHUNK_SIZE: usize = 1024 * 1024 * 3;
+// const CHUNK_SIZE: usize = 1024 * 1024  * 2;
 
 // Process audio data in chunks of 5 seconds * 44100 samples/second * 2 channels * 2 bytes/sample = 882000 bytes
 const CHUNK_SIZE: usize = 882000;
@@ -49,7 +49,15 @@ impl AudioData {
     /// 
     /// Upload as a single chunk
     pub async fn new(bytes: Vec<u8>) -> Result<Self> { 
-        todo!()
+        let wav = parse_wav_file(bytes).await?;
+        let transcription = AudioData::transcribe_audio(wav).await?;
+        let id = ObjectId::new().to_string();
+
+        Ok(Self { 
+            id: Some(id), 
+            transcription: Some(transcription), 
+            ..Default::default()
+        })
     }
 
     /// Upload audio into multiple batches 
@@ -110,7 +118,7 @@ impl AudioData {
     
         // The max number of tokens per audio chunk     
         // params.set_max_tokens(32);
-        params.set_max_tokens(32);
+        params.set_max_tokens(0);
     
         // Partial encoder context for better performance 
         params.set_audio_ctx(0);
@@ -479,24 +487,27 @@ fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<V
 async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> { 
     let (result_producer, result_consumer) = unbounded();
     
-    // Performs a fork join style thread work,
-    // Rayon Scope ensures that all threads spawned for each batch of data will be terminated before we move on 
-    // to the next batch of data 
-    rayon::scope(|s|  { 
-        for data in buffer {
-            // Split audio data into smaller pcm chunks 
-            let data = parse_audio_into_pcm_chunks(&data, CHUNK_SIZE).unwrap();
-            // Spawn a worker to transcribe each PCM chunk
-            for (index, sample) in data.into_iter().enumerate() {
-                let result_producer = result_producer.clone();
-                s.spawn(move |_| {
-                    let task = AudioData::transcribe_pcm_chunks_into_stream(sample).unwrap();
-                    log::info!("✅✅");
-                    result_producer.send((task, index)).unwrap();
-                });
+    
+    for batch in buffer.par_chunks(BATCH_SIZE).collect::<Vec<_>>() {
+        // Performs a fork join style thread work,
+        // Rayon Scope ensures that all threads spawned for each batch of data will be terminated before we move on 
+        // to the next batch of data 
+        rayon::scope(|s|  { 
+            for data in batch {
+                // Split audio data into smaller pcm chunks 
+                let data = parse_audio_into_pcm_chunks(&data, CHUNK_SIZE).unwrap();
+                // Spawn a worker to transcribe each PCM chunk
+                for (index, sample) in data.into_iter().enumerate() {
+                    let result_producer = result_producer.clone();
+                    s.spawn(move |_| {
+                        let task = AudioData::transcribe_pcm_chunks_into_stream(sample).unwrap();
+                        log::info!("✅✅");
+                        result_producer.send((task, index)).unwrap();
+                    });
+                }
             }
-        }
-    });
+        });
+    }
     let mut results = Vec::new();
 
     // Spawn multiple workers to consume tasks from the receiver and process them concurrently 
@@ -551,20 +562,18 @@ pub async fn upload_single_chunk(mut payload: Multipart) -> Result<Vec<u8>> {
 /// Split the payload into multiple smaller batches, which will be processed in parallel 
 /// to reduce processing time 
 pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> { 
-    let mut bytes = Vec::new();
+    let mut buffer = Vec::new();
     while let Some(mut item) = payload.try_next().await.unwrap() { 
+        let mut bytes = Vec::new();
         // Write the content of the file of the temporary file 
         while let Some(chunk) = item.try_next().await.unwrap() { 
             bytes.write_all(&chunk).await?;
         }
-    }
-    // Add the audio files to the buffer 
-    let chunks = bytes.clone()
-        .par_chunks(BATCH_SIZE)
-        .map(|f| f.to_vec())
-        .collect::<Vec<_>>();
+        // Add the audio files to the buffer 
+        buffer.push(bytes);
 
-    Ok(chunks)
+    }
+    Ok(buffer)
 }
 
 ///
