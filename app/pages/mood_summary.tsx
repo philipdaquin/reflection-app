@@ -9,6 +9,9 @@ import { GetServerSideProps } from 'next'
 import { TextClassification, TopMood, WeeklySummary } from '../typings'
 import { getMoodSummary } from '../util/getMoodSummary'
 import { getWeeklySummary } from '../util/getWeeklySummary'
+import SettingsButtons from '../components/SettingsButtons'
+import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
+import HomeNav from '../components/navigation/mobile/HomeNav'
 
 
 
@@ -28,19 +31,20 @@ function mood_summary({
             <link rel="icon" href="/favicon.ico" />
           </Head>
           
-          <div className="md:bg-[#EEEEEE] bg-white  flex 
-        md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
+          <div className="md:bg-[#EEEEEE] bg-white flex 
+        md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px]">
             <main className=" justify-center flex flex-col items-center space-y-[27px] ">
-              <div className="flex items-center">
-                <div className='relative right-10'>
+              <div className="flex items-center md:relative md:right-5 h-full">
+                
+                <div className='relative right-10 hidden md:block'>
                   <NavigationButtons />        
                 </div>
+                
                 <PhoneView children={
                   <MoodSummaryContents 
                   mood_graph={mood_graph}
                   weekly_summary={weekly_summary}
                   />
-                
                 }/>
               </div>
               <div className='md:block hidden'>
@@ -49,6 +53,14 @@ function mood_summary({
             {/* <RecordComponent /> */}
     
             </main>
+            {/* Settings / Footer  */}
+            <div className="flex-grow"></div>
+            <div className='relative bottom-10 md:block hidden '>
+              <SettingsButtons />
+            </div>
+            <div className='flex items-center  md:hidden justify-center mb-10'>
+                <NavigationMobile children={<HomeNav/>} />        
+            </div>
           </div>
         </>
       )

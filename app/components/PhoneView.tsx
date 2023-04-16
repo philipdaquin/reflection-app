@@ -7,14 +7,11 @@ interface Props {
 
 function PhoneView({children}: Props) {
   return (
-    <div className='md:transition-all md:duration-500 ease-in-out md:w-[424px] md:h-[803px] bg-white md:shadow-xl md:rounded-[70px] md:border-[#F5F5F5] md:border-8 border-white shadow-inherit '>
+    <div className=' md:w-[424px] md:h-[803px] bg-white md:shadow-xl md:rounded-[70px] md:border-[#F5F5F5] md:border-8 border-white shadow-inherit '>
         <div className='
+          md:w-full 
           md:px-4 
           md:pt-10 
-          pt-12 
-          md:w-full 
-          h-full 
-          w-screen
           md:border-[16px] 
           md:shadow-sm 
           md:border-[#FCFCFC] 
@@ -23,11 +20,17 @@ function PhoneView({children}: Props) {
           md:overflow-scroll 
           md:scrollbar-hide 
           md:py-4 
-          shadow-inherit
+          w-screen
+          h-full 
+          pt-12 
           py-14
+          px-10
           border-0
           rounded-none
-          px-10
+          shadow-inherit
+          transition-transform
+          duration-700
+          ease-in-out
 '>
           {children}
         </div>

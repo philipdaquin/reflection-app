@@ -137,7 +137,15 @@ function StartStopRecording() {
 
       const START = () => { 
         return (
-          <div className='bg-[#5d5fef] cursor-pointer rounded-full h-[185px] flex items-center w-[62px] justify-center' 
+          <div className='bg-[#5d5fef] 
+            cursor-pointer 
+            rounded-full 
+
+            h-[62px] md:h-[185px]  
+            w-[185px] md:w-[62px]  
+
+            flex items-center 
+            justify-center' 
             onClick={start}>
             <MicrophoneIcon height={24} width={24} color="white"/>
           </div>
@@ -145,7 +153,15 @@ function StartStopRecording() {
       }
       const STOP = () => { 
         return (
-          <div className='bg-[#e84040]  cursor-pointer rounded-full h-[185px] flex items-center w-[62px] justify-center' 
+          <div className='bg-[#e84040]  
+          cursor-pointer 
+          rounded-full 
+          
+          h-[62px] md:h-[185px]  
+          w-[185px] md:w-[62px]  
+
+          flex items-center 
+          justify-center' 
             onClick={stop}>
             <StopIcon height={24} width={24} color="white"/>
           </div>
@@ -154,7 +170,13 @@ function StartStopRecording() {
       // On Process, add loading spinners 
       const CONTINUE = () => { 
         return (
-          <div className='bg-[#5d5fef] cursor-pointer rounded-full h-[185px] flex items-center w-[62px] justify-center' 
+          <div className='bg-[#5d5fef] cursor-pointer rounded-full 
+          
+          h-[62px] md:h-[185px]  
+          w-[185px] md:w-[62px]  
+
+          flex items-center 
+          justify-center' 
             onClick={processAudioRecording}>
             <ChevronRightIcon height={24} width={24} strokeWidth={2} color="white"/>
           </div>
@@ -164,8 +186,13 @@ function StartStopRecording() {
       return (
         <>
           {isCurrRecording ? (
-            <div className=" items-center space-y-2 flex flex-col justify-center">
-              {stopRecord ? <CONTINUE/> : <STOP/>}
+            <div className="flex md:flex-col items-center space-x-2">
+              <div className='md:pb-2'>
+                {
+                  stopRecord ? <CONTINUE/> : <STOP/>
+                }
+              </div>
+              
               <Button icon={<XMarkIcon height={24} width={24} color="white" strokeWidth={2} onClick={resetRecordingStates} />} />
             </div>
           ) : (
@@ -179,9 +206,9 @@ function StartStopRecording() {
 
 function AudioControls() {
   return (
-      <div className='flex flex-col  items-center justify-between space-y-3'>
+      <div className='flex md:flex-col md:space-y-3 items-center space-x-2 md:space-x-0 md:relative md:right-10'>
           <StartStopRecording/>
-          <div className='space-y-2'>
+          <div className='md:space-y-2 flex md:flex-col space-x-2 md:space-x-0'>
             <Button icon={<SpeakerWaveIcon  height={24} width={24} color="white"/> }/>  
             <Button icon={<HiOutlineAnnotation  size={24}  color="white"/> }/>  
           </div>

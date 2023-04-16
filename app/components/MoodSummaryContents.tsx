@@ -119,7 +119,7 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
     const weeklyIndex = getAverageMoodWeek(mood_graph)
 
     return (
-        <section className='pb-10'>
+        <section className=''>
 
             <h1 className='items-center flex justify-center font-bold text-center text-base text-[#212121]'>
                 Weekly Summary

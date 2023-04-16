@@ -6,6 +6,9 @@ import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
 import AudioControls from '../components/AudioControls'
 import ChatControls from '../components/ChatControls'
+import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
+import SettingsButtons from '../components/SettingsButtons'
+import HomeNav from '../components/navigation/mobile/HomeNav'
 
 function chat() {
     return (
@@ -15,20 +18,31 @@ function chat() {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         
-        <div className="md:bg-[#EEEEEE] bg-white  flex 
-        md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
+        <div className="md:bg-[#EEEEEE] bg-white flex 
+        transition-all duration-500 ease-out
+            md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
 
-            <main className=" justify-center flex flex-col items-center space-y-[27px]  ">
-
-            <div className="flex items-center relative right-10 space-x-5">
-                <ChatControls />       
-                <PhoneView children={<ChatContent/>} />
-            </div>
-            <div className='md:block hidden'>
-                <SwitchView />
-            </div>
+            <main className=" justify-center flex flex-col items-center space-y-[27px]">
+                <div className="flex items-center md:relative md:right-9 h-full">
+                    <div className='md:block hidden'>
+                        <ChatControls />       
+                    </div>
+                    <PhoneView children={<ChatContent/>} />
+                </div>
+                <div className='md:block hidden'>
+                    <SwitchView />
+                </div>
             {/* <RecordComponent /> */}
             </main>
+            {/* Settings / Footer  */}
+            <div className="flex-grow   transition-transform duration-500 ease-out"></div>
+            <div className='relative bottom-10 md:block hidden'>
+                <SettingsButtons />
+            </div>
+
+            <div className='flex items-center md:hidden justify-center mb-10'>
+                <NavigationMobile children={<ChatControls/>} />        
+            </div>
         </div>
         </>
     )

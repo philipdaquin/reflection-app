@@ -39,7 +39,7 @@ function Home({data}: Props) {
       </Head>
       
       <div className="md:bg-[#EEEEEE] bg-white flex 
-        md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px] px-2">
+        md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px]">
 
         <main className="justify-center flex flex-col items-center space-y-[27px]">
           <div className="flex items-center md:relative md:right-5 h-full">
@@ -48,7 +48,6 @@ function Home({data}: Props) {
             </div>
             <PhoneView children={<HomeContents data={data}/>} />
           </div>
-
           <div className='md:block hidden '>
               <SwitchView />
           </div>
@@ -59,7 +58,7 @@ function Home({data}: Props) {
         <div className='relative bottom-10 md:block hidden '>
           <SettingsButtons />
         </div>
-        <div className='flex items-center  md:hidden justify-center mb-10'>
+        <div className='flex items-center  md:hidden justify-center mb-10 '>
             <NavigationMobile children={<HomeNav/>} />        
         </div>
         {/* <RecordComponent /> */}

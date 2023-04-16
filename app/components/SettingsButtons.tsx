@@ -230,7 +230,7 @@ function SettingsToggle() {
 function SettingsButtons() {
   return (
     <div>
-        <div className='flex items-center space-x-10 -z-30'>
+        <div className='flex items-center space-x-10'>
             <SettingsToggle />
             <div className='w-[2px] h-4 rounded-full bg-[#9e9e9e]'></div>
             <div className='text-[#757575]  text-left text-sm'>Donate</div>
