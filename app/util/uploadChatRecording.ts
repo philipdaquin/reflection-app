@@ -15,7 +15,6 @@ export async function uploadChatRecording(wavFile: Blob): Promise<Blob> {
     const headers = {
         'X-API-KEY-OPENAI': apiKey,
         'X-API-KEY-ELEVENLABS': elevenLabsApiKey,
-        'Content-Type': 'multipart/form-data'
     }
 
     const formData = new FormData();

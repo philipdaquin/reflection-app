@@ -147,13 +147,9 @@ function SettingsToggle() {
     const [openAiState, setopenAi] = useRecoilState(OpenAIApiKey);
 
     const deleteAllKeys = () => {
-
         let res = deleteLocalStorage()
         setDeleted(res)
-   
     }
- 
-
     useEffect(() => {
 
         if (deleted) { 
@@ -176,7 +172,7 @@ function SettingsToggle() {
                     <ul tabIndex={0} className=" dropdown-content p-2 mb-5 menu active shadow bg-base-100 rounded-box">
                         <li>
                             <SettingSlot 
-                                savedValue={elevenLabs} 
+                                savedValue={openAi} 
                                 title='Eleven Labs API Key'
                                 component={
                                     <AddAPIKeys
@@ -189,7 +185,7 @@ function SettingsToggle() {
                         </li>
                         <li>
                             <SettingSlot
-                                savedValue={openAi}
+                                savedValue={elevenLabs}
                                 title='OpenAI API Key'
                                 component={
                                     <AddAPIKeys
