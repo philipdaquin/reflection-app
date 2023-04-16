@@ -10,7 +10,7 @@ interface Props {
 
 function Button({icon, routerName}: Props) { 
     return (
-        <Link href={`/${routerName}`} className='cursor'>
+        <Link href={`/${routerName}`} className='cursor-pointer'>
           <div className='bg-[#424242] rounded-full p-2 cursor-pointer'>
             {icon}
           </div>

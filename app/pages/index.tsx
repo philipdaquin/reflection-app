@@ -15,6 +15,8 @@ import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY,
 } from '../hooks/useLocalStorage'
 import { useRecoilState } from 'recoil'
 import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
+import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
+import HomeNav from '../components/navigation/mobile/HomeNav'
 
 
 
@@ -36,21 +38,18 @@ function Home({data}: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <div className="md:bg-[#EEEEEE] bg-white  flex 
-        md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
-
+      <div className="md:bg-[#EEEEEE] bg-white flex 
+        md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px] px-2">
 
         <main className="justify-center flex flex-col items-center space-y-[27px]">
-          <div className="flex items-center relative right-5 h-full">
+          <div className="flex items-center md:relative md:right-5 h-full">
             <div className='relative right-10 hidden md:block'>
-              <NavigationButtons />        
-            </div>
-            <div className='absolute bottom-0 md:hidden'>
               <NavigationButtons />        
             </div>
             <PhoneView children={<HomeContents data={data}/>} />
           </div>
-          <div className='md:block hidden'>
+
+          <div className='md:block hidden '>
               <SwitchView />
           </div>
         </main>
@@ -60,8 +59,10 @@ function Home({data}: Props) {
         <div className='relative bottom-10 md:block hidden '>
           <SettingsButtons />
         </div>
-
-        <RecordComponent />
+        <div className='flex items-center  md:hidden justify-center mb-10'>
+            <NavigationMobile children={<HomeNav/>} />        
+        </div>
+        {/* <RecordComponent /> */}
       </div>
     </>
   )
