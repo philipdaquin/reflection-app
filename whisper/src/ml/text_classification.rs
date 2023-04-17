@@ -2,8 +2,8 @@ use mongodb::bson::oid::ObjectId;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use chrono::{NaiveDateTime, Weekday, Datelike, DateTime, Utc};
-use crate::{error::Result, persistence::audio_analysis::{AnalysisDb, TextAnalysisInterface}};
-use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT};
+use crate::{error::Result, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}};
+use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_pattern::WeeklyAnalysis};
 use num::CheckedSub;
 
 #[derive(Debug, Serialize, Clone, Deserialize)]
@@ -48,17 +48,35 @@ pub struct TextClassification {
 impl TextClassification { 
 
     ///
+    /// Inserting a daily input 
+    /// 1. Check the date of the daily input 
+    /// 2. Retrieve the corresponding weekly record based on the date of the daily input 
+    /// 3. If not found, create a new one and insert it into the weekly table 
+    /// 4. Get the id of the weekly record
+    /// 5. Insert the daily input into the daily table, with the week id 
     /// Intialise new TextClassification with updated Id, date, and audioId
-    pub fn new(audio_ref: Option<String>) -> Self { 
+    pub async fn new(audio_ref: Option<String>) -> Self { 
         let id = ObjectId::new();
         let date = Utc::now().naive_local();
         let day = date.weekday().to_string();
+
+        // Find the week or create a new one, get the id 
+        let week = if let Some(curr_week) = WeeklyAnalysisDB::get_corresponding_week(date).await.unwrap() { 
+            curr_week
+        } else { 
+            // Else create a new Weekly Analysis and save to database 
+            WeeklyAnalysis::new().
+                save()
+                .await
+                .unwrap()
+        };
 
         Self { 
             id: Some(id), 
             audio_ref: audio_ref.map(|a| ObjectId::parse_str(a).expect("Unable to convert String to ObjectId")),
             date: Some(date),
             day,
+            weekly_ref: week.id,
             ..Default::default()
         }
     }

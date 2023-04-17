@@ -16,8 +16,13 @@ pub struct ImportantEvents {
 /// Weekly Analysis from start_week to end_week 
 #[derive(Debug, Serialize, Default, Clone, Deserialize)]
 pub struct WeeklyAnalysis { 
+
+    // Weekly id 
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>, 
+    // The week number 
+    // pub week_number: i32, 
+    
     // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
     pub start_week: Option<NaiveDate>,
     // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]

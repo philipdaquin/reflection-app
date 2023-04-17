@@ -366,6 +366,7 @@ impl AudioData {
         
         if let Some(transcript) = &self.transcription { 
             let new_analysis = TextClassification::new(self.id.clone())
+                .await
                 .get_text_analysis(&transcript)
                 .await
                 .unwrap();
