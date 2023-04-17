@@ -18,6 +18,15 @@ pub fn configure_weekly_analysis_service(cfg: &mut web::ServiceConfig) {
     ;
 }
 
+#[route("/api/weekly/get-current-week", method = "GET")]
+pub async fn get_current_week() -> Result<HttpResponse> { 
+    todo!()
+}
+
+#[route("/api/weekly/get-current-week", method = "GET")]
+pub async fn get_specific_day() -> Result<HttpResponse> { 
+    todo!()
+}
 
 
 ///

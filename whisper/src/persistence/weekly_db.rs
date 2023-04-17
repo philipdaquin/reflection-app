@@ -117,6 +117,10 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
 
         let res = collection.find_one(filter, None).await?;
 
+
+        log::info!("{res:?}");
+
+
         Ok(res)
     }
 

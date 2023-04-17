@@ -12,9 +12,6 @@ interface Props {
 
 function HomeContents({data}: Props) {
   
-
-
-
   return (
     <div className='bg-white md:w-full md:h-full w-full h-full rounded-[70px]'>
       <GreetingUser />

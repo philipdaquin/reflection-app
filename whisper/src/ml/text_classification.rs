@@ -65,8 +65,8 @@ impl TextClassification {
             curr_week
         } else { 
             // Else create a new Weekly Analysis and save to database 
-            WeeklyAnalysis::new().
-                save()
+            WeeklyAnalysis::new()
+                .save()
                 .await
                 .unwrap()
         };
