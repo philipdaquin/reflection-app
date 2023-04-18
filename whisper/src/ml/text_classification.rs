@@ -1,9 +1,9 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Serialize, Deserialize};
-use chrono::{NaiveDateTime, Weekday, Datelike, DateTime, Utc};
+use chrono::{NaiveDateTime, Weekday, Datelike, Utc};
 use crate::{error::Result, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}};
 use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_pattern::WeeklyAnalysis};
-use bson::{ DateTime as BsonDate};
+use bson::{ DateTime};
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct TopMood { 
     pub emotion: Option<String>,
@@ -36,7 +36,7 @@ pub struct TextClassification {
     #[serde(rename = "_audio_id", skip_serializing_if = "Option::is_none")]
     pub weekly_ref: Option<ObjectId>,
 
-    pub date: Option<BsonDate>,
+    pub date: Option<DateTime>,
     pub day: String,
     pub emotion: Option<String>,
     pub emotion_emoji: Option<String>, 

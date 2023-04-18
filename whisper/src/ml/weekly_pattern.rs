@@ -1,4 +1,4 @@
-use bson::{oid::ObjectId, DateTime as BsonDate};
+use bson::{oid::ObjectId, DateTime};
 use chrono::{Utc, Datelike, NaiveDate, Weekday, TimeZone};
 use serde::{Serialize, Deserialize};
 
@@ -29,11 +29,11 @@ pub struct WeeklyAnalysis {
 
     // Start date of the week 
     // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
-    pub start_week: Option<BsonDate>,
+    pub start_week: Option<DateTime>,
 
     // End date of the week 
     // #[serde(with = "bson::serde_helpers::chrono_datetime_as_bson_datetime")]
-    pub end_week: Option<BsonDate>,
+    pub end_week: Option<DateTime>,
 
     // User's common mood in the week 
     pub common_mood: Option<Vec<TopMood>>,

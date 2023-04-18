@@ -1,6 +1,6 @@
 use actix_multipart::Multipart;
-use bson::{oid::ObjectId, DateTime as BsonDate};
-use chrono::{ Utc, Datelike, DateTime};
+use bson::{oid::ObjectId, DateTime};
+use chrono::{ Utc, Datelike};
 use futures::{Stream, AsyncWriteExt};
 use hound::{SampleFormat, WavReader};
 use parking_lot::{Mutex};
@@ -38,7 +38,7 @@ pub struct AudioData {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     pub title: Option<String>,
-    pub created_date: Option<BsonDate>,
+    pub date: Option<DateTime>,
     pub day: Option<String>,
     pub transcription: Option<String>,
     pub summary: Option<String>,
@@ -65,7 +65,7 @@ impl AudioData {
         Ok(Self { 
             id: Some(id), 
             transcription: Some(transcription),
-            created_date: Some(bson_date_time), 
+            date: Some(bson_date_time), 
             day: Some(day), 
             ..Default::default()
         })
@@ -88,7 +88,7 @@ impl AudioData {
         Ok(Self { 
             id: Some(id), 
             transcription: Some(transcription), 
-            created_date: Some(bson_date_time), 
+            date: Some(bson_date_time), 
             day: Some(day),
             ..Default::default()
         })

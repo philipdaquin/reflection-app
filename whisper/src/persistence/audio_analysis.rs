@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{Utc, Duration, TimeZone};
+use chrono::{Utc, Duration, TimeZone, Datelike};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
 use mongodb::options::AggregateOptions;
@@ -91,16 +91,41 @@ impl AnalysisDb {
 #[async_trait]
 impl TextAnalysisInterface for AnalysisDb { 
     ///
-    /// Retrieves Text Classification Analyses from the last 7 days 
+    /// Retrieves Text Classification Analyses for this week 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn get_recent() -> Result<Vec<TextClassification>> {
         log::info!("Retrieving recent dataset...");
         let mut result = Vec::with_capacity(10);
         let collection = AnalysisDb::get_analysis_db();
 
-        let seven_days_ago = Utc::now() - Duration::days(7);
-        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
-        let filter = doc! { "date": { "$gte": bson_date_time } };
+        // NaiveDate 
+        let now = Utc::now().date_naive();
+        let start_of_week = now - Duration::days(now.weekday().num_days_from_monday() as i64);
+        let end_of_week = start_of_week + Duration::days(7);
+        
+        // To NaiveDateTime
+        let start_date = start_of_week.and_hms_opt(0, 0, 0).unwrap();
+        let end_date = end_of_week.and_hms_opt(0, 0, 0).unwrap();
+
+        // To DateTime        
+        let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_date);
+        let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_date);
+        // let start_date_time =  chrono::DateTime::parse_from_rfc3339(&start_date.to_string()).unwrap();
+        // let end_date_time =  chrono::DateTime::parse_from_rfc3339(&end_date.to_string()).unwrap();
+
+        // Bson DateTime 
+        let bson_start_date = bson::DateTime::from_chrono(start_date_time);
+        let bson_end_date = bson::DateTime::from_chrono(end_date_time);
+        
+
+        // Filter 
+        let filter = doc! { 
+            "date": { 
+                // "$exists": true,
+                "$gte": bson_start_date,
+                "$lt": bson_end_date,
+            } 
+        };
         
         // let filter = doc! { };
         
@@ -110,6 +135,8 @@ impl TextAnalysisInterface for AnalysisDb {
         while let Some(doc) = doc.try_next().await? {
             result.push(doc);
         }
+
+        log::info!("FOUNDED ITEMS FOR THIS: {result:#?}");
 
         Ok(result)
     }
