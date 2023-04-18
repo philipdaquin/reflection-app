@@ -38,7 +38,7 @@ pub async fn get_mood_summary() -> Result<HttpResponse> {
 
     log::info!("{serialized:#?}");
 
-    Ok(HttpResponse::Ok().body(serialized))
+    Ok(HttpResponse::Ok().json(res))
 
 }
 
@@ -50,8 +50,8 @@ pub async fn get_common_mood() -> Result<HttpResponse> {
     
     // log::info!("{mood:?}");
     
-    let serialized = serde_json::to_string(&mood).unwrap();
-    Ok(HttpResponse::Ok().body(serialized))
+    // let serialized = serde_json::to_string(&mood).unwrap();
+    Ok(HttpResponse::Ok().json(mood))
 }
 
 ///
@@ -64,8 +64,8 @@ pub async fn get_weekly_patterns() -> Result<HttpResponse>  {
     let mood_patterns = TextClassification::get_weekly_patterns().await.unwrap();
     log::info!("{mood_patterns:?}");
     
-    let serialized = serde_json::to_string(&mood_patterns).unwrap();
-    Ok(HttpResponse::Ok().body(serialized))
+    // let serialized = serde_json::to_string(&mood_patterns).unwrap();
+    Ok(HttpResponse::Ok().json(mood_patterns))
 }
 
 #[derive(Deserialize, Debug)]
@@ -85,8 +85,8 @@ pub async fn get_weekly_recommendation(input: web::Json<Summaries>) -> Result<Ht
     }
     let recommendation = RecommendedActivity::get_personalised_recommendations(summaries.unwrap()).await.unwrap();
 
-    let serialized = serde_json::to_string(&recommendation).unwrap();
-    Ok(HttpResponse::Ok().body(serialized))
+    // let serialized = serde_json::to_string(&recommendation).unwrap();
+    Ok(HttpResponse::Ok().json(recommendation))
 }
 
 ///

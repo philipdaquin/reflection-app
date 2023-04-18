@@ -1,11 +1,9 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Serialize, Deserialize};
-use uuid::Uuid;
 use chrono::{NaiveDateTime, Weekday, Datelike, DateTime, Utc};
 use crate::{error::Result, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}};
 use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_pattern::WeeklyAnalysis};
-use num::CheckedSub;
-
+use bson::{ DateTime as BsonDate};
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct TopMood { 
     pub emotion: Option<String>,
@@ -38,7 +36,7 @@ pub struct TextClassification {
     #[serde(rename = "_audio_id", skip_serializing_if = "Option::is_none")]
     pub weekly_ref: Option<ObjectId>,
 
-    pub date: Option<NaiveDateTime>,
+    pub date: Option<BsonDate>,
     pub day: String,
     pub emotion: Option<String>,
     pub emotion_emoji: Option<String>, 
@@ -57,7 +55,10 @@ impl TextClassification {
     /// Intialise new TextClassification with updated Id, date, and audioId
     pub async fn new(audio_ref: Option<String>) -> Self { 
         let id = ObjectId::new();
-        let date = Utc::now().naive_local();
+
+        let date = Utc::now();
+        let bson_date_time = bson::DateTime::from_chrono(date);
+        
         let day = date.weekday().to_string();
 
         // Find the week or create a new one, get the id 
@@ -74,7 +75,7 @@ impl TextClassification {
         Self { 
             id: Some(id), 
             audio_ref: audio_ref.map(|a| ObjectId::parse_str(a).expect("Unable to convert String to ObjectId")),
-            date: Some(date),
+            date: Some(bson_date_time),
             day,
             weekly_ref: week.id,
             ..Default::default()
@@ -220,6 +221,33 @@ impl TextClassification {
         log::info!("✅ The max avg_mood: {max_avg_mood} at {max_point:?}");
 
         Ok(max_point)
+    }
+
+    ///
+    /// Gets the weekly average for the last seven days
+    pub async fn get_weekly_average() -> Result<Option<f32>> {
+        let data_points = AnalysisDb::get_data_set_in_last_seven_days().await?;
+        let total_len = data_points.len();
+        let mut sum = 0.0;
+        
+        for point in data_points.into_iter() { 
+            if let Some(avg) = point.average_mood { 
+                sum  += avg ;
+            }
+        }
+        
+        let avg = sum as f32 / total_len as f32;
+
+        Ok(Some(avg))
+    }
+
+    ///
+    /// Count the number of documents in the same week 
+    pub async fn get_total_entries() -> Result<Option<i32>> { 
+        let count = AnalysisDb::count_documents_in_seven_days()
+            .await?
+            .unwrap() as i32;
+        Ok(Some(count))
     }
 
 }

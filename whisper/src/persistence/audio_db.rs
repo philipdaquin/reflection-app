@@ -1,5 +1,7 @@
 
 use async_trait::async_trait;
+use chrono::{Utc, Duration, TimeZone, NaiveTime};
+use futures::TryStreamExt;
 use uuid::Uuid;
 use crate::error::{Result, ServerError};
 use crate::ml::whisper::AudioData;
@@ -17,6 +19,7 @@ pub trait AudioInterface {
     async fn delete_one_entry(id: &str) -> Result<Option<AudioData>>;
     async fn get_entry(id: &str) -> Result<AudioData>;
     async fn update_entry(id: &str, updated_meta: &AudioData) -> Result<AudioData>;
+    async fn get_recent() -> Result<Vec<AudioData>>;
     fn get_collection() -> Collection<AudioData>;
 }
 
@@ -100,6 +103,40 @@ impl AudioInterface for AudioDB {
             .await?
             .ok_or(ServerError::NotFound(format!("{id}")))
     }
+
+    ///
+    /// Retrieves current day audio entries 
+    #[tracing::instrument(level= "debug", err)]
+    async fn get_recent() -> Result<Vec<AudioData>> { 
+        let collection = AudioDB::get_collection();
+        let mut result = Vec::new();
+        let now_chrono = Utc::now();
+
+        // Set to 00:00:00
+        let today = now_chrono
+            .date_naive()
+            .and_hms_opt(0,0, 0)
+            .unwrap();
+
+        let date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&today);
+        log::info!(" {date_time:?}");
+        let bson_date_time = bson::DateTime::from_chrono(date_time);
+        let filter = doc! { "date": { "$gte": bson_date_time } };
+        
+        // let filter = doc! {};
+        // Get the matching document 
+        let mut doc = collection.find(filter, None).await?;
+        
+        while let Some(doc) = doc.try_next().await? {
+            result.push(doc);
+        }
+
+        log::info!("{result:#?}");
+
+        Ok(result)
+    }
+
+
     /// Access collection from database
     fn get_collection() -> Collection<AudioData> {
         MongoDbClient::get_collection::<AudioData>(COLL_NAME, DB_NAME)

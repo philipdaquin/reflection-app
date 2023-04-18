@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use chrono::{Utc, Duration, Local, TimeZone};
+use chrono::{Utc, Duration, TimeZone};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
 use mongodb::options::AggregateOptions;
@@ -18,32 +18,44 @@ pub trait TextAnalysisInterface {
     async fn get_most_common_emotions() -> Result<Vec<TopMood>>;
     async fn delete_all_entries() -> Result<bool>;
     fn get_analysis_db() -> Collection<TextClassification>;
-    
 }
 #[derive(Debug)]
 pub struct AnalysisDb;
 
 impl AnalysisDb { 
+
+    ///
+    /// Returns the total number of document found within the last 7 days 
+    pub async fn count_documents_in_seven_days() -> Result<Option<u64>> { 
+        let collection = AnalysisDb::get_analysis_db();
+        let seven_days_ago = Utc::now() - Duration::days(7);
+        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
+
+        let filter = doc! { "date": { "$gte": bson_date_time } };
+        
+        let total_records = collection.count_documents(filter, None).await?;
+
+        Ok(Some(total_records))
+    }   
+
     ///
     /// Retrieves data points from the last seven days 
     #[tracing::instrument(level= "debug", err)]
     pub async fn get_data_set_in_last_seven_days() -> Result<Vec<TextClassification>> {
         let collection = AnalysisDb::get_analysis_db();
-        let seven_days_ago = Utc::now().naive_utc() - Duration::days(7);
-        let date_time: chrono::DateTime<Local> =  Local.from_local_datetime(&seven_days_ago).unwrap();
-
-        let bson_date_time = bson::DateTime::from_chrono(date_time);
+        let seven_days_ago = Utc::now() - Duration::days(7);
+        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
 
         // Get all objects in database within the 7 days 
         let pipeline = vec![
             // Match documents within the last 7 days
-            // doc! {
-            //     "$match": {
-            //         "date": {
-            //             "$gte": bson_date_time
-            //         }
-            //     }
-            // },
+            doc! {
+                "$match": {
+                    "date": {
+                        "$gte": bson_date_time
+                    }
+                }
+            },
             // Project the desired fields
             doc! {
                 "$project": {
@@ -79,17 +91,18 @@ impl AnalysisDb {
 #[async_trait]
 impl TextAnalysisInterface for AnalysisDb { 
     ///
-    /// Retrieves items from the last 7 days 
+    /// Retrieves Text Classification Analyses from the last 7 days 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn get_recent() -> Result<Vec<TextClassification>> {
         log::info!("Retrieving recent dataset...");
         let mut result = Vec::with_capacity(10);
         let collection = AnalysisDb::get_analysis_db();
+
         let seven_days_ago = Utc::now() - Duration::days(7);
-        // let in_bson = bson::DateTime::from_chrono(seven_days_ago);
-        // let filter = doc! { "date": { "$gte": in_bson } };
-        // let filter = doc! { "day": "Monday" };
-        let filter = doc! { };
+        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
+        let filter = doc! { "date": { "$gte": bson_date_time } };
+        
+        // let filter = doc! { };
         
         // Get the matching document 
         let mut doc = collection.find(filter, None).await?;
@@ -133,23 +146,22 @@ impl TextAnalysisInterface for AnalysisDb {
     #[tracing::instrument(level= "debug", err)]
     async fn get_most_common_emotions() -> Result<Vec<TopMood>> {
         let collection = AnalysisDb::get_analysis_db();
-    
+        let seven_days_ago = Utc::now() - Duration::days(7);
+        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
+
         // Aggregate the top 3 most commonly recorded mood/emotion over the week or days
         let pipeline = vec![
             // Filter for documents within the last 7 days
             doc! {
+
                 "$match": {
-                    // "start_week": {"$gte": Utc::now().date().naive_utc().add_signed(Duration::days(-7))}
-                    // "day": "Monday"
+                    "date": {
+                        "$gte": bson_date_time
+                    },
 
                     "emotion": {"$ne": null},
-                    // "emoji": {"$ne": null},
-                    // "average_mood": {"$ne": null},
-
                 }
             },
-            // Unwind the common_mood array
-            // doc! {"$unwind": "$common_mood"},
             // Group by emotion and count the number of occurrences
             doc! {
                 "$group": {
@@ -183,8 +195,15 @@ impl TextAnalysisInterface for AnalysisDb {
     
         // Execute the aggregation pipeline and retrieve the results 
         let mut doc = collection.aggregate(pipeline, options).await.unwrap();
+        
         // Calculate the total number of records  
-        let total_records = collection.count_documents(None, None).await?;
+        // Testing purposes 
+        let default = collection.count_documents(None, None).await?;
+        
+        let total_records = AnalysisDb::count_documents_in_seven_days()
+            .await?
+            .unwrap_or(default);
+        
         let mut result = Vec::new();
     
         // Map the aggregated results 

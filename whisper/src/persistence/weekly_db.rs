@@ -1,7 +1,7 @@
 use crate::error::ServerError;
 use crate::{error::Result, ml::weekly_pattern::WeeklyAnalysis};
 use async_trait::async_trait;
-use chrono::{Utc, Duration, Local, TimeZone, NaiveDateTime, NaiveDate};
+use chrono::{Utc, Duration, TimeZone, DateTime};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, };
 use super::{db::MongoDbClient};
@@ -15,7 +15,7 @@ pub trait WeeklyAnalysisInterface {
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<WeeklyAnalysis>>;
     async fn delete_all_entries() -> Result<bool>;
     async fn get_one_analysis(id: ObjectId) -> Result<WeeklyAnalysis>;
-    async fn get_corresponding_week(start_date: NaiveDateTime) -> Result<Option<WeeklyAnalysis>>;
+    async fn get_corresponding_week(start_date: DateTime<Utc>) -> Result<Option<WeeklyAnalysis>>;
     fn get_analysis_db() -> Collection<WeeklyAnalysis>;
 
 }
@@ -99,12 +99,11 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
     /// 
     /// Daily call this function to retrieve the current week
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn get_corresponding_week(start_date: NaiveDateTime) -> Result<Option<WeeklyAnalysis>> { 
+    async fn get_corresponding_week(start_date: DateTime<Utc>) -> Result<Option<WeeklyAnalysis>> { 
 
         let collection = WeeklyAnalysisDB::get_analysis_db();
 
-        let s_date_time: chrono::DateTime<Local> =  Local.from_local_datetime(&start_date).unwrap();
-        let bson_s_date_time = bson::DateTime::from_chrono(s_date_time);
+        let bson_s_date_time = bson::DateTime::from_chrono(start_date);
         
         let filter = doc! { 
             "start_week": { 

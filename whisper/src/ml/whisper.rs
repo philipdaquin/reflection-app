@@ -1,6 +1,6 @@
 use actix_multipart::Multipart;
-use bson::oid::ObjectId;
-use chrono::{NaiveDateTime, Utc, Datelike};
+use bson::{oid::ObjectId, DateTime as BsonDate};
+use chrono::{ Utc, Datelike, DateTime};
 use futures::{Stream, AsyncWriteExt};
 use hound::{SampleFormat, WavReader};
 use parking_lot::{Mutex};
@@ -38,7 +38,7 @@ pub struct AudioData {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     pub title: Option<String>,
-    pub created_date: Option<NaiveDateTime>,
+    pub created_date: Option<BsonDate>,
     pub day: Option<String>,
     pub transcription: Option<String>,
     pub summary: Option<String>,
@@ -54,14 +54,18 @@ impl AudioData {
     pub async fn new(bytes: Vec<u8>) -> Result<Self> { 
         let wav = parse_wav_file(bytes).await?;
         let id = ObjectId::new().to_string();
-        let created_date = Utc::now().naive_local();
+        let created_date = Utc::now();
+
+        let bson_date_time = bson::DateTime::from_chrono(created_date);
+
+
         let day = created_date.weekday().to_string();
         let transcription = AudioData::transcribe_audio(wav).await?;
 
         Ok(Self { 
             id: Some(id), 
             transcription: Some(transcription),
-            created_date: Some(created_date), 
+            created_date: Some(bson_date_time), 
             day: Some(day), 
             ..Default::default()
         })
@@ -76,13 +80,15 @@ impl AudioData {
         // Generate a new UUID for the item 
         let transcription = process_chunks_with_workers(audio_batches).await?;
         let id = ObjectId::new().to_string();
-        let created_date = Utc::now().naive_local();
+        let created_date = Utc::now();
+        let bson_date_time = bson::DateTime::from_chrono(created_date);
+
         let day = created_date.weekday().to_string();
 
         Ok(Self { 
             id: Some(id), 
             transcription: Some(transcription), 
-            created_date: Some(created_date), 
+            created_date: Some(bson_date_time), 
             day: Some(day),
             ..Default::default()
         })
@@ -452,7 +458,6 @@ async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
 /// Split the audio data and divide it into smaller chunks of a fixed size PCM audio chunks
 #[tracing::instrument(level= "debug")]
 fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<Vec<f32>>> { 
-    log::info!("🏃‍♂️🏃‍♂️🏃‍♂️🏃‍♂️🏃‍♂️🏃‍♂️ {:?}", bytes.len());
     let mut reader = Cursor::new(&bytes);
     let wav_reader = WavReader::new(&mut reader).unwrap();
     
@@ -499,8 +504,9 @@ fn parse_audio_into_pcm_chunks(bytes: &[u8], chunk_size: usize) ->  Result<Vec<V
 async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> { 
     let (result_producer, result_consumer) = unbounded();
     
-    
+    //
     for batch in buffer.par_chunks(BATCH_SIZE).collect::<Vec<_>>() {
+        log::info!("✅ {}", batch[0].len());
         // Performs a fork join style thread work,
         // Rayon Scope ensures that all threads spawned for each batch of data will be terminated before we move on 
         // to the next batch of data 
@@ -584,6 +590,7 @@ pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> {
         // Add the audio files to the buffer 
         buffer.push(bytes); 
     }
+
 
     // let s = bytes
     //     .par_chunks(BATCH_SIZE)

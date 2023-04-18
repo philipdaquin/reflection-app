@@ -23,6 +23,7 @@ use super::{Input, eleven_labs::ElevenLabsClient};
 pub fn configure_audio_services(cfg: &mut web::ServiceConfig) { 
     cfg
     .service(upload)
+    .service(get_recent_entries)
     .service(batch_upload)
     .service(get_text_summary)
     .service(get_text_analysis)
@@ -34,6 +35,20 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     .service(delete_audio_entry)
     ;
 }
+
+///
+/// Retrieves the recent audio journal entries 
+#[route("/api/audio/get-recent", method = "GET")]
+pub async fn get_recent_entries() -> Result<HttpResponse> {
+    let res = AudioDB::get_recent().await?;
+    let serialized = serde_json::to_string(&res).unwrap();
+
+    log::info!("FINAL {serialized:#?}");
+
+    Ok(HttpResponse::Ok().body(serialized))
+}
+
+
 ///
 /// Get text summary instantly
 /// id -> Audio summary id 
@@ -99,9 +114,9 @@ pub async fn get_text_analysis(input: web::Json<Input>) -> Result<HttpResponse> 
         .await?
         .text_classification
         .unwrap();
-    let serialised = serde_json::to_string(&analysis).unwrap();
+    // let serialised = serde_json::to_string(&analysis).unwrap();
 
-    Ok(HttpResponse::Ok().body(serialised))
+    Ok(HttpResponse::Ok().json(analysis))
 } 
 
 /// Get related tags from the transcript 
@@ -130,9 +145,9 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
         .await?
         .tags
         .unwrap();
-    let serialized = serde_json::to_string(&tags)?;
+    // let serialized = serde_json::to_string(&tags)?;
 
-    Ok(HttpResponse::Ok().body(serialized))
+    Ok(HttpResponse::Ok().json(tags))
 } 
 
 
@@ -162,8 +177,8 @@ pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse
         .save()
         .await?;
     log::info!("{audio:#?}");
-    let serialized = serde_json::to_string(&audio)?;
-    Ok(HttpResponse::Ok().body(serialized))
+    // let serialized = serde_json::to_string(&audio)?;
+    Ok(HttpResponse::Ok().json(audio))
 }
 
 #[route("/api/audio/batch-upload", method = "POST")]
@@ -187,8 +202,8 @@ pub async fn batch_upload(req: HttpRequest, payload: Multipart) -> Result<HttpRe
         .save()
         .await?;
     log::info!("{audio:#?}");
-    let serialized = serde_json::to_string(&audio)?;
-    Ok(HttpResponse::Ok().body(serialized))
+    // let serialized = serde_json::to_string(&audio)?;
+    Ok(HttpResponse::Ok().json(audio))
 
 }
 
@@ -204,8 +219,6 @@ pub async fn batch_upload(req: HttpRequest, payload: Multipart) -> Result<HttpRe
 pub async fn chat_response(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
     
     // Initialise eleven labs client and open ai client 
-
-
     if let Some(openai) = req.headers()
         .get("X-API-KEY-OPENAI")
         .and_then(|v| v.to_str().ok())

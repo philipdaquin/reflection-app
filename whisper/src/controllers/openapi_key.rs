@@ -1,8 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse, Result};
 use once_cell::sync::OnceCell;
 
-use crate::error::ServerError;
-
 
 // User's Open API KEY in Singleton 
 #[derive(Debug, Clone)]
@@ -30,15 +28,6 @@ impl OpenAIClient {
     #[tracing::instrument(level= "debug")]
     pub async fn set_key(key: &str) -> Result<&'static Self> {
         
-        // let open_api_key = req
-        //     .headers()
-        //     .get("X-API-KEY-OPENAI")
-        //     .expect("Unabled to find OPEN API KEY")
-        //     .to_str()
-        //     .map_err(|_| ServerError::Unauthorized)
-        //     .map_err(|_| ServerError::MissingOpenAIAPIKey)
-        //     .unwrap();
-    
         // Store the current API key on singleton 
         let key = OpenAIClient::from(key.to_string());
         let _ = OPENAI_KEY.set(key);

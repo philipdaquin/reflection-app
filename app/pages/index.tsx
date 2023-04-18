@@ -61,7 +61,7 @@ function Home({data}: Props) {
         <div className='flex items-center  md:hidden justify-center mb-10 '>
             <NavigationMobile children={<HomeNav/>} />        
         </div>
-        {/* <RecordComponent /> */}
+        <RecordComponent />
       </div>
     </>
   )
