@@ -121,8 +121,8 @@ impl AudioInterface for AudioDB {
             .and_hms_opt(0, 0, 0)
             .unwrap();
 
-        let end_of_day = (now_chrono + Duration::days(1))
-            .and_hms_opt(0, 0, 0)
+        let end_of_day = now_chrono
+            .and_hms_opt(23, 59, 59)
             .unwrap();
 
         // Convert into local timezone 

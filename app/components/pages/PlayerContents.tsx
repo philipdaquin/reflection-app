@@ -47,47 +47,55 @@ interface PlayerContentProps {
 }
 
 function PlayerContents({entry}: PlayerContentProps) {
-  return (
-    <section className='flex flex-col h-full justify-between'>
-        <div className='flex flex-row items-center justify-between pb-5'>
-            <BackButton link='' />
-            <h1 className='font-semibold text-[15px] text-center text-[#757575]'>Now Playing</h1>
-            <div className='px-4 bg-black'></div>
-        </div>
-        
-        <div className=' w-full '>
-            <div className='flex flex-col items-center space-y-[74px] pb-7'>
-                <ThumbnailPlayer src={entry.thumbnailUrl}/>
-                <div className=''>
-                    <h1 className='text-[20px] font-bold text-center'>{entry.title}</h1>
-                    <div className='text-center justify-center items-center flex flex-row space-x-2 text-[#757575] text-[15px]'>
-                        {entry.subtitle && (
-                            <div className='flex space-x-2'>
-                                <h1>{entry.subtitle}</h1>
-                                <p>•</p>
-                            </div>
-                        )}
-                        
-                        {entry.date && (
-                            <h1>{entry.date.toString()}</h1>
-                        )}
 
-                        {entry.duration && (
-                            <div className='flex space-x-2'>
-                                <p>•</p>
-                                <h1>{entry.duration}</h1>
-                            </div>
-                        )}
+    // let month = entry.date?.toLocaleDateString('en-US', { 
+    //         month: 'long', 
+    //         day: 'numeric', 
+    //         year: 'numeric' 
+    //     }
+    // );
 
+    return (
+        <section className='flex flex-col h-full justify-between'>
+            <div className='flex flex-row items-center justify-between pb-5'>
+                <BackButton link='' />
+                <h1 className='font-semibold text-[15px] text-center text-[#757575]'>Now Playing</h1>
+                <div className='px-4 bg-black'></div>
+            </div>
+            
+            <div className=' w-full '>
+                <div className='flex flex-col items-center space-y-[74px] pb-7'>
+                    <ThumbnailPlayer src={entry.thumbnailUrl}/>
+                    <div className=''>
+                        <h1 className='text-[20px] font-bold text-center'>{entry.title}</h1>
+                        <div className='text-center justify-center items-center flex flex-row space-x-2 text-[#757575] text-[15px]'>
+                            {entry.subtitle && (
+                                <div className='flex space-x-2'>
+                                    <h1>{entry.subtitle}</h1>
+                                    <p>•</p>
+                                </div>
+                            )}
+                            
+                            {/* {entry.date && (
+                                <h1>{month}</h1>
+                            )} */}
+
+                            {entry.duration && (
+                                <div className='flex space-x-2'>
+                                    <p>•</p>
+                                    <h1>{entry.duration}</h1>
+                                </div>
+                            )}
+
+                        </div>
                     </div>
                 </div>
+                {/* media player */}
+                <AudioMediaPlayer src={entry.audioUrl} />
             </div>
-            {/* media player */}
-            <AudioMediaPlayer src={entry.audioUrl} />
-        </div>
-        <ShowTranscript />
-    </section>
-  )
+            <ShowTranscript />
+        </section>
+    )
 }
 
 export default PlayerContents
