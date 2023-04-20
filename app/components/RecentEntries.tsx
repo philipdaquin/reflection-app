@@ -5,7 +5,7 @@ import { AudioEntryType } from '../typings'
 
 
 interface Props { 
-  entries: AudioEntryType[]
+  entries: AudioEntryType[] | null | undefined
 }
 
 function RecentEntries({entries}: Props) {
@@ -19,11 +19,11 @@ function RecentEntries({entries}: Props) {
 
             <ul className='space-y-2'>
               {
-                  entries.map((item, k) => { 
+                  entries?.map((item, k) => { 
                       return (
                         <li key={k}>
                           <Link href={{
-                              pathname: `/play/${item.id}`,
+                              pathname: `/play/${item.id.toString()}`,
                               // query: { id: item.id }
                             }}>
                             <AudioEntry  

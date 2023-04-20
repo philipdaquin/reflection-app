@@ -1,9 +1,11 @@
 use crate::error::ServerError;
-use crate::{error::Result, ml::weekly_pattern::WeeklyAnalysis};
+use crate::{error::Result, ml::weekly_pattern::WeeklyAnalysisDTO};
 use async_trait::async_trait;
-use chrono::{Utc, Duration, TimeZone, DateTime};
+use bson::DateTime;
+use chrono::{Utc, Duration, TimeZone, Datelike};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, };
+use super::audio_analysis::AnalysisDb;
 use super::{db::MongoDbClient};
 
 const DB_NAME: &str = "human-assistant";
@@ -11,12 +13,14 @@ const COLL_NAME: &str = "weekly";
 
 #[async_trait]
 pub trait WeeklyAnalysisInterface { 
-    async fn add_analysis(new_analysis: &WeeklyAnalysis) -> Result<WeeklyAnalysis>;
-    async fn delete_one_analysis(id: ObjectId) -> Result<Option<WeeklyAnalysis>>;
+    async fn add_analysis(new_analysis: &WeeklyAnalysisDTO) -> Result<WeeklyAnalysisDTO>;
+    async fn delete_one_analysis(id: ObjectId) -> Result<Option<WeeklyAnalysisDTO>>;
     async fn delete_all_entries() -> Result<bool>;
-    async fn get_one_analysis(id: ObjectId) -> Result<WeeklyAnalysis>;
-    async fn get_corresponding_week(start_date: DateTime<Utc>) -> Result<Option<WeeklyAnalysis>>;
-    fn get_analysis_db() -> Collection<WeeklyAnalysis>;
+    async fn get_one_analysis(id: ObjectId) -> Result<WeeklyAnalysisDTO>;
+    async fn get_corresponding_week(start_date: DateTime) -> Result<Option<WeeklyAnalysisDTO>>;
+    async fn get_current_week() -> Result<Option<WeeklyAnalysisDTO>>;
+    async fn update_total_entry(id: ObjectId) -> Result<()>;
+    fn get_analysis_db() -> Collection<WeeklyAnalysisDTO>;
 
 }
 
@@ -26,7 +30,7 @@ pub struct WeeklyAnalysisDB;
 
 impl WeeklyAnalysisDB { 
     /// Get the first value for testing purposes 
-    pub async fn get_first_item() -> Result<Option<WeeklyAnalysis>> { 
+    pub async fn get_first_item() -> Result<Option<WeeklyAnalysisDTO>> { 
 
         let collection = WeeklyAnalysisDB::get_analysis_db();
         
@@ -41,7 +45,7 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
     ///
     /// Retrieve one weekly analysis on id 
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn get_one_analysis(id: ObjectId) -> Result<WeeklyAnalysis> {
+    async fn get_one_analysis(id: ObjectId) -> Result<WeeklyAnalysisDTO> {
         let collection = WeeklyAnalysisDB::get_analysis_db();
 
         let filter = doc! { "_id": &id};
@@ -55,7 +59,7 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
     ///
     /// Add new weekly analysis db 
     #[tracing::instrument(fields(new_analysis), level= "debug", err)]
-    async fn add_analysis(new_analysis: &WeeklyAnalysis) -> Result<WeeklyAnalysis> {
+    async fn add_analysis(new_analysis: &WeeklyAnalysisDTO) -> Result<WeeklyAnalysisDTO> {
         log::info!("✅ Saving Analysis to database {new_analysis:#?}");
         let collection = WeeklyAnalysisDB::get_analysis_db();
         let item = collection.insert_one(new_analysis, None).await?;
@@ -84,7 +88,7 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
     ///
     /// Delete one entry 
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn delete_one_analysis(id: ObjectId) -> Result<Option<WeeklyAnalysis>> {
+    async fn delete_one_analysis(id: ObjectId) -> Result<Option<WeeklyAnalysisDTO>> {
         let collection = WeeklyAnalysisDB::get_analysis_db();
 
         let filter = doc! {"_id" : id};
@@ -96,37 +100,89 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
         Ok(Some(item))
     }
 
-    /// 
-    /// Daily call this function to retrieve the current week
+    ///
+    /// Get the weekly record based on the date of the daily input       
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn get_corresponding_week(start_date: DateTime<Utc>) -> Result<Option<WeeklyAnalysis>> { 
+    async fn get_corresponding_week(created_date: DateTime) -> Result<Option<WeeklyAnalysisDTO>> { 
 
         let collection = WeeklyAnalysisDB::get_analysis_db();
-
-        let bson_s_date_time = bson::DateTime::from_chrono(start_date);
         
         let filter = doc! { 
             "start_week": { 
-                "$lte": bson_s_date_time.clone(),
+                "$lte": created_date,
             },
             "end_week": { 
-                "$gte": bson_s_date_time.clone()
+                "$gte": created_date
             }
         };
-
         let res = collection.find_one(filter, None).await?;
 
 
         log::info!("{res:?}");
 
+        Ok(res)
+    }
+
+    // Get the current week for the current day 
+    #[tracing::instrument(level= "debug", err)]
+    async fn get_current_week() -> Result<Option<WeeklyAnalysisDTO>> {
+        let collection = WeeklyAnalysisDB::get_analysis_db();
+
+
+         // Get current start of the week and end of the week dates 
+         let now = Utc::now().date_naive();
+         let start_of_week = now - Duration::days(now.weekday().num_days_from_monday() as i64);
+         let end_of_week = start_of_week + Duration::days(7);
+         
+         // Convert both values into naivedatetime and set to 00:00:00
+         let start_date = start_of_week.and_hms_opt(0, 0, 0).unwrap();
+         let end_date = end_of_week.and_hms_opt(0, 0, 0).unwrap();
+ 
+         // Convert to DateTime in Chrono        
+         let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_date);
+         let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_date);
+ 
+         // Convert to Bson DateTime  
+         let bson_start_date = bson::DateTime::from_chrono(start_date_time);
+         let bson_end_date = bson::DateTime::from_chrono(end_date_time);
+
+
+        let filter = doc! { 
+            "start_week": { 
+                "$gte": bson_start_date,
+            },
+            "end_week": { 
+                "$lt": bson_end_date
+            }
+        };
+
+        let res = collection.find_one(filter, None).await?;
 
         Ok(res)
     }
 
+    /// Increment the value of total entries 
+    /// - Filter by id 
+    /// - Increment `total_entries` by 1 
+    #[tracing::instrument(level= "debug", err)]
+    async fn update_total_entry(id: ObjectId) -> Result<()> { 
+        let collection = WeeklyAnalysisDB::get_analysis_db();
+
+        let filter = doc! { "_id" : id};
+        let increment = doc! {"$inc" : {
+            "total_entries" : 1
+            }
+        };
+
+        collection.update_one(filter, increment, None).await?;
+
+        Ok(())
+    }
+
     ///
     /// Access to weekly collection 
-    fn get_analysis_db() -> Collection<WeeklyAnalysis> {
-        MongoDbClient::get_collection::<WeeklyAnalysis>(COLL_NAME, DB_NAME)
+    fn get_analysis_db() -> Collection<WeeklyAnalysisDTO> {
+        MongoDbClient::get_collection::<WeeklyAnalysisDTO>(COLL_NAME, DB_NAME)
     }
    
 }

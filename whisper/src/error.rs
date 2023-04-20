@@ -40,8 +40,8 @@ pub enum ServerError {
     #[error("Internal Server Error. Message: {0}")]
     ServerError(String),
 
-    #[error("A server error occurred")]
-    DatabaseError,
+    #[error("A server error occurred: {0}")]
+    DatabaseError(String),
     
     #[error("Missing Open AI API Key")]
     MissingOpenAIAPIKey,

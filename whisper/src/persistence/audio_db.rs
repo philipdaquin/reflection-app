@@ -1,10 +1,10 @@
 
 use async_trait::async_trait;
-use chrono::{Utc, Duration, TimeZone, NaiveTime};
+use chrono::{Utc, Duration, TimeZone, NaiveTime, NaiveDate};
 use futures::TryStreamExt;
 use uuid::Uuid;
 use crate::error::{Result, ServerError};
-use crate::ml::whisper::AudioData;
+use crate::ml::whisper::AudioDataDTO;
 use mongodb::Collection;
 use mongodb::bson::{doc, oid::ObjectId, DateTime, Document};
 
@@ -14,13 +14,16 @@ const COLL_NAME: &str = "metadata";
 
 #[async_trait]
 pub trait AudioInterface { 
-    async fn add_entry(meta: &AudioData) -> Result<AudioData>;
+    async fn add_entry(meta: &AudioDataDTO) -> Result<AudioDataDTO>;
     async fn delete_all_entries() -> Result<()>;
-    async fn delete_one_entry(id: &str) -> Result<Option<AudioData>>;
-    async fn get_entry(id: &str) -> Result<AudioData>;
-    async fn update_entry(id: &str, updated_meta: &AudioData) -> Result<AudioData>;
-    async fn get_recent() -> Result<Vec<AudioData>>;
-    fn get_collection() -> Collection<AudioData>;
+    async fn delete_one_entry(id: &str) -> Result<Option<AudioDataDTO>>;
+    async fn get_entry(id: &str) -> Result<AudioDataDTO>;
+    async fn update_entry(id: &str, updated_meta: &AudioDataDTO) -> Result<AudioDataDTO>;
+    async fn get_recent() -> Result<Vec<AudioDataDTO>>;
+    async fn get_all_by_date(date: NaiveDate) -> Result<Vec<AudioDataDTO>>;
+    async fn get_all_by_week_number(week_number: i32) -> Result<Vec<AudioDataDTO>>; 
+    
+    fn get_collection() -> Collection<AudioDataDTO>;
 }
 
 #[derive(Debug)]
@@ -31,8 +34,8 @@ impl AudioInterface for AudioDB {
 
     ///
     /// Add new entry 
-    #[tracing::instrument(fields(repository = "AudioData"), level= "debug", err)]
-    async fn add_entry(meta: &AudioData) -> Result<AudioData> {
+    #[tracing::instrument(fields(repository = "AudioDataDTO"), level= "debug", err)]
+    async fn add_entry(meta: &AudioDataDTO) -> Result<AudioDataDTO> {
         let collection = AudioDB::get_collection();
         let insert_res = collection
             .insert_one(meta, None)
@@ -58,7 +61,7 @@ impl AudioInterface for AudioDB {
     ///
     /// Delete one entry 
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn delete_one_entry(id: &str) -> Result<Option<AudioData>> {
+    async fn delete_one_entry(id: &str) -> Result<Option<AudioDataDTO>> {
         let collection = AudioDB::get_collection();
 
         let filter = doc! {"_id" : id};
@@ -73,7 +76,7 @@ impl AudioInterface for AudioDB {
     ///
     /// Get entry by Id 
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn get_entry(id: &str) -> Result<AudioData> {
+    async fn get_entry(id: &str) -> Result<AudioDataDTO> {
         let collection = AudioDB::get_collection();
 
         let filter = doc! { "_id": &id};
@@ -88,7 +91,7 @@ impl AudioInterface for AudioDB {
     ///
     /// Update entry from id 
     #[tracing::instrument(fields(id,updated_meta), level= "debug", err)]
-    async fn update_entry(id: &str, updated_meta: &AudioData) -> Result<AudioData> {
+    async fn update_entry(id: &str, updated_meta: &AudioDataDTO) -> Result<AudioDataDTO> {
         
         log::info!("{updated_meta:#?}");
         
@@ -105,24 +108,38 @@ impl AudioInterface for AudioDB {
     }
 
     ///
-    /// Retrieves current day audio entries 
+    /// Retrieves the current day audio entries from 00:00:00 to 24:00:00 
     #[tracing::instrument(level= "debug", err)]
-    async fn get_recent() -> Result<Vec<AudioData>> { 
+    async fn get_recent() -> Result<Vec<AudioDataDTO>> { 
         let collection = AudioDB::get_collection();
         let mut result = Vec::new();
-        let now_chrono = Utc::now();
 
-        // Set to 00:00:00
-        let today = now_chrono
-            .date_naive()
-            .and_hms_opt(0,0, 0)
+        let now_chrono = Utc::now().date_naive();
+
+        // Set to date - 00:00:00 to 24:00:00
+        let start_of_day = now_chrono
+            .and_hms_opt(0, 0, 0)
             .unwrap();
 
-        let date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&today);
-        log::info!(" {date_time:?}");
-        let bson_date_time = bson::DateTime::from_chrono(date_time);
-        let filter = doc! { "date": { "$gte": bson_date_time } };
+        let end_of_day = (now_chrono + Duration::days(1))
+            .and_hms_opt(0, 0, 0)
+            .unwrap();
+
+        // Convert into local timezone 
+        let start_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_of_day);
+        let end_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_of_day);
+
+        let bson_start_time = bson::DateTime::from_chrono(start_time);
+        let bson_end_time = bson::DateTime::from_chrono(end_time);
         
+        // Filter 
+        let filter = doc! { 
+            "date": { 
+                "$gte": bson_start_time,
+                "$lt": bson_end_time,
+            } 
+        };      
+
         // let filter = doc! {};
         // Get the matching document 
         let mut doc = collection.find(filter, None).await?;
@@ -136,9 +153,69 @@ impl AudioInterface for AudioDB {
         Ok(result)
     }
 
+    ///
+    /// Retrieve entries by a specific date 
+    /// input: January 1, 2023
+    async fn get_all_by_date(date: NaiveDate) -> Result<Vec<AudioDataDTO>> {
+        let collection = AudioDB::get_collection();
+        let mut result = Vec::new();
 
+        // Set to date - 00:00:00 to 24:00:00
+        let start_of_day = date
+            .and_hms_opt(0, 0, 0)
+            .unwrap();
+
+        let end_of_day = (date + Duration::days(1))
+            .and_hms_opt(0, 0, 0)
+            .unwrap();
+
+        // Convert into local timezone 
+        let start_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_of_day);
+        let end_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_of_day);
+
+        let bson_start_time = bson::DateTime::from_chrono(start_time);
+        let bson_end_time = bson::DateTime::from_chrono(end_time);
+        
+        // Filter 
+        let filter = doc! { 
+            "date": { 
+                "$gte": bson_start_time,
+                "$lt": bson_end_time,
+            } 
+        };      
+
+        // let filter = doc! {};
+        // Get the matching document 
+        let mut doc = collection.find(filter, None).await?;
+        
+        while let Some(doc) = doc.try_next().await? {
+            result.push(doc);
+        }
+
+        log::info!("{result:#?}");
+
+        Ok(result)
+    }
+
+    ///
+    /// Retrieve all entries by the week number 
+    async fn get_all_by_week_number(week_number: i32) -> Result<Vec<AudioDataDTO>> { 
+        let collection = AudioDB::get_collection();
+        let mut result = Vec::new();
+        let filter = doc! { "week_number": week_number};
+        
+        let mut doc = collection.find(filter, None).await?;
+        
+        while let Some(doc) = doc.try_next().await? {
+            result.push(doc);
+        }
+
+        Ok(result)
+    }
+
+    ///
     /// Access collection from database
-    fn get_collection() -> Collection<AudioData> {
-        MongoDbClient::get_collection::<AudioData>(COLL_NAME, DB_NAME)
+    fn get_collection() -> Collection<AudioDataDTO> {
+        MongoDbClient::get_collection::<AudioDataDTO>(COLL_NAME, DB_NAME)
     }
 }   

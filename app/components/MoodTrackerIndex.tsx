@@ -23,13 +23,13 @@ const defaultDataPoint: DataPoint[] = [
 
 export function Emoji(average: number): string { 
   let emoji = ""
-  if (average <= 2) {
+  if (average <= 0.2) {
     emoji = "😔";
-  } else if (average <= 4) {
+  } else if (average <= 0.4) {
     emoji = "😕";
-  } else if (average <= 6) {
+  } else if (average <= 0.6) {
     emoji = "😐";
-  } else if (average <= 8) {
+  } else if (average <= 0.8) {
     emoji = "🙂";
   } else {
     emoji = "😊";
@@ -46,8 +46,9 @@ export function getAverageMoodWeek(data: TextClassification[] | null) : string {
   //@ts-ignore
   let average: number | null | undefined = data?.reduce((total, item) => total + item.average_mood, 0) / length;
   let avgString = (average ? (average * 100.0).toString().slice(0, 5) : '0');
-  let messageToUser = Emoji(average || 0) + " " + avgString + "%";
+  let emoji = Emoji(average || 0)
 
+  let messageToUser = emoji + " " + avgString + "%";
 
   return messageToUser
 }

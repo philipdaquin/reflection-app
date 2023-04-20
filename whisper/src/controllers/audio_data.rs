@@ -1,18 +1,14 @@
 use actix_multipart::{Multipart};
 use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
-use bson::oid::ObjectId;
 use crate::{ml::{
-    whisper::{AudioData, upload_audio, batch_upload_audio}, 
-    sockets::{WebSocketSession}, 
+    whisper::{AudioDataDTO, upload_audio, batch_upload_audio}, 
     prompt::GENERAL_CONTEXT, 
     chat::get_chat_response, 
     tts::process_text_to_audio, 
-    text_classification::TextClassification, 
-    recommendation::RecommendedActivity},
+    response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}},
     persistence::{audio_db::{AudioDB, AudioInterface}, 
     audio_analysis::{AnalysisDb, TextAnalysisInterface}}, 
     error::ServerError, controllers::openapi_key::OpenAIClient, 
-    // controllers::{OpenAICLient, OPENAI_KEY}
 };
 
 use super::{Input, eleven_labs::ElevenLabsClient};
@@ -24,12 +20,12 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     cfg
     .service(upload)
     .service(get_recent_entries)
-    .service(batch_upload)
     .service(get_text_summary)
     .service(get_text_analysis)
     .service(get_related_tags)
-    .service(chat_response)
+    .service(batch_upload)
     .service(get_entry)
+    .service(chat_response)
     .service(update_entry)
     .service(delete_all_audio_entries)
     .service(delete_audio_entry)
@@ -40,14 +36,14 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
 /// Retrieves the recent audio journal entries 
 #[route("/api/audio/get-recent", method = "GET")]
 pub async fn get_recent_entries() -> Result<HttpResponse> {
-    let res = AudioDB::get_recent().await?;
-    let serialized = serde_json::to_string(&res).unwrap();
+    let res = AudioDB::get_recent()
+        .await?
+        .into_iter()
+        .map(AudioData::from)
+        .collect::<Vec<AudioData>>();
 
-    log::info!("FINAL {serialized:#?}");
-
-    Ok(HttpResponse::Ok().body(serialized))
+    Ok(HttpResponse::Ok().json(res))
 }
-
 
 ///
 /// Get text summary instantly
@@ -59,8 +55,6 @@ pub async fn get_text_summary(input: web::Json<Input>) -> Result<HttpResponse> {
         Some(i) => i,
         None => return Ok(HttpResponse::BadRequest().into())
     };
-
-    
     // Get the AudioMeta from DB
     let mut audio = AudioDB::get_entry(id)   
         .await
@@ -116,7 +110,7 @@ pub async fn get_text_analysis(input: web::Json<Input>) -> Result<HttpResponse> 
         .unwrap();
     // let serialised = serde_json::to_string(&analysis).unwrap();
 
-    Ok(HttpResponse::Ok().json(analysis))
+    Ok(HttpResponse::Ok().json(AudioAnalysis::from(analysis)))
 } 
 
 /// Get related tags from the transcript 
@@ -150,7 +144,6 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json(tags))
 } 
 
-
 /// 
 /// REQUIRES: Bearer - apikey
 /// An API endpoint that accepts user audio and settings for OpenAi response 
@@ -176,9 +169,8 @@ pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse
         .await?
         .save()
         .await?;
-    log::info!("{audio:#?}");
     // let serialized = serde_json::to_string(&audio)?;
-    Ok(HttpResponse::Ok().json(audio))
+    Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
 
 #[route("/api/audio/batch-upload", method = "POST")]
@@ -201,9 +193,8 @@ pub async fn batch_upload(req: HttpRequest, payload: Multipart) -> Result<HttpRe
         .await?
         .save()
         .await?;
-    log::info!("{audio:#?}");
     // let serialized = serde_json::to_string(&audio)?;
-    Ok(HttpResponse::Ok().json(audio))
+    Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 
 }
 
@@ -266,25 +257,30 @@ pub async fn get_entry(input: web::Json<Input>) -> Result<HttpResponse> {
         .map_err(|_| ServerError::NotFound(id.to_string()))?;
     log::info!("{audio:#?}");
     // let serialized = serde_json::to_string(&audio).unwrap();
-    Ok(HttpResponse::Ok().json(audio))
+    Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
 
-
+///
+/// 
 #[route("/api/audio/update-entry", method = "PUT")]
 pub async fn update_entry(data: web::Json<AudioData>) -> Result<HttpResponse> { 
-    let id = match &data.id { 
-        Some(i) => i,
+
+    let data = data.into_inner();
+    let audio_data = AudioDataDTO::from(data);
+
+    let id = match &audio_data.id { 
+        Some(i) => i.to_string(),
         None => return Ok(HttpResponse::BadRequest().into())
     };
-
-    let audio = AudioDB::update_entry(id, &data).await?;
+    let audio = AudioDB::update_entry(&id, &audio_data).await?;
     
     log::info!("{audio:#?}");
     
-    let serialized = serde_json::to_string(&audio).unwrap();
-    Ok(HttpResponse::Ok().body(serialized))
+    Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
 
+///
+/// 
 #[route("/api/audio/delete-all", method = "DELETE")]
 pub async fn delete_all_audio_entries() -> Result<HttpResponse> { 
     let _ = AudioDB::delete_all_entries().await?;

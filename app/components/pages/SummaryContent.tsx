@@ -42,7 +42,15 @@ interface Props {
 
 function SummaryContent({data}: Props) {
 
-    const { _id, title, transcription, summary, tags, text_classification } = data
+    const { _id, 
+            title, 
+            transcription, 
+            summary, 
+            tags, 
+            text_classification, 
+            date, 
+            day 
+          } = data
     const [editedSummary, setEditedSummary] = useState(summary)
     const [editedTags, setEditedTags] = useState(tags)
     const [editedTitle, setEditedTitle] = useState(title)
@@ -53,10 +61,12 @@ function SummaryContent({data}: Props) {
         const updatedAudioData = new AudioData(
             _id,
             editedTitle,
+            date, 
+            day,
             transcription, 
             editedSummary, 
             text_classification, 
-            editedTags
+            editedTags,
         );
         setUpdatedAudioData(updatedAudioData);
       }, [
@@ -65,7 +75,9 @@ function SummaryContent({data}: Props) {
         transcription, 
         editedSummary, 
         text_classification, 
-        editedTags
+        editedTags, 
+        date, 
+        day
     ]);
     const [, setAudioDataAtom] = useRecoilState(AudioSummaryAtom);
     

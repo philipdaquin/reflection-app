@@ -69,7 +69,7 @@ function PlayerContents({entry}: PlayerContentProps) {
                         )}
                         
                         {entry.date && (
-                            <h1>{entry.date}</h1>
+                            <h1>{entry.date.toString()}</h1>
                         )}
 
                         {entry.duration && (

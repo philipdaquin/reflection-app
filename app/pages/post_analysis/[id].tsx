@@ -9,6 +9,9 @@ import SwitchView from '../../components/SwitchView'
 import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
 import { getEntry } from '../../util/getEntry'
 import { AudioData } from '../../typings'
+import SettingsButtons from '../../components/SettingsButtons'
+import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
+import AudioControls from '../../components/AudioControls'
 
 
 interface Props { 
@@ -29,12 +32,15 @@ function post_analysis({
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             
-            <div className="md:bg-[#EEEEEE] bg-white  flex 
+            <div className="md:bg-[#EEEEEE] bg-white  flex
                 md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
                 <main className=" justify-center flex flex-col items-center space-y-[27px] ">
-
-                <div className="flex items-center relative right-10 space-x-5">
-                    <PostSummaryControls />
+                <div className="flex items-center md:relative md:right-10 h-full">
+                    
+                    <div className='md:block hidden'>
+                        <PostSummaryControls />
+                    </div>
+                    
                     <PhoneView children={<SummaryContent data={data}/>}/>
                 </div>
                 <div className='md:block hidden'>
@@ -42,6 +48,15 @@ function post_analysis({
                 </div>
                     {/* <RecordComponent /> */}
                 </main>
+                 {/* Settings / Footer  */}
+                <div></div>
+                <div className="flex-grow"></div>
+                <div className='relative bottom-10 md:block hidden'>
+                    <SettingsButtons />
+                </div>
+                <div className='flex items-center md:hidden justify-center mb-10'>
+                    <NavigationMobile children={<PostSummaryControls/>} />        
+                </div>
             </div>
         </>
     )

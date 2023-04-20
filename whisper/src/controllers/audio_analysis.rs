@@ -3,8 +3,12 @@ use actix_multipart::{Multipart};
 use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
 use bson::oid::ObjectId;
 use crate::{ml::{
-    text_classification::TextClassification, recommendation::RecommendedActivity, weekly_pattern::WeeklyAnalysis},
-    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::WeeklyAnalysisDB}, error::ServerError};
+    text_classification::TextClassification, 
+    recommendation::RecommendedActivity, 
+    weekly_pattern::WeeklyAnalysisDTO, response_types::{weeklydata::WeeklyAnalysis, audioanalysis::AudioAnalysis}},
+    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, 
+    weekly_db::WeeklyAnalysisDB}, 
+    error::ServerError};
 use serde_derive::{Deserialize};
 
 use super::Input;
@@ -33,13 +37,13 @@ pub async fn get_version() -> &'static str {
 /// Retrieves items from the last 7 days 
 #[route("/api/analysis/get-mood-summary", method = "GET")]
 pub async fn get_mood_summary() -> Result<HttpResponse> { 
-    let res = AnalysisDb::get_recent().await?;
-    let serialized = serde_json::to_string(&res).unwrap();
-
-    log::info!("{serialized:#?}");
+    let res = AnalysisDb::get_recent()
+        .await?
+        .into_iter()
+        .map(AudioAnalysis::from)
+        .collect::<Vec<AudioAnalysis>>();
 
     Ok(HttpResponse::Ok().json(res))
-
 }
 
 /// 
@@ -47,10 +51,6 @@ pub async fn get_mood_summary() -> Result<HttpResponse> {
 #[route("/api/analysis/get-common-mood", method = "GET")]
 pub async fn get_common_mood() -> Result<HttpResponse> { 
     let mood = TextClassification::get_most_common_moods().await.unwrap();
-    
-    // log::info!("{mood:?}");
-    
-    // let serialized = serde_json::to_string(&mood).unwrap();
     Ok(HttpResponse::Ok().json(mood))
 }
 
@@ -59,12 +59,11 @@ pub async fn get_common_mood() -> Result<HttpResponse> {
 /// Gets weekly patterns based on the last 3 entries 
 #[route("/api/analysis/get-weekly-patterns", method = "GET")]
 pub async fn get_weekly_patterns() -> Result<HttpResponse>  { 
-    // let mood_patterns = TextClassification::get_weekly_patterns().await.unwrap();
-    // log::info!("{mood_patterns:?}");
-    let mood_patterns = TextClassification::get_weekly_patterns().await.unwrap();
-    log::info!("{mood_patterns:?}");
-    
-    // let serialized = serde_json::to_string(&mood_patterns).unwrap();
+    let mood_patterns = TextClassification::get_weekly_patterns()
+        .await?
+        .into_iter()
+        .map(AudioAnalysis::from)
+        .collect::<Vec<AudioAnalysis>>();
     Ok(HttpResponse::Ok().json(mood_patterns))
 }
 
@@ -72,7 +71,6 @@ pub async fn get_weekly_patterns() -> Result<HttpResponse>  {
 pub struct Summaries { 
     summaries: Option<Vec<String>>
 }
-
 ///
 /// 
 #[route("/api/analysis/get-weekly-recommendation", method = "POST")]
@@ -85,7 +83,6 @@ pub async fn get_weekly_recommendation(input: web::Json<Summaries>) -> Result<Ht
     }
     let recommendation = RecommendedActivity::get_personalised_recommendations(summaries.unwrap()).await.unwrap();
 
-    // let serialized = serde_json::to_string(&recommendation).unwrap();
     Ok(HttpResponse::Ok().json(recommendation))
 }
 
@@ -107,7 +104,9 @@ pub async fn delete_entry(input: web::Json<Input>) -> Result<HttpResponse> {
     };
     let bson = ObjectId::parse_str(id).expect("Unable to convert to ObjectId");
 
-    let audio = AnalysisDb::delete_one_analysis(bson).await?;
+    let audio = AnalysisDb::delete_one_analysis(bson)
+        .await?
+        .map(|f| AudioAnalysis::from(f));
          
     Ok(HttpResponse::Ok().json(audio))
 }

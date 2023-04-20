@@ -22,8 +22,6 @@ function record() {
         </Head>
 
         <div className="md:bg-[#EEEEEE] bg-white flex 
-            
-
             md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
             <main className="justify-center flex flex-col items-center space-y-[27px] ">
                 <div className="flex items-center md:relative md:right-10 h-full">

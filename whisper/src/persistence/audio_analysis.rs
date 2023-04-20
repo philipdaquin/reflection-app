@@ -26,12 +26,18 @@ impl AnalysisDb {
 
     ///
     /// Returns the total number of document found within the last 7 days 
-    pub async fn count_documents_in_seven_days() -> Result<Option<u64>> { 
+    pub async fn count_documents_in_current_week() -> Result<Option<u64>> { 
         let collection = AnalysisDb::get_analysis_db();
-        let seven_days_ago = Utc::now() - Duration::days(7);
-        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
-
-        let filter = doc! { "date": { "$gte": bson_date_time } };
+        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
+        
+        // Filter 
+        let filter = doc! { 
+            "date": { 
+                // "$exists": true,
+                "$gte": bson_start_date,
+                "$lt": bson_end_date,
+            } 
+        };
         
         let total_records = collection.count_documents(filter, None).await?;
 
@@ -41,19 +47,19 @@ impl AnalysisDb {
     ///
     /// Retrieves data points from the last seven days 
     #[tracing::instrument(level= "debug", err)]
-    pub async fn get_data_set_in_last_seven_days() -> Result<Vec<TextClassification>> {
+    pub async fn get_data_in_current_week() -> Result<Vec<TextClassification>> {
         let collection = AnalysisDb::get_analysis_db();
-        let seven_days_ago = Utc::now() - Duration::days(7);
-        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
+        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
 
         // Get all objects in database within the 7 days 
         let pipeline = vec![
             // Match documents within the last 7 days
             doc! {
                 "$match": {
-                    "date": {
-                        "$gte": bson_date_time
-                    }
+                    "date": { 
+                        "$gte": bson_start_date,
+                        "$lt": bson_end_date,
+                    } 
                 }
             },
             // Project the desired fields
@@ -85,6 +91,29 @@ impl AnalysisDb {
 
         Ok(result)
     }
+
+    /// 
+    /// Helper function to get the start of the week and end date of the week in bson 
+    fn get_current_week() -> (DateTime, DateTime) { 
+        // Get current start of the week and end of the week dates 
+        let now = Utc::now().date_naive();
+        let start_of_week = now - Duration::days(now.weekday().num_days_from_monday() as i64);
+        let end_of_week = start_of_week + Duration::days(7);
+        
+        // Convert both values into naivedatetime and set to 00:00:00
+        let start_date = start_of_week.and_hms_opt(0, 0, 0).unwrap();
+        let end_date = end_of_week.and_hms_opt(0, 0, 0).unwrap();
+
+        // Convert to DateTime in Chrono        
+        let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_date);
+        let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_date);
+
+        // Convert to Bson DateTime  
+        let bson_start_date = bson::DateTime::from_chrono(start_date_time);
+        let bson_end_date = bson::DateTime::from_chrono(end_date_time);
+
+        (bson_start_date, bson_end_date)
+    }
 }
 
 
@@ -98,30 +127,11 @@ impl TextAnalysisInterface for AnalysisDb {
         let mut result = Vec::with_capacity(10);
         let collection = AnalysisDb::get_analysis_db();
 
-        // NaiveDate 
-        let now = Utc::now().date_naive();
-        let start_of_week = now - Duration::days(now.weekday().num_days_from_monday() as i64);
-        let end_of_week = start_of_week + Duration::days(7);
+        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
         
-        // To NaiveDateTime
-        let start_date = start_of_week.and_hms_opt(0, 0, 0).unwrap();
-        let end_date = end_of_week.and_hms_opt(0, 0, 0).unwrap();
-
-        // To DateTime        
-        let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_date);
-        let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_date);
-        // let start_date_time =  chrono::DateTime::parse_from_rfc3339(&start_date.to_string()).unwrap();
-        // let end_date_time =  chrono::DateTime::parse_from_rfc3339(&end_date.to_string()).unwrap();
-
-        // Bson DateTime 
-        let bson_start_date = bson::DateTime::from_chrono(start_date_time);
-        let bson_end_date = bson::DateTime::from_chrono(end_date_time);
-        
-
         // Filter 
         let filter = doc! { 
             "date": { 
-                // "$exists": true,
                 "$gte": bson_start_date,
                 "$lt": bson_end_date,
             } 
@@ -140,6 +150,8 @@ impl TextAnalysisInterface for AnalysisDb {
 
         Ok(result)
     }
+    
+    ///
     /// Insert new Analysis 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn add_analysis(new_analysis: TextClassification) -> Result<TextClassification> {
@@ -155,6 +167,8 @@ impl TextAnalysisInterface for AnalysisDb {
 
         Ok(res)
     }
+    
+    ///
     /// Delete Analysis 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>> {
@@ -168,13 +182,13 @@ impl TextAnalysisInterface for AnalysisDb {
             .await?;
         Ok(item)
     }
-
+    
+    ///
     /// Aggregate the top 3 most commonly mood / emotion over the week 
     #[tracing::instrument(level= "debug", err)]
     async fn get_most_common_emotions() -> Result<Vec<TopMood>> {
         let collection = AnalysisDb::get_analysis_db();
-        let seven_days_ago = Utc::now() - Duration::days(7);
-        let bson_date_time = bson::DateTime::from_chrono(seven_days_ago);
+        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
 
         // Aggregate the top 3 most commonly recorded mood/emotion over the week or days
         let pipeline = vec![
@@ -182,11 +196,14 @@ impl TextAnalysisInterface for AnalysisDb {
             doc! {
 
                 "$match": {
-                    "date": {
-                        "$gte": bson_date_time
+                    "date": { 
+                        "$gte": bson_start_date,
+                        "$lt": bson_end_date,
                     },
 
-                    "emotion": {"$ne": null},
+                    "emotion": {
+                        "$ne": null
+                    },
                 }
             },
             // Group by emotion and count the number of occurrences
@@ -227,7 +244,7 @@ impl TextAnalysisInterface for AnalysisDb {
         // Testing purposes 
         let default = collection.count_documents(None, None).await?;
         
-        let total_records = AnalysisDb::count_documents_in_seven_days()
+        let total_records = AnalysisDb::count_documents_in_current_week()
             .await?
             .unwrap_or(default);
         
@@ -259,6 +276,7 @@ impl TextAnalysisInterface for AnalysisDb {
 
         Ok(true)
     }
+    
     ///
     /// Access to collection
     fn get_analysis_db() -> Collection<TextClassification> { 

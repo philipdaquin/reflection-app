@@ -29,7 +29,7 @@ function PostSummaryControls() {
         if (!audioData) return 
         
 
-        deleteEntry(audioData._id)
+        deleteEntry(audioData._id.toString())
             .then(resp => { 
 
                 // if False
@@ -52,12 +52,16 @@ function PostSummaryControls() {
     const CONTINUE = () => { 
         return (
             
-            <div className='bg-[#4285f4] h-full items-center flex justify-center cursor-pointer rounded-full px-5 py-3'
+            <div className='bg-[#4285f4] 
+                
+                h-[62px] md:h-[185px]  
+                w-[185px] md:w-[62px]
+                
+                items-center 
+                flex justify-center cursor-pointer 
+                rounded-full'
             onClick={updateData}>
                 <CheckIcon height={24} width={24} strokeWidth={2} color="white"/>
-                {/* <h1 className='text-[15px] text-white font-bold text-center'>
-
-                </h1> */}
             </div>
         )
     }
@@ -87,9 +91,11 @@ function PostSummaryControls() {
     
     
     return (
-        <div className='space-y-5 flex flex-col h-[350px] w-[62px] justify-between'>
+        <div className='flex items-center space-x-2 md:space-x-0 md:flex-col md:space-y-2
+            md:relative md:right-10
+        '>
             <CONTINUE />
-            <div className='space-y-2'>
+            <div className='flex items-center space-x-2 md:flex-col  md:space-x-0 md:space-y-2'>
                 <SEND_TO_AI />
                 <DELETE_ENTRY />
             </div>

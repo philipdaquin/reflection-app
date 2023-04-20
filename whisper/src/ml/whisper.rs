@@ -34,7 +34,7 @@ const CHUNK_SIZE: usize = 882000;
 const NUM_WORKERS: usize = 5;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct AudioData { 
+pub struct AudioDataDTO { 
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     pub title: Option<String>,
@@ -46,7 +46,7 @@ pub struct AudioData {
     pub tags: Option<Vec<String>>
 }
 
-impl AudioData { 
+impl AudioDataDTO { 
 
     ///
     /// 
@@ -55,12 +55,12 @@ impl AudioData {
         let wav = parse_wav_file(bytes).await?;
         let id = ObjectId::new().to_string();
         let created_date = Utc::now();
-
         let bson_date_time = bson::DateTime::from_chrono(created_date);
 
 
+
         let day = created_date.weekday().to_string();
-        let transcription = AudioData::transcribe_audio(wav).await?;
+        let transcription = AudioDataDTO::transcribe_audio(wav).await?;
 
         Ok(Self { 
             id: Some(id), 
@@ -518,7 +518,7 @@ async fn process_chunks_with_workers(buffer: Vec<Vec<u8>>) -> Result<String> {
                 for (index, sample) in data.into_iter().enumerate() {
                     let result_producer = result_producer.clone();
                     s.spawn(move |_| {
-                        let task = AudioData::transcribe_pcm_chunks_into_stream(sample).unwrap();
+                        let task = AudioDataDTO::transcribe_pcm_chunks_into_stream(sample).unwrap();
                         log::info!("✅✅");
                         result_producer.send((task, index)).unwrap();
                     });
@@ -602,17 +602,17 @@ pub async fn batch_into_chunks(mut payload: Multipart) -> Result<Vec<Vec<u8>>> {
 
 ///
 /// Helper function for uploading payload into multiple batches
-pub async fn batch_upload_audio(payload: Multipart) -> ActixResult<AudioData> { 
+pub async fn batch_upload_audio(payload: Multipart) -> ActixResult<AudioDataDTO> { 
     let audio_batches = batch_into_chunks(payload).await?;
-    let wav_data = AudioData::new_batch(audio_batches).await.unwrap();
+    let wav_data = AudioDataDTO::new_batch(audio_batches).await.unwrap();
     Ok(wav_data)
 }
 
 /// 
 /// Helper function for uploading payload into a single chunk
 /// Returns AudioData
-pub async fn upload_audio(payload: Multipart) -> ActixResult<AudioData> { 
+pub async fn upload_audio(payload: Multipart) -> ActixResult<AudioDataDTO> { 
     let audio_batches = upload_single_chunk(payload).await?;
-    let wav_data = AudioData::new(audio_batches).await.unwrap();
+    let wav_data = AudioDataDTO::new(audio_batches).await.unwrap();
     Ok(wav_data)
 }

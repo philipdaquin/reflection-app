@@ -7,7 +7,7 @@ import SwitchView from '../components/SwitchView'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import AudioVisualizer from '../components/AudioVisualizer'
-import { TextClassification } from '../typings'
+import { AudioData, TextClassification } from '../typings'
 import { getMoodSummary } from '../util/getMoodSummary'
 import SettingsButtons from '../components/SettingsButtons'
 import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, 
@@ -17,17 +17,20 @@ import { useRecoilState } from 'recoil'
 import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
+import { getRecentAudioEntries } from '../util/getRecentAudioEntries'
 
 
 
 
 interface Props { 
-  data: TextClassification[] | null
+  mood_data: TextClassification[] | null,
+  recent_entries: AudioData[] | null
 }
 
 
-function Home({data}: Props) {
+function Home({mood_data, recent_entries}: Props) {
 
+  console.log(recent_entries)
   // Start API keys 
   initialiseAPIKeys()
 
@@ -46,13 +49,16 @@ function Home({data}: Props) {
             <div className='relative right-10 hidden md:block'>
               <NavigationButtons />        
             </div>
-            <PhoneView children={<HomeContents data={data}/>} />
+            <PhoneView children={<HomeContents 
+                mood_data={mood_data}
+                recent_entries={recent_entries}  
+              />} 
+            />
           </div>
           <div className='md:block hidden '>
               <SwitchView />
           </div>
-        </main>
-
+        </main> 
         {/* Settings / Footer  */}
         <div className="flex-grow"></div>
         <div className='relative bottom-10 md:block hidden '>
@@ -61,7 +67,7 @@ function Home({data}: Props) {
         <div className='flex items-center  md:hidden justify-center mb-10 '>
             <NavigationMobile children={<HomeNav/>} />        
         </div>
-        <RecordComponent />
+        {/* <RecordComponent /> */}
       </div>
     </>
   )
@@ -70,15 +76,17 @@ function Home({data}: Props) {
 export default Home
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const [response] = await Promise.all([
+  const [mood_data, recent_entries] = await Promise.all([
       ( await getMoodSummary() ),
+      ( await getRecentAudioEntries() )
   ]) 
 
   // console.log(response)
 
   return { 
     props: { 
-      data: response
+      mood_data,
+      recent_entries
     }
   }
 }

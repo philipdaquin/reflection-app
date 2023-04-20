@@ -1,10 +1,11 @@
+import { ObjectId } from 'bson'
 import Image from 'next/image'
 import React from 'react'
 
 interface Props { 
-    id: number,
-    title: string,
-    duration: number
+    id: string,
+    title: string | null, 
+    duration: number | null
     thumbnailUrl: string | null | undefined
 }
 

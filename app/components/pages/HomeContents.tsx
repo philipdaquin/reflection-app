@@ -4,19 +4,23 @@ import MoodTrackerIndex from '../MoodTrackerIndex'
 import RecentEntries from '../RecentEntries'
 import WeeklyRoundUpComp from '../WeeklyRoundUpComp'
 import { getServerSideProps } from '../../pages/post_analysis/[id]'
-import { AudioEntryType, DEFAULT_RECENT_SAMPLES, TextClassification } from '../../typings'
+import { AudioData, AudioEntryType, TextClassification } from '../../typings'
 
 interface Props { 
-  data: TextClassification[] | null
+  mood_data: TextClassification[] | null,
+  recent_entries: AudioData[] | null
 }
 
-function HomeContents({data}: Props) {
-  
+function HomeContents({mood_data, recent_entries}: Props) {
+
+  // AudioData to AudioDataEntry
+  const entries = recent_entries?.map((f) => new AudioEntryType(f) )
+
   return (
     <div className='bg-white md:w-full md:h-full w-full h-full rounded-[70px]'>
       <GreetingUser />
       <div className='mt-10'>
-        <MoodTrackerIndex data={data}/>
+        <MoodTrackerIndex data={mood_data}/>
       </div>
 
       {/* Weekly roundups  */}
@@ -25,7 +29,7 @@ function HomeContents({data}: Props) {
       </div>
       {/* Recent entries  */}
       <div className='pt-11'>
-        <RecentEntries entries={DEFAULT_RECENT_SAMPLES} />
+          <RecentEntries entries={entries} />
       </div>
     </div>
   )

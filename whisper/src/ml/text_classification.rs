@@ -2,7 +2,7 @@ use mongodb::bson::oid::ObjectId;
 use serde::{Serialize, Deserialize};
 use chrono::{NaiveDateTime, Weekday, Datelike, Utc};
 use crate::{error::Result, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}};
-use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_pattern::WeeklyAnalysis};
+use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_pattern::WeeklyAnalysisDTO};
 use bson::{ DateTime};
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct TopMood { 
@@ -33,7 +33,7 @@ pub struct TextClassification {
     pub audio_ref: Option<ObjectId>,
 
     // Reference to the weekly data 
-    #[serde(rename = "_audio_id", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "weekly_ref", skip_serializing_if = "Option::is_none")]
     pub weekly_ref: Option<ObjectId>,
 
     pub date: Option<DateTime>,
@@ -52,32 +52,44 @@ impl TextClassification {
     /// 3. If not found, create a new one and insert it into the weekly table 
     /// 4. Get the id of the weekly record
     /// 5. Insert the daily input into the daily table, with the week id 
+    /// 6. Increment the `total_entries` 
     /// Intialise new TextClassification with updated Id, date, and audioId
     pub async fn new(audio_ref: Option<String>) -> Self { 
         let id = ObjectId::new();
 
         let date = Utc::now();
         let bson_date_time = bson::DateTime::from_chrono(date);
-        
+
         let day = date.weekday().to_string();
 
         // Find the week or create a new one, get the id 
-        let week = if let Some(curr_week) = WeeklyAnalysisDB::get_corresponding_week(date).await.unwrap() { 
-            curr_week
-        } else { 
-            // Else create a new Weekly Analysis and save to database 
-            WeeklyAnalysis::new()
-                .save()
-                .await
-                .unwrap()
-        };
+        let week = WeeklyAnalysisDB::get_corresponding_week(bson_date_time)
+            .await
+            .unwrap();
+        
+        let mut weekly_analysis = match week { 
+            Some(i) => i,
+            _ => {
+                // create a new Weekly Analysis and save to database 
+                WeeklyAnalysisDTO::new()
+                    .save()
+                    .await
+                    .unwrap()
+            }
+        };  
+
+        // Increment total entries by 1 
+        let _ = weekly_analysis
+            .increment_entries()
+            .await
+            .unwrap();
 
         Self { 
             id: Some(id), 
             audio_ref: audio_ref.map(|a| ObjectId::parse_str(a).expect("Unable to convert String to ObjectId")),
             date: Some(bson_date_time),
             day,
-            weekly_ref: week.id,
+            weekly_ref: weekly_analysis.id,
             ..Default::default()
         }
     }
@@ -122,7 +134,6 @@ impl TextClassification {
     /// Aggregates the top 3 most common mood within a week 
     #[tracing::instrument(fields(input, self), level= "debug")]
     pub async fn get_most_common_moods() -> Result<Vec<TopMood>> { 
-        log::info!("✅✅✅");
         
         let weekly = AnalysisDb::get_most_common_emotions().await.unwrap();
 
@@ -159,8 +170,8 @@ impl TextClassification {
     /// 
     #[tracing::instrument(level= "debug")]
     pub async fn get_weekly_inflection_point() -> Result<Option<TextClassification>> { 
-        // Collect all data points from the last seven days 
-        let data_points = AnalysisDb::get_data_set_in_last_seven_days().await?;
+        // Collect all data points in the current week 
+        let data_points = AnalysisDb::get_data_in_current_week().await?;
 
         // Find the inflection point within the datapoint 
         let point = find_inflection_point(data_points);
@@ -173,9 +184,8 @@ impl TextClassification {
     /// 
     #[tracing::instrument(level= "debug")]
     pub async fn get_min_point_in_week() -> Result<Option<TextClassification>> {
-        // Collect all data points from the last seven days 
-        let data_points = AnalysisDb::get_data_set_in_last_seven_days().await?;
-        
+        // Collect all data points in the current week 
+        let data_points = AnalysisDb::get_data_in_current_week().await?;
         
         let mut min_avg_mood = f32::MAX;
         let mut curr_avg_mood = 0.0;
@@ -202,7 +212,7 @@ impl TextClassification {
     #[tracing::instrument(level= "debug")]
     pub async fn get_max_point_in_week() -> Result<Option<TextClassification>> {
         // Collect all data points from the last seven days 
-        let data_points = AnalysisDb::get_data_set_in_last_seven_days().await?;
+        let data_points = AnalysisDb::get_data_in_current_week().await?;
         
         let mut max_avg_mood = f32::MIN;
         let mut curr_avg_mood = 0.0;
@@ -226,7 +236,7 @@ impl TextClassification {
     ///
     /// Gets the weekly average for the last seven days
     pub async fn get_weekly_average() -> Result<Option<f32>> {
-        let data_points = AnalysisDb::get_data_set_in_last_seven_days().await?;
+        let data_points = AnalysisDb::get_data_in_current_week().await?;
         let total_len = data_points.len();
         let mut sum = 0.0;
         
@@ -240,11 +250,10 @@ impl TextClassification {
 
         Ok(Some(avg))
     }
-
     ///
     /// Count the number of documents in the same week 
     pub async fn get_total_entries() -> Result<Option<i32>> { 
-        let count = AnalysisDb::count_documents_in_seven_days()
+        let count = AnalysisDb::count_documents_in_current_week()
             .await?
             .unwrap() as i32;
         Ok(Some(count))
