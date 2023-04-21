@@ -1,24 +1,50 @@
 import React from 'react'
-import AudioEntry from './AudioEntry'
+import BackButton from '../BackButton'
+import { AudioData } from '../../typings'
 import Link from 'next/link'
-import { AudioData, AudioEntryType } from '../typings'
-
+import AudioEntry from '../AudioEntry'
 
 interface Props { 
-  // entries: AudioEntryType[] | null | undefined
-  entries: AudioData[] | null
-}
+    entries: AudioData[] | null
+  }
+  
 
-function RecentEntries({entries}: Props) {
-
+function SeeAllContent({entries}: Props) {
+    
     // @ts-ignore
     entries.sort((a, b) => new Date(b.date.toString()) - new Date(a.date.toString()))
+    
+    const Earliest = () => { 
+    // @ts-ignore
+    entries.sort((a, b) => new Date(b.date.toString()) - new Date(a.date.toString()))
+        
+    }
 
+    const Oldest = () => { 
+    // @ts-ignore
+    entries.sort((a, b) => new Date(a.date.toString()) - new Date(b.date.toString()))
+        
+    }
+    
     return (
-        <div className='space-y-5'>
-            <div className='flex flex-row items-end justify-between'>
-                <h1 className='text-[20px] font-bold'>Recent Entries</h1>
-                <Link href={'/see_all'} className='text-[14px] text-[#757575] text-left hover:underline'>See all</Link>
+        <section className='space-y-5'>  
+
+            <div className='flex flex-row items-center justify-between'>
+                <BackButton link='' />
+                <h1 className='font-bold text-[15px] text-center '>Entries</h1>
+                <div className='px-4 bg-black'></div>
+            </div>
+
+            <hr />
+
+            <div>
+                <div>
+                    Earliest
+                </div>
+                
+                <div>
+                    
+                </div>
             </div>
 
             <ul className='space-y-2'>
@@ -49,8 +75,10 @@ function RecentEntries({entries}: Props) {
                   })
               }
             </ul>
-        </div>
+
+        </section>
+    
     )
 }
 
-export default RecentEntries
+export default SeeAllContent

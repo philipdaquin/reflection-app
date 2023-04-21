@@ -14,6 +14,7 @@ const COLL_NAME: &str = "metadata";
 
 #[async_trait]
 pub trait AudioInterface { 
+    async fn get_all_entries() -> Result<Vec<AudioDataDTO>>;
     async fn add_entry(meta: &AudioDataDTO) -> Result<AudioDataDTO>;
     async fn delete_all_entries() -> Result<()>;
     async fn delete_one_entry(id: &str) -> Result<Option<AudioDataDTO>>;
@@ -32,6 +33,19 @@ pub struct AudioDB;
 #[async_trait]
 impl AudioInterface for AudioDB { 
 
+    /// Gets all audio entries from the user 
+    #[tracing::instrument(fields(repository = "AudioDataDTO"), level= "debug", err)]
+    async fn get_all_entries() -> Result<Vec<AudioDataDTO>> {
+        let collection = AudioDB::get_collection();
+        let filter = doc! {};
+        let mut result = Vec::new();
+        let mut doc = collection.find(filter, None).await?;
+        
+        while let Some(doc) = doc.try_next().await? {
+            result.push(doc);
+        }
+        Ok(result)
+    }
     ///
     /// Add new entry 
     #[tracing::instrument(fields(repository = "AudioDataDTO"), level= "debug", err)]

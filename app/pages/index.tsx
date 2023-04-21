@@ -32,7 +32,6 @@ function Home({mood_data, recent_entries}: Props) {
 
   console.log(recent_entries)
   // Start API keys 
-  initialiseAPIKeys()
 
   return (
     <>
@@ -67,7 +66,7 @@ function Home({mood_data, recent_entries}: Props) {
         <div className='flex items-center  md:hidden justify-center mb-10 '>
             <NavigationMobile children={<HomeNav/>} />        
         </div>
-        <RecordComponent />
+        {/* <RecordComponent /> */}
       </div>
     </>
   )

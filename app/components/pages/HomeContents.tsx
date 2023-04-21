@@ -26,13 +26,13 @@ function HomeContents({mood_data, recent_entries}: Props) {
       {/* <WeeklyCalendar /> */}
       {/* Weekly roundups  */}
       
-      {/* {
+      {
         DEFAULT_JOBLIST && (
           <div className='pt-7'>
             <WeeklyRoundUpComp list={DEFAULT_JOBLIST}/>
           </div>
         )
-      } */}
+      }
       
       {/* Recent entries  */}
       <div className='pt-11'>

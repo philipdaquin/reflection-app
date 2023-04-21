@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import useLocalStorage from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
-import { deleteLocalStorage } from '../pages'
+import { deleteLocalStorage, initialiseAPIKeys } from '../pages'
 
 
 export const ELEVEN_LABS_KEY: string = "eleven_labs_api_key"
@@ -228,6 +228,8 @@ function SettingsToggle() {
 
 
 function SettingsButtons() {
+    initialiseAPIKeys()
+
   return (
     <div>
         <div className='flex items-center space-x-10'>

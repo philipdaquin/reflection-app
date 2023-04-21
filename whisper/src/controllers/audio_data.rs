@@ -19,6 +19,7 @@ use super::{Input, eleven_labs::ElevenLabsClient};
 pub fn configure_audio_services(cfg: &mut web::ServiceConfig) { 
     cfg
     .service(upload)
+    .service(get_all_entries)
     .service(get_recent_entries)
     .service(get_text_summary)
     .service(get_text_analysis)
@@ -30,6 +31,16 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     .service(delete_all_audio_entries)
     .service(delete_audio_entry)
     ;
+}
+#[route("/api/audio/get-all", method = "GET")]
+pub async fn get_all_entries() -> Result<HttpResponse> { 
+    let res = AudioDB::get_all_entries()
+        .await?
+        .into_iter()
+        .map(AudioData::from)
+        .collect::<Vec<AudioData>>();
+
+    Ok(HttpResponse::Ok().json(res))
 }
 
 ///
