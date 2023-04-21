@@ -5,7 +5,7 @@ import { ObjectId, Long, BSON } from 'bson';
 export type TextClassification = { 
     _id: string,
     audio_ref: string,
-    weekly_ref: string, 
+    weekly_ref: string | null, 
     date: Date,
     day: string,
     emotion: string, 
@@ -47,7 +47,7 @@ export class AudioEntryType {
     id: string;
     title: string | null;
     subtitle: string | null;
-    date: Date | null | undefined;
+    date: Date;
     duration: number | null;
     thumbnailUrl: string | null;
     audioUrl: string;
@@ -137,3 +137,26 @@ export type WeeklySummary = {
 //       audioUrl: 'https://www.youtube.com/watch?v=Ke90Tje7VS0'
 //     }
 //   ];
+export type JobList = {
+  title: string, 
+  details: string
+  isDone: boolean
+}
+
+export const DEFAULT_JOBLIST: JobList[] = [
+  {
+    title: 'Finish project',
+    details: 'Complete all remaining tasks and submit it before the deadline',
+    isDone: false,
+  },
+  {
+    title: 'Buy groceries',
+    details: 'Purchase items from the grocery list for the week',
+    isDone: true,
+  },
+  {
+    title: 'Go for a run',
+    details: 'Run for 30 minutes around the park',
+    isDone: false,
+  },
+];

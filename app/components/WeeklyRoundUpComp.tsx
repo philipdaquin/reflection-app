@@ -1,37 +1,20 @@
 import React from 'react'
 import BorderLinearProgress from './BorderLinearProgress'
 import UserJobList from './UserJobList'
+import { JobList } from '../typings'
 
-type JobList = {
-    title: string, 
-    details: string
-    isDone: boolean
-}
+
    
+interface Props { 
+    list: JobList[] 
+}
 
-function WeeklyRoundUpComp() {
+function WeeklyRoundUpComp({list}: Props) {
 
     let maxProgress = 100 
     let currValue = 20
 
-    let list: JobList[] = [
-        // {
-        //   title: 'Finish project',
-        //   details: 'Complete all remaining tasks and submit it before the deadline',
-        //   isDone: false,
-        // },
-        {
-          title: 'Buy groceries',
-          details: 'Purchase items from the grocery list for the week',
-          isDone: true,
-        },
-        // {
-        //   title: 'Go for a run',
-        //   details: 'Run for 30 minutes around the park',
-        //   isDone: false,
-        // },
-      ];
-
+   
     return (
         <div className='flex flex-col'>
             <div className=''>

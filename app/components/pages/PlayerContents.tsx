@@ -48,12 +48,16 @@ interface PlayerContentProps {
 
 function PlayerContents({entry}: PlayerContentProps) {
 
-    // let month = entry.date?.toLocaleDateString('en-US', { 
+    let month = entry.date
+    
+    // .toLocaleDateString('en-US', { 
     //         month: 'long', 
     //         day: 'numeric', 
     //         year: 'numeric' 
     //     }
-    // );
+    // ).toString();
+
+    console.log(month)
 
     return (
         <section className='flex flex-col h-full justify-between'>

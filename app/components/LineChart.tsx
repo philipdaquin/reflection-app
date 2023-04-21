@@ -6,7 +6,7 @@ export class DataPoint {
     mood: number;
 
     constructor(text: TextClassification) { 
-      this.date = text.date;
+      this.date = text.date.toString();
       this.mood = text.average_mood;
     }
 }
@@ -48,16 +48,16 @@ function LineChart({data}: Props) {
         </linearGradient>
     );
     // return (
-    //   <svg viewBox={`0 0 ${data.length * 12} ${height}`} width="100%" height={height}>
+    //   <svg viewBox={`0 0 ${data.length * 20} ${height}`} width="100%" height={height}>
     //     {gradient}
     //     <polyline fill={`url(#${gradientId})`} stroke={color} strokeWidth="3" points={points.join(" ")} />
     //   </svg>
     // );
     // create path definition for the area graph
-    const path = `M${points[0]} C${points.slice(1).join(" ")} L${points[points.length - 1]} Z`;
+    const path = `M${points[0]} C${points.slice(0).join(" ")} L${points[points.length - 1]} Z`;
 
     return (
-      <svg viewBox={`0 0 ${data.length * 10} ${height  }`} width="100%" height={height}>
+      <svg viewBox={`0 0 ${data.length * 20} ${height }`} width="100%" height={height}>
         {gradient}
         <path d={path} fill={`url(#${gradientId})`} stroke={color} strokeWidth="2.5" />
       </svg>

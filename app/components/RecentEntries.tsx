@@ -1,14 +1,18 @@
 import React from 'react'
 import AudioEntry from './AudioEntry'
 import Link from 'next/link'
-import { AudioEntryType } from '../typings'
+import { AudioData, AudioEntryType } from '../typings'
 
 
 interface Props { 
-  entries: AudioEntryType[] | null | undefined
+  // entries: AudioEntryType[] | null | undefined
+  entries: AudioData[]
 }
 
 function RecentEntries({entries}: Props) {
+
+    // @ts-ignore
+    entries.sort((a, b) => new Date(b.date.toString()) - new Date(a.date.toString()))
 
     return (
         <div className='space-y-5'>
@@ -19,19 +23,26 @@ function RecentEntries({entries}: Props) {
 
             <ul className='space-y-2'>
               {
-                  entries?.map((item, k) => { 
+                  entries?.map(({
+                    _id, date, day, summary, tags, text_classification, title, transcription
+                  }, k) => { 
                       return (
                         <li key={k}>
                           <Link href={{
-                              pathname: `/play/${item.id.toString()}`,
+                              pathname: `/play/${_id.toString()}`,
                               // query: { id: item.id }
                             }}>
                             <AudioEntry  
-                                id={item.id}
-                                title={item.title}
-                                duration={item.duration}
-                                thumbnailUrl={item.thumbnailUrl}
+                                id= {_id}
+                                title= {title}
+                                duration={10} 
+                                date={date.toString()} 
+                                emotion={text_classification.emotion}
+                                emoji={text_classification.emotion_emoji} 
+                                average_mood={text_classification.average_mood}   
+                                thumbnailUrl={""}
                             />
+                                
                           </Link>
                         </li>
                       )

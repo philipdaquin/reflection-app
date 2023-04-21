@@ -12,10 +12,12 @@ export async function updateEntry(audioData: AudioData): Promise<AudioData> {
         },
         body: JSON.stringify(audioData)
     }).then(async (resp) => { 
-        if (!resp.ok) throw new Error('Unable to update the AudioData')
-        return await resp.json()
+        const body = await resp.json() as AudioData
+        console.log(body)
+        return body
     })
-    .catch(e => [ 
+    .catch(e => {
         console.error(e)
-    ])
+        throw new Error(e)
+    })
 }
