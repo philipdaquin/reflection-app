@@ -6,7 +6,7 @@ import { AudioData, AudioEntryType } from '../typings'
 
 interface Props { 
   // entries: AudioEntryType[] | null | undefined
-  entries: AudioData[]
+  entries: AudioData[] | null
 }
 
 function RecentEntries({entries}: Props) {

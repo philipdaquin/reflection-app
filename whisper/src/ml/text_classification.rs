@@ -33,7 +33,7 @@ pub struct TextClassification {
     pub audio_ref: Option<ObjectId>,
 
     // Reference to the weekly data 
-    #[serde(rename = "weekly_ref", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "_weekly_ref", skip_serializing_if = "Option::is_none")]
     pub weekly_ref: Option<ObjectId>,
 
     pub date: Option<DateTime>,
@@ -84,12 +84,15 @@ impl TextClassification {
             .await
             .unwrap();
 
+        let weekly_ref = weekly_analysis.id;
+
+
         Self { 
             id: Some(id), 
             audio_ref: audio_ref.map(|a| ObjectId::parse_str(a).expect("Unable to convert String to ObjectId")),
             date: Some(bson_date_time),
             day,
-            weekly_ref: weekly_analysis.id,
+            weekly_ref,
             ..Default::default()
         }
     }

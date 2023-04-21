@@ -9,7 +9,7 @@ import WeeklyCalendar from '../WeeklyCalendar'
 
 interface Props { 
   mood_data: TextClassification[] | null,
-  recent_entries: AudioData[] 
+  recent_entries: AudioData[] | null
 }
 
 function HomeContents({mood_data, recent_entries}: Props) {

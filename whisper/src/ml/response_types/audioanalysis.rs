@@ -16,7 +16,7 @@ pub struct AudioAnalysis {
     pub audio_ref: Option<String>,
 
     // Reference to the weekly data 
-    #[serde(rename = "weekly_ref", skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "_weekly_ref", skip_serializing_if = "Option::is_none")]
     pub weekly_ref: Option<String>,
 
     pub date: Option<DateTime<Utc>>,

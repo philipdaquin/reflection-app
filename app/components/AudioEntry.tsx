@@ -46,7 +46,7 @@ function AudioEntry({
             /> 
           <div className='text-left flex flex-col space-y-1'>
             <div>
-              <p className='text-base font-medium'>{title}</p>
+              <p className='text-sm font-medium'>{title}</p>
               <div className='flex flex-row space-x-2'>
                 
                 { date && (
