@@ -23,7 +23,6 @@ function HomeContents({mood_data, recent_entries}: Props) {
       <div className='mt-10'>
         <MoodTrackerIndex data={mood_data}/>
       </div>
-      {/* <WeeklyCalendar /> */}
       {/* Weekly roundups  */}
       
       {

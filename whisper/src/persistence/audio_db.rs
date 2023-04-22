@@ -1,12 +1,12 @@
 
 use async_trait::async_trait;
-use chrono::{Utc, Duration, TimeZone, NaiveTime, NaiveDate};
+use chrono::{Utc, Duration, TimeZone, NaiveTime, NaiveDate, DateTime};
 use futures::TryStreamExt;
 use uuid::Uuid;
 use crate::error::{Result, ServerError};
 use crate::ml::whisper::AudioDataDTO;
 use mongodb::Collection;
-use mongodb::bson::{doc, oid::ObjectId, DateTime, Document};
+use mongodb::bson::{doc, oid::ObjectId, Document};
 
 use super::db::MongoDbClient;
 const DB_NAME: &str = "human-assistant";
@@ -21,7 +21,7 @@ pub trait AudioInterface {
     async fn get_entry(id: &str) -> Result<AudioDataDTO>;
     async fn update_entry(id: &str, updated_meta: &AudioDataDTO) -> Result<AudioDataDTO>;
     async fn get_recent() -> Result<Vec<AudioDataDTO>>;
-    async fn get_all_by_date(date: NaiveDate) -> Result<Vec<AudioDataDTO>>;
+    async fn get_all_by_date(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>>;
     async fn get_all_by_week_number(week_number: i32) -> Result<Vec<AudioDataDTO>>; 
     
     fn get_collection() -> Collection<AudioDataDTO>;
@@ -170,17 +170,19 @@ impl AudioInterface for AudioDB {
     ///
     /// Retrieve entries by a specific date 
     /// input: January 1, 2023
-    async fn get_all_by_date(date: NaiveDate) -> Result<Vec<AudioDataDTO>> {
+    async fn get_all_by_date(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>> {
         let collection = AudioDB::get_collection();
         let mut result = Vec::new();
 
         // Set to date - 00:00:00 to 24:00:00
         let start_of_day = date
+            .date_naive()
             .and_hms_opt(0, 0, 0)
             .unwrap();
 
-        let end_of_day = (date + Duration::days(1))
-            .and_hms_opt(0, 0, 0)
+        let end_of_day = date
+            .date_naive() 
+            .and_hms_opt(23, 59, 59)
             .unwrap();
 
         // Convert into local timezone 

@@ -1,5 +1,7 @@
 use actix_multipart::{Multipart};
 use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
+use chrono::{NaiveDate, DateTime, Utc};
+use serde::Deserialize;
 use crate::{ml::{
     whisper::{AudioDataDTO, upload_audio, batch_upload_audio}, 
     prompt::GENERAL_CONTEXT, 
@@ -20,6 +22,7 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     cfg
     .service(upload)
     .service(get_all_entries)
+    .service(get_all_by_date)
     .service(get_recent_entries)
     .service(get_text_summary)
     .service(get_text_analysis)
@@ -43,6 +46,25 @@ pub async fn get_all_entries() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json(res))
 }
 
+#[derive(Deserialize, Debug, Clone, Default)]
+pub struct InputDate { 
+    pub date: DateTime<Utc>
+}
+///
+/// Retrieves all entries by a specific date
+#[route("/api/audio/get-all-by-date", method = "POST")]
+pub async fn get_all_by_date(date: web::Json<InputDate>) -> Result<HttpResponse> {
+    log::info!("{date:?}");
+    
+    let res = AudioDB::get_all_by_date(date.date)
+        .await?
+        .into_iter()
+        .map(AudioData::from)
+        .collect::<Vec<AudioData>>();
+    log::info!("{res:#?}");
+
+    Ok(HttpResponse::Ok().json(res))
+}
 ///
 /// Retrieves the recent audio journal entries 
 #[route("/api/audio/get-recent", method = "GET")]

@@ -11,18 +11,10 @@ import RecordComponent from '../components/RecordComponent'
 import SwitchView from '../components/SwitchView'
 import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
-import SeeAllContent from '../components/pages/SeeAllContent'
+import WeeklyCalendarContent from '../components/pages/WeeklyCalendarContent'
 import HomeNav from '../components/navigation/mobile/HomeNav'
-import { getAll } from '../util/getAll'
-import { GetServerSideProps } from 'next'
-import { AudioData } from '../typings'
 
-
-interface Props { 
-  entries: AudioData[] | null
-}
-
-function see_all({entries}: Props) {
+function weekly_record() {
    
     return (
       <>
@@ -31,14 +23,16 @@ function see_all({entries}: Props) {
             <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <div className="md:bg-[#EEEEEE] bg-white flex md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
+        <div className="md:bg-[#EEEEEE] bg-white flex 
+            md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
             <main className="justify-center flex flex-col items-center space-y-[27px] ">
-                <div className="flex items-center md:relative md:right-5 h-full">
-                  <div className='relative right-10 hidden md:block'>
-                    <NavigationButtons />        
-                  </div>
+                <div className="flex items-center md:relative md:right-10 h-full">
+                    
+                    <div className='md:block hidden'>
+                        <NavigationButtons />       
+                    </div>
 
-                    <PhoneView children={<SeeAllContent entries={entries}/>} />
+                    <PhoneView children={<WeeklyCalendarContent/>} />
                 </div>
                 <div className='md:block hidden'>
                     <SwitchView />
@@ -60,19 +54,4 @@ function see_all({entries}: Props) {
     )
 }
 
-export default see_all
-
-
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const [entries] = await Promise.all([
-      ( await getAll() ),
-  ]) 
-
-  // console.log(response)
-
-  return { 
-    props: { 
-      entries,
-    }
-  }
-}
+export default weekly_record

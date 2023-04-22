@@ -1,5 +1,8 @@
 import React from 'react'
-import {HomeIcon, MagnifyingGlassIcon, MicrophoneIcon, UserIcon, MusicalNoteIcon } from '@heroicons/react/24/outline'
+import {HomeIcon, MagnifyingGlassIcon, MicrophoneIcon, 
+  
+  UserIcon, MusicalNoteIcon,
+CalendarDaysIcon } from '@heroicons/react/24/outline'
 import {RiChatVoiceLine} from 'react-icons/ri'
 import Link from 'next/link'
 
@@ -35,6 +38,11 @@ function NavigationButtons() {
         <Button 
           routerName='playlist'
           icon={<MusicalNoteIcon height={24} width={24} color="white"/>}/>
+        <Button 
+          routerName='weekly_calendar'
+          icon={<CalendarDaysIcon height={24} width={24} color="white"/>}/>
+      
+      
       </div>
     )
 }
