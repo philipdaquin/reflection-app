@@ -18,6 +18,9 @@ import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { getRecentAudioEntries } from '../util/getRecentAudioEntries'
+import { useState } from 'react'
+import ModalView from '../components/ModalView'
+import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 
 
 
@@ -32,6 +35,7 @@ function Home({mood_data, recent_entries}: Props) {
 
   console.log(recent_entries)
   // Start API keys 
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
@@ -64,7 +68,11 @@ function Home({mood_data, recent_entries}: Props) {
           <SettingsButtons />
         </div>
         <div className='flex items-center  md:hidden justify-center mb-10 '>
-            <NavigationMobile children={<HomeNav/>} />        
+            {/* <NavigationMobile children={<HomeNav/>} />         */}
+            {/* <NavigationMobile children={<HomeNav/>} />         */}
+              
+              <AddEntryContent />
+        
         </div>
         {/* <RecordComponent /> */}
       </div>

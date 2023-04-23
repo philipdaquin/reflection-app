@@ -11,7 +11,6 @@ pub mod response_types;
 pub mod daily_pattern;
 
 lazy_static! { 
-    
     pub static ref ENGINE: String = std::env::var("CHAT_MODEL_ENGINE").expect("Unable to read Engine ID");
     pub static ref OPENAI_API_KEY: String = std::env::var("OPENAI_API_KEY").expect("Unable to read OPEN API KEY");
     pub static ref VOICEID: String = std::env::var("VOICE_ID").expect("Unable to read VOICE ID");

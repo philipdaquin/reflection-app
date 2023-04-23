@@ -2,15 +2,15 @@ import useLocalStorage, { OPENAI_KEY } from "../hooks/useLocalStorage";
 import { AudioData } from "../typings";
 
 // Send the WAV fle to the server 
-export async function uploadAudioRecording(wavFile: Blob): Promise<AudioData> {
+export async function uploadAudioRecording(wavFile: Blob | File): Promise<AudioData> {
 
     
     console.log("Unploading to server")
 
     const formData = new FormData();
     formData.append('audio', wavFile);
-    
     const [apiKey, ] = useLocalStorage<string | null>(OPENAI_KEY, null)
+    
     if (apiKey === null) throw new Error("Failed to get Open AI key")
 
     console.log("APIKEY", apiKey)
