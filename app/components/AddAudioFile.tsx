@@ -88,7 +88,7 @@ function AddAudioFile({children}: Props) {
                 <div onClick={handleAvatar}>
                     {children}
                 </div>
-                <button onClick={handleFormSubmit}>Upload</button>
+                {/* <button onClick={handleFormSubmit}>Upload</button> */}
             </>
 
     )

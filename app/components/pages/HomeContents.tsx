@@ -6,6 +6,7 @@ import WeeklyRoundUpComp from '../WeeklyRoundUpComp'
 import { getServerSideProps } from '../../pages/post_analysis/[id]'
 import { AudioData, AudioEntryType, DEFAULT_JOBLIST, TextClassification } from '../../typings'
 import WeeklyCalendar from '../WeeklyCalendar'
+import AddEntryContent from '../navigation/mobile/AddEntryContent'
 
 interface Props { 
   mood_data: TextClassification[] | null,

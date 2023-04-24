@@ -13,8 +13,8 @@ import SettingsButtons from '../components/SettingsButtons'
 import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, 
   // initialiseAPIKeys 
 } from '../hooks/useLocalStorage'
-import { useRecoilState } from 'recoil'
-import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { AddEntryToggle, ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { getRecentAudioEntries } from '../util/getRecentAudioEntries'
@@ -36,6 +36,7 @@ function Home({mood_data, recent_entries}: Props) {
   console.log(recent_entries)
   // Start API keys 
   const [isOpen, setIsOpen] = useState(false);
+  const showModel = useRecoilValue(AddEntryToggle);
 
   return (
     <>
@@ -69,12 +70,15 @@ function Home({mood_data, recent_entries}: Props) {
         </div>
         <div className='flex items-center  md:hidden justify-center mb-10 '>
             {/* <NavigationMobile children={<HomeNav/>} />         */}
-            {/* <NavigationMobile children={<HomeNav/>} />         */}
-              
-              <AddEntryContent />
-        
+            <NavigationMobile children={<HomeNav/>} />        
         </div>
+
         {/* <RecordComponent /> */}
+        {showModel && (
+          <ModalView>
+            <AddEntryContent />
+          </ModalView>
+        )}
       </div>
     </>
   )

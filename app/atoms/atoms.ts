@@ -35,3 +35,8 @@ export const OpenAIApiKey = atom<string | null>({
     key: 'openai_api_key',
     default: null
 })
+
+export const AddEntryToggle = atom({
+    key: 'AddEntryToggle',
+    default: false,
+})
