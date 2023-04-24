@@ -4,6 +4,7 @@ import AddAudioFile from './AddAudioFile';
 import AudioStreaming from './AudioStreaming';
 import { useAudioRecorder } from 'react-audio-voice-recorder';
 import WebSocketClient from './WebsocketClient';
+import { UploadButton } from './navigation/mobile/AddEntryContent';
 
 
 
@@ -156,6 +157,9 @@ function RecordComponent() {
                     INSERT AUDIO FILE``
                 </h1>
                 {/* <AddAudioFile /> */}
+                {/* <AddAudioFile>
+                    <UploadButton/>
+                </AddAudioFile> */}
             </div>
 
 {/* 

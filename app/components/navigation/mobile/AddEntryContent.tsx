@@ -24,7 +24,7 @@ function Button({icon, routerName, title}: Props) {
     )
 }
 
-function UploadButton() { 
+export function UploadButton() { 
     return (
         <div className='cursor-pointer flex justify-center flex-col items-center space-y-2'>
           <div className='bg-[#f5f5f5] rounded-[20px] w-[112px] flex justify-center py-4 cursor-pointer'>
@@ -56,7 +56,7 @@ function AddEntryContent() {
 
         <div className=' flex flex-row w-full pt-[40px]'>
             <AddAudioFile>
-            <UploadButton/>
+              <UploadButton/>
             </AddAudioFile>
             <Button
                 icon={<RiChatVoiceLine size={24} color="#000"/> }

@@ -193,17 +193,18 @@ pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse
     }
 
     let audio = upload_audio(payload)
-        .await?
-        .get_summary()
-        .await?
-        .get_sentimental_analysis()
-        .await?
-        .get_tags()
-        .await?
-        .save()
+        // .await?
+        // .get_summary()
+        // .await?
+        // .get_sentimental_analysis()
+        // .await?
+        // .get_tags()
+        // .await?
+        // .save()
         .await?;
     // let serialized = serde_json::to_string(&audio)?;
-    Ok(HttpResponse::Ok().json(AudioData::from(audio)))
+    // Ok(HttpResponse::Ok().json(AudioData::from(audio)))
+    Ok(HttpResponse::Ok().into())
 }
 
 #[route("/api/audio/batch-upload", method = "POST")]
