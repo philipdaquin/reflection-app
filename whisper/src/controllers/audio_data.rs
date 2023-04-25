@@ -1,6 +1,7 @@
 use actix_multipart::{Multipart};
 use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
 use chrono::{NaiveDate, DateTime, Utc};
+use crossbeam::channel::unbounded;
 use serde::Deserialize;
 use crate::{ml::{
     whisper::{AudioDataDTO, upload_audio, batch_upload_audio}, 
@@ -12,6 +13,8 @@ use crate::{ml::{
     audio_analysis::{AnalysisDb, TextAnalysisInterface}}, 
     error::ServerError, controllers::openapi_key::OpenAIClient, 
 };
+use actix_web_lab::sse::{self, ChannelStream, Sse};
+
 
 use super::{Input, eleven_labs::ElevenLabsClient};
 
@@ -35,12 +38,6 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     .service(delete_audio_entry)
     ;
 }
-
-async fn sse() -> Result<HttpResponse> { 
-    todo!()
-}
-
-
 #[route("/api/audio/get-all", method = "GET")]
 pub async fn get_all_entries() -> Result<HttpResponse> { 
     let res = AudioDB::get_all_entries()
@@ -235,7 +232,6 @@ pub async fn batch_upload(req: HttpRequest, payload: Multipart) -> Result<HttpRe
         .await?;
     // let serialized = serde_json::to_string(&audio)?;
     Ok(HttpResponse::Ok().json(AudioData::from(audio)))
-
 }
 
 

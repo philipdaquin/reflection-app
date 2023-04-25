@@ -6,6 +6,7 @@ pub mod audio_analysis;
 pub mod ws;
 pub mod weekly_controller;
 pub mod eleven_labs;
+pub mod sse;
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Input { 
