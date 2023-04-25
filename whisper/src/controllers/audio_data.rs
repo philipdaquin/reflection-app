@@ -35,6 +35,12 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     .service(delete_audio_entry)
     ;
 }
+
+async fn sse() -> Result<HttpResponse> { 
+    todo!()
+}
+
+
 #[route("/api/audio/get-all", method = "GET")]
 pub async fn get_all_entries() -> Result<HttpResponse> { 
     let res = AudioDB::get_all_entries()
@@ -193,14 +199,14 @@ pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse
     }
 
     let audio = upload_audio(payload)
-        // .await?
-        // .get_summary()
-        // .await?
-        // .get_sentimental_analysis()
-        // .await?
-        // .get_tags()
-        // .await?
-        // .save()
+        .await?
+        .get_summary()
+        .await?
+        .get_sentimental_analysis()
+        .await?
+        .get_tags()
+        .await?
+        .save()
         .await?;
     // let serialized = serde_json::to_string(&audio)?;
     // Ok(HttpResponse::Ok().json(AudioData::from(audio)))

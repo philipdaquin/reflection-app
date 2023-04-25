@@ -1,23 +1,55 @@
 import Link from 'next/link'
-import React from 'react'
-import {ArrowUpTrayIcon, MicrophoneIcon, XMarkIcon} from '@heroicons/react/24/outline'
+import React, { useState } from 'react'
+import {ArrowUpTrayIcon, MicrophoneIcon, XMarkIcon, FolderPlusIcon} from '@heroicons/react/24/outline'
 import { RiChatVoiceLine } from 'react-icons/ri'
 import AddAudioFile from '../../AddAudioFile'
 import { useRecoilState } from 'recoil'
 import { AddEntryToggle } from '../../../atoms/atoms'
 
 
+
+// interface ModalProps { 
+//   title: string
+//   subtitle: string
+//   children: any
+//   nextPage?: any
+//   prevPage?: any
+// }
+
+// function ModalContent({
+//   title, 
+//   subtitle, 
+//   children,
+//   nextPage,
+//   prevPage
+// }: ModalProps) { 
+//   return (
+//     <>
+//       <div className='flex flex-row justify-between items-center'>
+//         <div className='flex flex-col'>
+//           <h1 className='text-lg font-semibold text-left'>{title}</h1>
+//           <h3 className='text-xs text-[#757575]'>{subtitle}</h3>
+//         </div>
+//         <CloseModal />
+//       </div>
+//       <div className=' flex flex-row w-full pt-[24px]  justify-between'>
+//         {children}
+//       </div>
+//     </>
+//   )
+// }
+
 interface Props { 
-    icon: any
+    children: any
     routerName: string
     title: string
 }
 
-function Button({icon, routerName, title}: Props) { 
+function Button({children, routerName, title}: Props) { 
     return (
         <Link href={`/${routerName}`} className='cursor-pointer flex justify-center flex-col items-center space-y-2'>
           <div className='bg-[#f5f5f5] rounded-[20px] w-[100px] flex justify-center py-2 cursor-pointer'>
-            {icon}
+            {children}
           </div>
           <div className='text-[12px] text-center font-medium'>
             {title}
@@ -39,6 +71,92 @@ export function UploadButton() {
     )
 }
 
+interface UploadContent { 
+  prevPage: any
+}
+
+function UploadContent({prevPage}: UploadContent) { 
+  const [uploadFile, setUploadFile] = useState(false)
+  const [isAudioFileSelected, SelectAudioFile] = useState(false)
+
+  const upload = () => { 
+    setUploadFile(true)
+  }
+
+  return (
+    <>
+      <div className='flex flex-row justify-between items-center'>
+        <div className='flex flex-col'>
+          <h1 className='text-lg font-semibold text-left'>
+            {
+              uploadFile ? (
+                'Creating a new journal entry...'
+                ) : (
+                'Upload an Audio Recording'
+              )
+            }
+
+          </h1>
+          <h3 className='text-xs text-[#757575]'>
+            
+            {
+              uploadFile ? (
+                'You will be redirected shortly.'
+              ) : (
+                'Attach an Audio Recording to this entry.'
+              )
+            }
+
+          </h3>
+        </div>
+        <CloseModal />
+      </div>
+      
+      
+      <div className='pt-7 pb-4'>
+        <AddAudioFile uploadFile={uploadFile} isFileSelected={SelectAudioFile}>
+
+          {
+            !uploadFile && (
+              <section className='w-full rounded-[20px] border-[2px] border-[#757575] 
+              flex flex-col justify-center items-center py-4 border-dashed cursor-pointer'>
+                <ArrowUpTrayIcon height={40} width={40} color='#757575' strokeWidth={1}/>
+                
+                <div className='items-center text-center pt-2'>
+                  <h1 className='font-semibold text-sm'>    
+                    Browse audio files on your device.
+                  </h1>
+                  <p className='text-xs text-[#757575]'>
+                    **Only WAV files are currently supported.
+                  </p>
+                </div>
+              </section>
+            ) 
+          }
+
+        </AddAudioFile>
+      </div>
+      
+      <hr />  
+
+      <div className='w-full justify-between flex flex-row items-center pt-4 pb-4 space-x-2'>
+        <div hidden={uploadFile} onClick={prevPage} className='bg-[#fafafa] cursor-pointer border-2 font-medium text-sm border-[#e0e0e0] rounded-[10px]  py-2 text-[#757575] w-full  text-center '>
+          Cancel
+        </div>
+        <button onClick={upload} disabled={!isAudioFileSelected || uploadFile} className={`
+         ${isAudioFileSelected ? 'bg-[#212121] text-white' : 'bg-[#e0e0e0] text-[#757575] '}
+         cursor-pointer border-2 font-medium text-sm border-[#e0e0e0] rounded-[10px]  py-2  w-full text-center `}>
+          {
+            uploadFile ? ('Uploading...') : ('Continue')
+          }
+        </button>
+      </div>
+
+    </>
+  )
+}
+
+
 function CloseModal() { 
   const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
 
@@ -51,37 +169,61 @@ function CloseModal() {
 }
 
 
-function AddEntryContent() {
-       
+interface MenuProps { 
+  nextPage: any
+}
+
+function MenuContent({nextPage}: MenuProps) { 
   return (
-    <div className='rounded-t-3xl w-full bg-white shadow-2xl absolute bottom-0 h-[220px] px-7 py-4'>
-        <div className='flex flex-row justify-between items-center'>
-          <div className='flex flex-col'>
-              <h1 className='text-lg font-semibold text-left'>Add a new journal entry</h1>
-              <h3 className='text-xs text-[#757575]'>Add a new journal in three ways:</h3>
-          </div>
-          <CloseModal />
+    <>
+      <div className='flex flex-row justify-between items-center'>
+        <div className='flex flex-col'>
+          <h1 className='text-lg font-semibold text-left'>Add a new journal entry</h1>
+          <h3 className='text-xs text-[#757575]'>Add a new journal in three ways:</h3>
         </div>
-        <div className=' flex flex-row w-full pt-[24px]  justify-between'>
-            <AddAudioFile>
-              <UploadButton/>
-            </AddAudioFile>
-            <Button
-                icon={<RiChatVoiceLine size={24} color="#000"/> }
-                routerName='/chat'
-                title='Chat with AI' 
-            />
-            <Button
-                icon={
-                    <MicrophoneIcon height={24} width={24} color="#000"/>
-                }
-                routerName='/record'
-                title='Record Audio' 
-            />
+        <CloseModal />
+      </div>
+      <div className=' flex flex-row w-full pt-[24px]  justify-between'>
+        
+        <div onClick={nextPage}>
+          <UploadButton/>
         </div>
-        <p className='text-xs text-[#757575] pt-7 font-medium'>**Only WAV Files are currently supported.</p>
+
+        <Button routerName='/chat' title='Chat with AI'>
+          <RiChatVoiceLine size={24} color="#000"/>
+        </Button>
+        <Button routerName='/record' title='Record Audio'>
+          <MicrophoneIcon height={24} width={24} color="#000"/>
+        </Button>
+      </div>
+        <p className='text-xs text-[#757575] pt-10 font-medium pb-6'>**Only WAV Files are currently supported.</p>
+    </>
+  )
+}
+
+
+
+function AddEntryContent() {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const nextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  const prevPage = () => {
+    setCurrentPage(currentPage - 1);
+  };
+
+
+  return (
+    <div className={`rounded-t-3xl w-full bg-white shadow-2xl absolute bottom-0 h-fit px-7 py-4`}>
+      {currentPage === 1 && (<MenuContent nextPage={nextPage} />)}
+      {currentPage === 2 && (<UploadContent prevPage={prevPage}/>)}
+      {/* {currentPage === 3 && (<ProgressContent/>) } */}
     </div>
   )
 }
 
 export default AddEntryContent
+
+
