@@ -15,7 +15,7 @@ pub fn configure_sse_services(cfg: &mut web::ServiceConfig) {
 ///
 /// Create a new client connection to the broadcaster, which allows the 
 /// client to receive SSE events from the broadcaster in real time as they are generated
-#[route("/api/audio/batch-upload/events", method = "GET")]
+#[route("/api/audio/events", method = "GET")]
 pub async fn sse_handler(broadcaster: web::Data<Broadcaster>) -> impl Responder { 
     broadcaster.new_client().await 
 }

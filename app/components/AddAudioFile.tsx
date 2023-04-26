@@ -101,7 +101,7 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
     const [currentProgress, setCurrentProgress] = useState(0)
     useEffect(() => {
         if (!uploadFile) return 
-        const eventSource = new EventSource('http://localhost:4001/api/audio/batch-upload/events');
+        const eventSource = new EventSource('http://localhost:4001/api/audio/events');
         
         eventSource.addEventListener('message', (event) => {
           const data: ProgressData = JSON.parse(event.data);
