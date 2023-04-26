@@ -3,7 +3,7 @@
 /*
     GETS TEXT SUMMARY FROM SERVER
 */
-export async function getTextSummary(input: string): Promise<string> { 
+export async function getTextSummary(input: string): Promise<string | null> { 
 
     return fetch("http://localhost:4001/api/audio/summary", {
         method: "POST",
@@ -18,6 +18,7 @@ export async function getTextSummary(input: string): Promise<string> {
         return await resp.text()
     })
     .catch((e) => {
-        throw new Error(e)
+        console.error(e)
+        return null
     })
 }

@@ -10,9 +10,9 @@ interface Props {
 }
 
 function RecentEntries({entries}: Props) {
-
+    let entry = entries || []
     // @ts-ignore
-    entries.sort((a, b) => new Date(b.date.toString()) - new Date(a.date.toString()))
+    entry.sort((a, b) => new Date(b.date.toString()) - new Date(a.date.toString()))
 
     return (
         <div className='space-y-5'>
@@ -23,7 +23,7 @@ function RecentEntries({entries}: Props) {
 
             <ul className='space-y-2'>
               {
-                  entries?.map(({
+                  entry?.map(({
                     _id, date, day, summary, tags, text_classification, title, transcription
                   }, k) => { 
                       return (

@@ -19,6 +19,7 @@ export async function deleteEntry(id: string): Promise<boolean> {
     })
     .catch(e => {
         console.error(e)
-        return false}
+        return false
+    }
     )
 }

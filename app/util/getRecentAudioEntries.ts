@@ -4,7 +4,7 @@ import {BSON} from 'bson'
 /*
     GETS WEEKLY SUMMARY 
 */
-export async function getRecentAudioEntries(): Promise<AudioData[]> { 
+export async function getRecentAudioEntries(): Promise<AudioData[] | null> { 
 
     return fetch("http://localhost:4001/api/audio/get-recent", {
         method: "GET",
@@ -24,6 +24,7 @@ export async function getRecentAudioEntries(): Promise<AudioData[]> {
 
     })
     .catch((e) => {
-        throw new Error(e)
+        // throw new Error(e)
+        return null
     })
 }

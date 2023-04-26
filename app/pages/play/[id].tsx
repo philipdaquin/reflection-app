@@ -61,7 +61,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context: Get
 
   // fetch data from your server using the id
   const data = await getEntry(id)
-  
+
+  if (!data) return { 
+    notFound: true
+  }
+
   return {
       props: { 
           data

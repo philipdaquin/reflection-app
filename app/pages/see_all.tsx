@@ -67,7 +67,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [entries] = await Promise.all([
       ( await getAll() ),
   ]) 
-
+  if (!entries) return { 
+    notFound: true
+  }
+  
   // console.log(response)
 
   return { 

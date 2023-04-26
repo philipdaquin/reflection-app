@@ -1,6 +1,6 @@
 import { AudioData } from "../typings"
 
-export async function getEntry(id: string): Promise<AudioData> { 
+export async function getEntry(id: string): Promise<AudioData | null> { 
     console.log(id)
     return fetch("http://localhost:4001/api/audio/get-entry", {
         method: "POST",
@@ -18,6 +18,7 @@ export async function getEntry(id: string): Promise<AudioData> {
     })
     .catch((e) => {
         console.error(e)
-        throw new Error(e)
+        // throw new Error(e)
+        return null
     })
 }

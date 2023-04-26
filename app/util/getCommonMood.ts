@@ -1,6 +1,6 @@
 import { TopMood } from "../typings"
 
-export async function getCommonMood(): Promise<TopMood[]> { 
+export async function getCommonMood(): Promise<TopMood[] | null> { 
     return fetch('http://localhost:4001/api/analysis/get-common-mood', {
         method: "GET",
         headers: {
@@ -15,6 +15,7 @@ export async function getCommonMood(): Promise<TopMood[]> {
     })
     .catch((e) => {
         console.error(e)
-        throw new Error(e)
+        // throw new Error(e)
+        return null
     })
 }

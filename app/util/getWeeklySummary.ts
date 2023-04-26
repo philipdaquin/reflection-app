@@ -4,7 +4,7 @@ import { WeeklySummary } from "../typings"
 /*
     GETS WEEKLY SUMMARY 
 */
-export async function getWeeklySummary(): Promise<WeeklySummary> { 
+export async function getWeeklySummary(): Promise<WeeklySummary | null> { 
 
     return fetch("http://localhost:4001/api/weekly/get-weekly-summary", {
         method: "GET",
@@ -18,6 +18,7 @@ export async function getWeeklySummary(): Promise<WeeklySummary> {
         return body
     })
     .catch((e) => {
-        throw new Error(e)
+        console.error(e)
+        return null
     })
 }

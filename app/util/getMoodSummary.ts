@@ -15,7 +15,6 @@ export async function getMoodSummary(): Promise<TextClassification[] | null> {
     })
     .catch((e) => {
         console.error(e)
-        // throw new Error(e)
         return null
     })
 }
