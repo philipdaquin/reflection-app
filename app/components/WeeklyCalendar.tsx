@@ -52,7 +52,9 @@ function WeeklyCalendar({setCurrDate}: Props) {
             <ul className='flex flex-row space-x-3 pt-5'>
                 {days.map((day, index) => (
                 <li key={index} onClick={(e) => setDate(day)}>
-                    <div className='flex flex-col bg-[#F5F5F5] w-10 py-2 items-center rounded-xl'>
+                    <div className='flex flex-col bg-[#F5F5F5] 
+                        md:w-10 w-12
+                        py-2 items-center rounded-xl'>
                         <p className='text-[10px] font-medium text-[#757575]'>
                             {daysOfWeek[index].slice(0, 3)} 
                         </p>
