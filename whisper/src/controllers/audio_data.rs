@@ -2,7 +2,8 @@ use actix_multipart::{Multipart};
 use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
 use chrono::{NaiveDate, DateTime, Utc};
 use crossbeam::channel::unbounded;
-use serde::Deserialize;
+use parking_lot::Mutex;
+use serde::{Deserialize, Serialize};
 use crate::{ml::{
     whisper::{AudioDataDTO, upload_audio, batch_upload_audio}, 
     prompt::GENERAL_CONTEXT, 
@@ -11,12 +12,12 @@ use crate::{ml::{
     response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}},
     persistence::{audio_db::{AudioDB, AudioInterface}, 
     audio_analysis::{AnalysisDb, TextAnalysisInterface}}, 
-    error::ServerError, controllers::openapi_key::OpenAIClient, 
+    error::ServerError, controllers::openapi_key::OpenAIClient, broadcast::Broadcaster, 
 };
 use actix_web_lab::sse::{self, ChannelStream, Sse};
 
 
-use super::{Input, eleven_labs::ElevenLabsClient};
+use super::{Input, eleven_labs::ElevenLabsClient, Progress};
 
 
 ///
@@ -184,7 +185,11 @@ pub async fn get_related_tags(input: web::Json<Input>) -> Result<HttpResponse> {
 /// REQUIRES: Bearer - apikey
 /// An API endpoint that accepts user audio and settings for OpenAi response 
 #[route("/api/audio/upload", method = "POST")]
-pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> {
+pub async fn upload(
+    req: HttpRequest, 
+    payload: Multipart,
+    broadcast: web::Data<Broadcaster>
+) -> Result<HttpResponse> {
     log::info!("✅✅ Initialising the key");
     
     if let Some(api_key) = req.headers().get("Authorization").and_then(|v| v.to_str().ok()) { 
@@ -195,23 +200,46 @@ pub async fn upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse
         return Ok(HttpResponse::Unauthorized().finish().into());
     }
 
-    let audio = upload_audio(payload)
-        .await?
-        .get_summary()
-        .await?
-        .get_sentimental_analysis()
-        .await?
-        .get_tags()
-        .await?
-        .save()
-        .await?;
-    // let serialized = serde_json::to_string(&audio)?;
-    // Ok(HttpResponse::Ok().json(AudioData::from(audio)))
-    Ok(HttpResponse::Ok().into())
+
+    let mut progress = Progress::default();
+    progress.progress += 10;
+    broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+    let mut audio = upload_audio(payload).await?;
+        
+        progress.progress += 20;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+        audio.get_summary().await?;
+
+        progress.progress += 20;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+
+        audio.get_sentimental_analysis().await?;
+        
+        progress.progress += 20;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+        audio.clone()
+            .get_tags()
+            .await?
+            .save()
+            .await?;
+
+        progress.progress += 30;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+    Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
 
+
 #[route("/api/audio/batch-upload", method = "POST")]
-pub async fn batch_upload(req: HttpRequest, payload: Multipart) -> Result<HttpResponse> { 
+pub async fn batch_upload(
+    req: HttpRequest, 
+    payload: Multipart,
+    broadcast: web::Data<Broadcaster>
+) -> Result<HttpResponse> { 
     if let Some(api_key) = req.headers().get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()) { 
         let key = api_key.strip_prefix("Bearer ").unwrap_or("");
         // Initialise OpenAIClient
@@ -220,17 +248,33 @@ pub async fn batch_upload(req: HttpRequest, payload: Multipart) -> Result<HttpRe
         return Ok(HttpResponse::Unauthorized().finish().into());
     }
 
-    let audio = batch_upload_audio(payload)
-        .await?
-        .get_summary()
-        .await?
-        .get_sentimental_analysis()
-        .await?
-        .get_tags()
-        .await?
-        .save()
-        .await?;
-    // let serialized = serde_json::to_string(&audio)?;
+    let mut progress = Progress::default();
+    progress.progress += 10;
+    broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+    let mut audio = batch_upload_audio(payload).await?;
+        
+        progress.progress += 20;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+        audio.get_summary().await?;
+
+        progress.progress += 20;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+        audio.get_sentimental_analysis().await?;
+        progress.progress += 20;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+        audio.clone()
+            .get_tags()
+            .await?
+            .save()
+            .await?;
+
+        progress.progress += 30;
+        broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
     Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
 

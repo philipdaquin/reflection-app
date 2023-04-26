@@ -160,3 +160,8 @@ export const DEFAULT_JOBLIST: JobList[] = [
     isDone: false,
   },
 ];
+
+
+export type ProgressData = { 
+  progress: number | null
+}

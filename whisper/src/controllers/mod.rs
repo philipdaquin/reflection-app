@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 pub mod openapi_key;
 pub mod audio_data;
@@ -15,8 +15,15 @@ pub struct Input {
     pub id: Option<String>
 }
 
-// Temporary 
+//  Temporary 
 #[derive(Deserialize, Debug, Clone, Default)]
 pub struct TagResponse { 
     pub response: Vec<String>
+}
+
+
+//  for Progress bar 
+#[derive(Deserialize, Debug, Clone, Default, Serialize)]
+pub struct Progress { 
+    pub progress: i32
 }

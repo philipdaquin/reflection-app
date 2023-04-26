@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
-import { AudioData } from '../typings';
+import { AudioData, ProgressData } from '../typings';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { OPENAI_KEY } from './SettingsButtons';
 import { BsSoundwave } from 'react-icons/bs';
@@ -98,6 +98,24 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
         setCurrentFile(null)
         isFileSelected(false)
     }
+    const [currentProgress, setCurrentProgress] = useState(0)
+    useEffect(() => {
+        if (!uploadFile) return 
+        const eventSource = new EventSource('http://localhost:4001/api/audio/batch-upload/events');
+        
+        eventSource.addEventListener('message', (event) => {
+          const data: ProgressData = JSON.parse(event.data);
+            
+          console.log(data)
+            if (!data.progress) return
+
+            setCurrentProgress(data.progress);
+        });
+    
+        return () => {
+          eventSource.close();
+        };
+      }, [uploadFile]);
 
     return (
 
@@ -121,15 +139,19 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
                                             <p className='text-left text-[#757575] text-sm'>
                                                 {selectedFile && `${(selectedFile?.size / 1000000).toFixed(2)} MB`}
                                             </p>
+                                            {/* <div>
+                                                SSE
+                                                {currentProgress}
+                                            </div> */}
                                         </div>
                                     </div>
-                                    {progress > 0 && (
+                                    {currentProgress > 0 && (
                                         <div className=' flex flex-row w-full space-x-2 pt-2 items-center '>
                                             <div className=' bg-gray-200 rounded-full w-full h-2 overflow-hidden'>
-                                                <div className='bg-black h-full  rounded-full w-full' style={{width: `${progress}%`}}>
+                                                <div className='bg-black h-full  rounded-full w-full' style={{width: `${currentProgress}%`}}>
                                                 </div>
                                             </div>
-                                            <div className="text-center text-sm relative font-bold">{progress.toFixed(1)}%</div>
+                                            <div className="text-center text-sm relative font-bold">{currentProgress.toFixed(1)}%</div>
                                         </div>
                                     )} 
                                 </div>
