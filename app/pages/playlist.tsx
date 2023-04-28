@@ -38,8 +38,10 @@ function playlist() {
             <div className='relative bottom-10 md:block hidden '>
                 <SettingsButtons />
             </div>
-            <div className='flex items-center  md:hidden justify-center mb-10'>
-                <NavigationMobile children={<HomeNav/>} />        
+            <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2'>
+              <div className='flex items-center  md:hidden justify-center mb-10 '>
+                  <NavigationMobile children={<HomeNav/>} />        
+              </div>
             </div>
         </>
     )

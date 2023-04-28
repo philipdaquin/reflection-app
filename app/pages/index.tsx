@@ -46,7 +46,7 @@ function Home({mood_data, recent_entries}: Props) {
       </Head>
       
       <div className="md:bg-[#EEEEEE] bg-white flex 
-        md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px]">
+        md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px] relative">
 
         <main className="justify-center flex flex-col items-center space-y-[27px]">
           <div className="flex items-center md:relative md:right-5 h-full">
@@ -68,9 +68,11 @@ function Home({mood_data, recent_entries}: Props) {
         <div className='relative bottom-10 md:block hidden '>
           <SettingsButtons />
         </div>
-        <div className='flex items-center  md:hidden justify-center mb-10 '>
-            {/* <NavigationMobile children={<HomeNav/>} />         */}
-            <NavigationMobile children={<HomeNav/>} />        
+
+        <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2'>
+          <div className='flex items-center  md:hidden justify-center mb-10 '>
+              <NavigationMobile children={<HomeNav/>} />        
+          </div>
         </div>
 
         {/* <RecordComponent /> */}

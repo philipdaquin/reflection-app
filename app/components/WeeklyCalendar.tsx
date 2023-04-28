@@ -49,7 +49,7 @@ function WeeklyCalendar({setCurrDate}: Props) {
 
                 </button>
             </div>
-            <ul className='flex flex-row space-x-3 pt-5'>
+            <ul className='flex flex-row space-x-3 pt-5 justify-center'>
                 {days.map((day, index) => (
                 <li key={index} onClick={(e) => setDate(day)}>
                     <div className='flex flex-col bg-[#F5F5F5] 

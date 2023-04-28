@@ -142,7 +142,7 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
                                             {/* <div>
                                                 SSE
                                                 {currentProgress}
-                                            </div> */}
+                      W                      </div> */}
                                         </div>
                                     </div>
                                     {currentProgress > 0 && (
