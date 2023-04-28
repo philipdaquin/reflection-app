@@ -69,7 +69,7 @@ function Home({mood_data, recent_entries}: Props) {
           <SettingsButtons />
         </div>
 
-        <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2'>
+        <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
           <div className='flex items-center  md:hidden justify-center mb-10 '>
               <NavigationMobile children={<HomeNav/>} />        
           </div>
