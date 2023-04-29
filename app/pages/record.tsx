@@ -30,7 +30,11 @@ function record() {
                         <AudioControls />       
                     </div>
 
-                    <PhoneView children={<RecordContent/>} />
+
+                    <PhoneView>
+                      <RecordContent/>
+                    </PhoneView>
+                  
                 </div>
                 <div className='md:block hidden'>
                     <SwitchView />

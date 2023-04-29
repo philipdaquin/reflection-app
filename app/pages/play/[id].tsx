@@ -35,7 +35,11 @@ function play({data}: Props) {
                 <div className='relative right-10 hidden md:block'>
                   <NavigationButtons />        
                 </div>
-                <PhoneView children={<PlayerContents entry={entry}/>} />
+
+                <PhoneView>
+                  <PlayerContents entry={entry}/>
+                </PhoneView>
+
               </div>
               <div className='md:block hidden'>
                 <SwitchView />

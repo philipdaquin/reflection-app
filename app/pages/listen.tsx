@@ -18,7 +18,11 @@ function listen() {
             <main className=" justify-center flex flex-col items-center space-y-[27px] ">
     
               <div className="flex items-center relative right-5">
-                <PhoneView children={<ListeningContent/>} />
+              
+              <PhoneView>
+                <ListeningContent/>
+              </PhoneView>
+
               </div>
               <div className='md:block hidden'>
                 <SwitchView />

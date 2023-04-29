@@ -27,7 +27,11 @@ function chat() {
                     <div className='md:block hidden'>
                         <ChatControls />       
                     </div>
-                    <PhoneView children={<ChatContent/>} />
+                
+                    <PhoneView>
+                     <ChatContent/>
+                    </PhoneView>
+                
                 </div>
                 <div className='md:block hidden'>
                     <SwitchView />

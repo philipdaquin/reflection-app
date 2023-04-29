@@ -12,6 +12,11 @@ import { getWeeklySummary } from '../util/getWeeklySummary'
 import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
+import HomeSummaryContent from '../components/pages/HomeSummaryContent'
+import { useRecoilValue } from 'recoil'
+import { AddEntryToggle } from '../atoms/atoms'
+import ModalView from '../components/ModalView'
+import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 
 
 
@@ -20,10 +25,13 @@ interface Props {
   weekly_summary: WeeklySummary | null
 }
 
-function mood_summary({
+function home_summary({
   mood_graph, 
   weekly_summary
 }: Props) {
+
+    const showModel = useRecoilValue(AddEntryToggle);
+
     return (
         <>
           <Head>
@@ -39,14 +47,10 @@ function mood_summary({
                 <div className='relative right-10 hidden md:block'>
                   <NavigationButtons />        
                 </div>
-
+                
                 <PhoneView>
-                  <MoodSummaryContents 
-                    mood_graph={mood_graph}
-                    weekly_summary={weekly_summary}
-                    />
+                  <HomeSummaryContent/>
                 </PhoneView>
-
 
               </div>
               <div className='md:block hidden'>
@@ -60,17 +64,27 @@ function mood_summary({
             <div className='relative bottom-10 md:block hidden '>
               <SettingsButtons />
             </div>
+            
+            
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center mb-10 '>
                   <NavigationMobile children={<HomeNav/>} />        
               </div>
             </div>
+              
+
+            {showModel && (
+              <ModalView>
+                <AddEntryContent />
+              </ModalView>
+            )}
+
           </div>
         </>
       )
 }
 
-export default mood_summary
+export default home_summary
 
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {

@@ -53,11 +53,14 @@ function Home({mood_data, recent_entries}: Props) {
             <div className='relative right-10 hidden md:block'>
               <NavigationButtons />        
             </div>
-            <PhoneView children={<HomeContents 
+            
+            <PhoneView>
+              <HomeContents 
                 mood_data={mood_data}
                 recent_entries={recent_entries}  
-              />} 
-            />
+              />
+            </PhoneView>
+
           </div>
           <div className='md:block hidden '>
               <SwitchView />

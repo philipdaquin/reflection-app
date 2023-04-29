@@ -33,6 +33,10 @@ function weekly_record() {
                     </div>
 
                     <PhoneView children={<WeeklyCalendarContent/>} />
+                    <PhoneView>
+                        <WeeklyCalendarContent/>
+                    </PhoneView>
+                
                 </div>
                 <div className='md:block hidden'>
                     <SwitchView />

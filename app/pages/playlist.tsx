@@ -24,7 +24,9 @@ function playlist() {
                         <div className='relative right-10 hidden md:block'>
                             <NavigationButtons />        
                         </div>
-                        <PhoneView children={<LibraryContent/>} />
+                        <PhoneView>
+                          <LibraryContent/>
+                        </PhoneView>
                     </div>
 
                     <div className='md:block hidden '>

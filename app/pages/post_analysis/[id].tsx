@@ -40,8 +40,9 @@ function post_analysis({
                     <div className='md:block hidden'>
                         <PostSummaryControls />
                     </div>
-                    
-                    <PhoneView children={<SummaryContent data={data}/>}/>
+                    <PhoneView>
+                       <SummaryContent data={data}/>
+                    </PhoneView>
                 </div>
                 <div className='md:block hidden'>
                     <SwitchView />

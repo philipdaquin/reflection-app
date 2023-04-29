@@ -38,7 +38,10 @@ function see_all({entries}: Props) {
                     <NavigationButtons />        
                   </div>
 
-                    <PhoneView children={<SeeAllContent entries={entries}/>} />
+                    <PhoneView>
+                      <SeeAllContent entries={entries}/>
+                    </PhoneView>
+                
                 </div>
                 <div className='md:block hidden'>
                     <SwitchView />
