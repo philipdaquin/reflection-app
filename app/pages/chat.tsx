@@ -29,7 +29,7 @@ function chat() {
                     </div>
                 
                     <PhoneView>
-                     <ChatContent/>
+                        <ChatContent/>
                     </PhoneView>
                 
                 </div>

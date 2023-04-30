@@ -32,7 +32,6 @@ function weekly_record() {
                         <NavigationButtons />       
                     </div>
 
-                    <PhoneView children={<WeeklyCalendarContent/>} />
                     <PhoneView>
                         <WeeklyCalendarContent/>
                     </PhoneView>
