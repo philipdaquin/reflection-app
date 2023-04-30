@@ -13,9 +13,14 @@ import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import WeeklyCalendarContent from '../components/pages/WeeklyCalendarContent'
 import HomeNav from '../components/navigation/mobile/HomeNav'
+import ModalView from '../components/ModalView'
+import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
+import { AddEntryToggle } from '../atoms/atoms'
+import { useRecoilValue } from 'recoil'
 
 function weekly_record() {
-   
+    const showModel = useRecoilValue(AddEntryToggle);
+
     return (
       <>
         <Head>
@@ -53,6 +58,12 @@ function weekly_record() {
                   <NavigationMobile children={<HomeNav/>} />        
               </div>
             </div>
+
+            {showModel && (
+          <ModalView>
+            <AddEntryContent />
+          </ModalView>
+        )}
         </div>
       
       </>

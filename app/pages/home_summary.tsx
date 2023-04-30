@@ -56,7 +56,6 @@ function home_summary({
               <div className='md:block hidden'>
                 <SwitchView />
               </div>
-            {/* <RecordComponent /> */}
     
             </main>
             {/* Settings / Footer  */}
