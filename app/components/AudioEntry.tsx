@@ -29,6 +29,8 @@ function AudioEntry({
   
   }: Props) {
 
+    console.log(date)
+
     if (!thumbnailUrl) thumbnailUrl = IMAGE_URL
     const adate =  recentEntryTimeStamp(date!)
     let avg = average_mood? average_mood * 10 : null

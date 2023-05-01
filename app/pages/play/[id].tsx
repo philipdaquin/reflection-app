@@ -10,7 +10,7 @@ import { utimes } from 'fs'
 import { AudioData, AudioEntryType } from '../../typings'
 import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
 import SettingsButtons from '../../components/SettingsButtons'
-import { getEntry } from '../../util/getEntry'
+import { getEntry } from '../../util/audio/getEntry'
 import { Long, ObjectId } from 'bson'
 
 interface Props { 

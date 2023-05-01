@@ -1,4 +1,4 @@
-import { TopMood } from "../typings"
+import { TopMood } from "../../typings"
 
 export async function getCommonMood(): Promise<TopMood[] | null> { 
     return fetch('http://localhost:4001/api/analysis/get-common-mood', {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import WeeklyCalendar from '../WeeklyCalendar'
-import { getAllByDate } from '../../util/getAllByDate'
+import { getAllByDate } from '../../util/audio/getAllByDate'
 import { AudioData } from '../../typings'
 import AudioEntry from '../AudioEntry'
 import Link from 'next/link'

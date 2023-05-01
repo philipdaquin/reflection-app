@@ -1,4 +1,4 @@
-import { getElevenLabsAPIKey, getOpenAPIKey } from "../pages"
+import { getElevenLabsAPIKey, getOpenAPIKey } from "../../pages"
 
 // Send the WAV fle to the server 
 export async function uploadChatRecording(wavFile: Blob): Promise<Blob> {

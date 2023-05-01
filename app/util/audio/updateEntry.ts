@@ -1,4 +1,4 @@
-import { AudioData } from "../typings"
+import { AudioData } from "../../typings"
 
 /*
     Update the Audio file on server

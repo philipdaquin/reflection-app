@@ -1,14 +1,14 @@
 import Head from 'next/head'
 import React from 'react'
-import MoodSummaryContents from '../components/MoodSummaryContents'
+import MoodSummaryContents from '../components/pages/MoodSummaryContents'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
 import { GetServerSideProps } from 'next'
 import { TextClassification, TopMood, WeeklySummary } from '../typings'
-import { getMoodSummary } from '../util/getMoodSummary'
-import { getWeeklySummary } from '../util/getWeeklySummary'
+import { getMoodSummary } from '../util/analysis/getMoodSummary'
+import { getWeeklySummary } from '../util/weekly/getWeeklySummary'
 import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
@@ -22,12 +22,10 @@ import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 
 interface Props { 
   mood_graph: TextClassification[] | null,
-  weekly_summary: WeeklySummary | null
 }
 
 function home_summary({
   mood_graph, 
-  weekly_summary
 }: Props) {
 
     const showModel = useRecoilValue(AddEntryToggle);
@@ -49,7 +47,7 @@ function home_summary({
                 </div>
                 
                 <PhoneView>
-                  <HomeSummaryContent/>
+                  <HomeSummaryContent mood_graph={mood_graph}/>
                 </PhoneView>
 
               </div>
@@ -89,16 +87,13 @@ export default home_summary
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [
     mood_graph, 
-    weekly_summary
   ] = await Promise.all([
     ( await getMoodSummary() ),
-    ( await getWeeklySummary() )
   ]) 
 
   return { 
     props: { 
       mood_graph,
-      weekly_summary
     }
   }
 }

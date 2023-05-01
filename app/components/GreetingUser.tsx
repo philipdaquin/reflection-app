@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import React from 'react'
+import { DEFAULT_IMAGE_URL } from '../typings'
 
-const IMAGE_URL: string = 'https://www.telegraph.co.uk/content/dam/news/2021/06/04/UFO_trans_NvBQzQNjv4BqECnBSB4T3tw7hRvCORLehcLZq-j_VIcNfiYtpwBx7zI.jpg?imwidth=680'
 
 function GreetingUser() {
     return (
@@ -10,7 +10,7 @@ function GreetingUser() {
             <div className='text-left font-semibold text-[32px]'>
                 Hello John👋
             </div>
-            <Image src={IMAGE_URL} 
+            <Image src={DEFAULT_IMAGE_URL} 
                 className='rounded-full object-fill w-[38px] h-[38px]' 
                 alt='User Profile'  
                 height={38}

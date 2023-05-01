@@ -1,11 +1,11 @@
 import React from 'react'
-import MoodAreaChart from './MoodAreaChart'
+import MoodAreaChart from '../MoodAreaChart'
 import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
-import CommonMoodContainer from './CommonMoodContainer'
-import { TextClassification, WeeklyData, WeeklySummary } from '../typings'
-import { AverageWeeklyIndex } from '../atoms/atoms'
+import CommonMoodContainer from '../CommonMoodContainer'
+import { TextClassification, WeeklyData, WeeklySummary } from '../../typings'
+import { AverageWeeklyIndex } from '../../atoms/atoms'
 import { useRecoilValue } from 'recoil'
-import { getAverageMoodWeek } from './MoodTrackerIndex'
+import { getAverageMoodWeek } from '../MoodTrackerIndex'
 
 
 // const data: WeeklyData[] = [

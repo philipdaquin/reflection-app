@@ -7,8 +7,8 @@ import { useRecoilState } from 'recoil'
 import { AudioUrl, RecordingState, TimerState } from '../atoms/atoms'
 import formatTime from '../util/formatTime'
 import { useRouter } from 'next/router';
-import { getTextSummary } from '../util/getTextSummary'
-import { getRelatedTags } from '../util/getRelatedTags'
+import { getTextSummary } from '../util/audio/getTextSummary'
+import { getRelatedTags } from '../util/audio/getRelatedTags'
 interface Props { 
   icon: any
 }

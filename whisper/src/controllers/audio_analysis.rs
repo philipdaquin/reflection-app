@@ -5,10 +5,10 @@ use bson::oid::ObjectId;
 use crate::{ml::{
     text_classification::TextClassification, 
     recommendation::RecommendedActivity, 
-    weekly_pattern::WeeklyAnalysisDTO, response_types::{weeklydata::WeeklyAnalysis, audioanalysis::AudioAnalysis}},
+    response_types::{weeklydata::WeeklyAnalysis, audioanalysis::AudioAnalysis}},
     persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, 
-    weekly_db::WeeklyAnalysisDB}, 
-    error::ServerError};
+}, 
+};
 use serde_derive::{Deserialize};
 
 use super::Input;
@@ -111,3 +111,14 @@ pub async fn delete_entry(input: web::Json<Input>) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json(audio))
 }
 
+///
+/// Filter query by 
+/// - 24 hours,
+/// - 7 Days, 
+/// - 14 Days
+/// - 30 Days, 
+/// - Max
+#[route("/api/analysis/filter", method = "DELETE")]
+pub async fn filter_analysis() -> Result<HttpResponse> { 
+    todo!()
+}

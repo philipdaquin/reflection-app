@@ -23,11 +23,26 @@ const CustomizedLabel: React.FC = () => (
     {`Max UV: ${maxValue}`}
   </text>
 );
+
+interface CustomXAxisTickProps {
+  x: number;
+  y: number;
+  payload: { value: string };
+}
+
+const CustomXAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
+  return (
+    <text x={x} y={y} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
+      {payload.value}
+    </text>
+  );
+};
+
     return (
-        <ResponsiveContainer height={200}>
+        <ResponsiveContainer width="100%" height="100%">
             <AreaChart
                 width={390}
-                height={200}
+                height={300}
                 data={data}
                 margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
             >
@@ -42,9 +57,10 @@ const CustomizedLabel: React.FC = () => (
                   </linearGradient>
                 </defs>
 
-                <XAxis dataKey="name" />
+                <XAxis dataKey="name" tick={CustomXAxisTick} />
                 <Tooltip />
 
+                {/* <CartesianGrid stroke="#eee" strokeDasharray="5 5"/> */}
 
 
                 {/* MAX DATA */}

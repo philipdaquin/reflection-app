@@ -1,5 +1,5 @@
-import useLocalStorage, { OPENAI_KEY } from "../hooks/useLocalStorage";
-import { AudioData } from "../typings";
+import useLocalStorage, { OPENAI_KEY } from "../../hooks/useLocalStorage";
+import { AudioData } from "../../typings";
 
 // Send the WAV fle to the server 
 export async function uploadAudioRecording(wavFile: Blob | File): Promise<AudioData> {

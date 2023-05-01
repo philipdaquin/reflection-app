@@ -165,3 +165,27 @@ export const DEFAULT_JOBLIST: JobList[] = [
 export type ProgressData = { 
   progress: number | null
 }
+
+export const DEFAULT_EMOTION = [
+  { date: "2022-04-25", happy: 10, sad: 5, angry: 3 },
+  { date: "2022-04-26", happy: 7, sad: 4, angry: 8 },
+  { date: "2022-04-27", happy: 9, sad: 3, angry: 6 },
+  { date: "2022-04-28", happy: 10, sad: 5, angry: 3 },
+  { date: "2022-04-29", happy: 7, sad: 4, angry: 8 },
+  { date: "2022-04-30", happy: 9, sad: 3, angry: 6 },
+  { date: "2022-05-01", happy: 10, sad: 5, angry: 3 },
+  { date: "2022-05-26", happy: 7, sad: 10, angry: 8 },
+  { date: "2022-05-27", happy: 0, sad: 3, angry: 6 },
+];
+
+export const DEFAULT_TEST_WEEKLY: WeeklyData[] = [
+    { name: 'M', mood: 4 },
+    { name: 'Tu', mood: 3 },
+    { name: 'W', mood: 0 },
+    { name: 'Th', mood: 10 },
+    { name: 'F', mood: 7 },
+    { name: 'Sa', mood: 4 },
+    { name: 'Su', mood: 10 },
+];
+
+export const DEFAULT_IMAGE_URL: string = 'https://www.telegraph.co.uk/content/dam/news/2021/06/04/UFO_trans_NvBQzQNjv4BqECnBSB4T3tw7hRvCORLehcLZq-j_VIcNfiYtpwBx7zI.jpg?imwidth=680'

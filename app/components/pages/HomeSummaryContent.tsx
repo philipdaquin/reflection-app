@@ -1,8 +1,57 @@
 import React from 'react'
+import MoodChart from '../moodWidgets/MoodAnalysisChange';
+import { getMoodSummary } from '../../util/analysis/getMoodSummary';
+import { GetServerSideProps } from 'next';
+import { DEFAULT_IMAGE_URL, TextClassification } from '../../typings';
+import MoodAnalysisChange from '../moodWidgets/MoodAnalysisChange';
+import Image from 'next/image';
+import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget';
+import MoodInsightWidget from '../moodWidgets/MoodInsightWidget';
+import MoodTriggersWidget from '../moodWidgets/MoodTriggersWidget';
 
-function HomeSummaryContent() {
+interface Props { 
+  mood_graph: TextClassification[] | null
+}
+
+function HomeSummaryContent({mood_graph} : Props) {
+
+  const currentDate = new Date()
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const currDay = currentDate.getDay()
+  
+  let day = daysOfWeek[currDay]
+
+  const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
+  const year = currentDate.getFullYear();
+
+
   return (
-    <div>HomeSummaryContent</div>
+    <section> 
+      <div className='flex flex-row items-center justify-between'>
+        <div>
+          <h1 className='text-left text-[25px] font-bold  '>{`Today, ${day}`}</h1>
+          <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{currDay} {month} {year}</h2>
+        </div>  
+        <Image src={DEFAULT_IMAGE_URL} 
+                className='rounded-full object-fill w-[38px] h-[38px]' 
+                alt='User Profile'  
+                height={38}
+                width={38}
+                quality={100}
+            />  
+      </div>
+
+      {/* Widget : Mood Changes */}
+      <div className='pt-[35px] space-y-5'>
+        <MoodAnalysisChange mood_graph={mood_graph} />
+        <MoodCompositionWidget data={[]}/>
+        <MoodInsightWidget />  
+        <MoodTriggersWidget />
+      </div>
+
+
+
+    </section>
   )
 }
 

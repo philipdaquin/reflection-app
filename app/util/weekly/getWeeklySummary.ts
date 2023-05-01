@@ -1,4 +1,4 @@
-import { WeeklySummary } from "../typings"
+import { WeeklySummary } from "../../typings"
 
  
 /*

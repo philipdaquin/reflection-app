@@ -5,8 +5,8 @@ import {CheckIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { AddEntryToggle, AudioSummaryAtom } from '../atoms/atoms'
-import { updateEntry } from '../util/updateEntry'
-import { deleteEntry } from '../util/deleteEntry'
+import { updateEntry } from '../util/audio/updateEntry'
+import { deleteEntry } from '../util/audio/deleteEntry'
 
 
 function PostSummaryControls() {

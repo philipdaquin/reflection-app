@@ -7,10 +7,10 @@ import { useRecoilState } from 'recoil'
 import { RecordingState, TimerState } from '../atoms/atoms'
 import formatTime from '../util/formatTime'
 import { useRouter } from 'next/router';
-import { getTextSummary } from '../util/getTextSummary'
-import { getRelatedTags } from '../util/getRelatedTags'
+import { getTextSummary } from '../util/audio/getTextSummary'
+import { getRelatedTags } from '../util/audio/getRelatedTags'
 import useAudioRecording from '../hooks/useAudioRecording'
-import { uploadAudioRecording } from '../util/uploadAudioRecording'
+import { uploadAudioRecording } from '../util/audio/uploadAudioRecording'
 interface Props { 
   icon: any
 }

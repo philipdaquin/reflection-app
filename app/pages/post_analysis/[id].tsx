@@ -7,7 +7,7 @@ import PhoneView from '../../components/PhoneView'
 import PostSummaryControls from '../../components/PostSummaryControls'
 import SwitchView from '../../components/SwitchView'
 import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
-import { getEntry } from '../../util/getEntry'
+import { getEntry } from '../../util/audio/getEntry'
 import { AudioData } from '../../typings'
 import SettingsButtons from '../../components/SettingsButtons'
 import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
