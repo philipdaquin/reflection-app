@@ -3,7 +3,28 @@ import { Bar, BarChart, CartesianGrid, Label, Legend, ResponsiveContainer, Toolt
 import { TextClassification } from '../typings'
 
 
+interface CustomXAxisTickProps {
+  x: number;
+  y: number;
+  payload: { value: string };
+}
 
+const CustomXAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
+  return (
+    <text x={x} y={y} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
+      {payload.value}
+    </text>
+  );
+};
+const CustomYAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
+  return (
+    <text x={x} y={y} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
+      {payload.value}
+    </text>
+  );
+};
+
+  
 // Assign a colour from 0 - 1 at each level 
 export function generateColours(average: number): string { 
   let colour = ""
@@ -31,6 +52,7 @@ export function generateColours(average: number): string {
 }
 
 type MoodDataPoint = { 
+  id: string,
   emotion: string, 
   avgMood: number, 
   date: string 
@@ -40,87 +62,99 @@ interface Props {
   entries: TextClassification[] | null
 }
 
-function MoodCompositionChart() {
- // A state to hold the color mapping for each emotion
- const [colors, setColors] = useState({});
+function MoodCompositionChart({entries}: Props) {
 
- // A function to generate a random color for each emotion
- const generateColors = () => {
-   const newColors = {};
-   Object.keys(DEFAULT_EMOTION[0]).forEach((key) => {
-     if (key !== "date") {
-       newColors[key] = "#" + Math.floor(Math.random() * 16777215).toString(16);
-     }
-   });
-   setColors(newColors);
- };
-
- // Call the generateColors function once when the component mounts
- useEffect(() => {
-   generateColors();
- }, []);
-
- // Create a new array with the total count of each emotion for each date
- const stackedData = DEFAULT_EMOTION.map(({ date, ...emotions }) => {
-  const totalCount = Object.values(emotions).reduce((sum, count) => sum + count, 0);
-  return { date, totalCount, ...emotions };
-});
-
-
-interface CustomXAxisTickProps {
-  x: number;
-  y: number;
-  payload: { value: string };
-}
-
-const CustomXAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
-  return (
-    <text x={x} y={y} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
-      {payload.value}
-    </text>
-  );
-};
-const CustomYAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
-  return (
-    <text x={x} y={y} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
-      {payload.value}
-    </text>
-  );
-};
-
-  
+  const moodData: MoodDataPoint[] = [
+    {
+      id: "1",
+      emotion: "Anger",
+      avgMood: 0.1,
+      date: "2023-05-02T08:30:00Z"
+    },
+    {
+      id: "2",
+      emotion: "Happiness",
+      avgMood: 0.9,
+      date: "2023-05-02T09:15:00Z"
+    },
+    {
+      id: "3",
+      emotion: "Sadness",
+      avgMood: 0.2,
+      date: "2023-05-02T10:00:00Z"
+    },
+    {
+      id: "4",
+      emotion: "Excitement",
+      avgMood: 0.8,
+      date: "2023-05-02T11:30:00Z"
+    },
+    {
+      id: "5",
+      emotion: "Anxiety",
+      avgMood: 0.3,
+      date: "2023-05-02T13:00:00Z"
+    },
+    {
+      id: "6",
+      emotion: "Contentment",
+      avgMood: 0.7,
+      date: "2023-05-02T14:45:00Z"
+    },
+    {
+      id: "7",
+      emotion: "Frustration",
+      avgMood: 0.4,
+      date: "2023-05-02T15:30:00Z"
+    },
+    {
+      id: "8",
+      emotion: "Gratitude",
+      avgMood: 0.6,
+      date: "2023-05-02T16:15:00Z"
+    },
+    {
+      id: "9",
+      emotion: "Enthusiasm",
+      avgMood: 0.9,
+      date: "2023-05-02T17:00:00Z"
+    },
+    {
+      id: "10",
+      emotion: "Indifference",
+      avgMood: 0.5,
+      date: "2023-05-02T18:30:00Z"
+    }
+  ];
 
   let day = new Date().getDay()
 
     return (
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart 
-            width={600} 
-            height={400} 
-            data={stackedData}
-            margin={{ top: 10, right: -40, left: 0, bottom: 0 }}
-            >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tick={CustomXAxisTick} />
-            <YAxis 
-              axisLine={false}  
-              tickLine={false}
-              dataKey="totalCount" 
-              tick={CustomYAxisTick} 
-              allowDataOverflow={true}
-              orientation='right' 
-              domain={[0, 50]}
-
-              tickFormatter={(value) => `$${value}`}
-            >
-              
-            </YAxis>
-            <Tooltip />
-            <Legend />
-            {Object.keys(colors).map((emotion) => (
-              <Bar key={emotion} dataKey={emotion} stackId="a" fill={colors[emotion]} />
-            ))}
-          </BarChart>
+           <BarChart 
+             width={600} 
+             height={400} 
+             data={moodData}
+             margin={{ top: 10, right: -40, left: 0, bottom: 0 }}
+             >
+             <CartesianGrid strokeDasharray="3 3" />
+             <XAxis dataKey="date" tick={CustomXAxisTick} />
+             <YAxis 
+               axisLine={false}  
+               tickLine={false}
+               dataKey="avgMood" 
+               tick={CustomYAxisTick} 
+               allowDataOverflow={true}
+               orientation='right' 
+               domain={[0, 1]}
+               tickFormatter={(value) => `$${value}`}
+             >
+             </YAxis>
+             <Tooltip />
+             <Legend />
+            
+           </BarChart>
+     
         </ResponsiveContainer>
     )
 }
