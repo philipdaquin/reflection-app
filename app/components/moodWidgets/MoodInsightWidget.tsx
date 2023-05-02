@@ -8,7 +8,7 @@ interface Props {
 
 function InsightContainer({title, date}: Props) { 
     return (
-        <div className='w-full  text-left px-5 py-4 space-y-2 rounded-[15px] border-[1px] border-[#e0e0e0] bg-white drop-shadow-sm'>
+        <div className='widget_container space-y-2'>
             <h2 className='text-left text-xs font-medium text-[#757575]'>{title}</h2>
             <h1 className='text-left text-lg font-semibold'>
                 {date}

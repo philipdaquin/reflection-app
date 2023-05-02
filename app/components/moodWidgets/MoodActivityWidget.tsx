@@ -2,7 +2,9 @@ import React from 'react'
 
 function MoodActivityWidget() {
   return (
-    <div>MoodActivityWidget</div>
+    <div className='widget_container'>
+      
+    </div>
   )
 }
 

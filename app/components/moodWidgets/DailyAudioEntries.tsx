@@ -112,7 +112,7 @@ function DailyAudioEntries({entries}: Props) {
     const router = useRouter()  
 
     return (
-        <div className='w-full min-h-fit px-5 py-4 rounded-[15px] border-[1px] border-[#e0e0e0] bg-white drop-shadow-sm'>
+        <div className='widget_container'>
             <div className='flex flex-row items-center justify-between'>
                 <div className='flex flex-col text-left space-y-1'>
                     <h1 className='text-[20px] font-medium'>
