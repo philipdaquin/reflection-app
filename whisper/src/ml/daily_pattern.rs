@@ -3,17 +3,15 @@ use serde::Serialize;
 
 
 #[derive(Debug, Serialize)]
-struct Daily { 
+pub struct Daily { 
     id: ObjectId,
 
     total_entries: i32,
 
     overall_mood: Option<String>,
 
+    // Daily Average 
     current_avg: Option<f32>,
 
-    change_avg: Option<f32>,
-
-    
     
 }

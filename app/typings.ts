@@ -142,7 +142,6 @@ export type JobList = {
   details: string
   isDone: boolean
 }
-
 export const DEFAULT_JOBLIST: JobList[] = [
   {
     title: 'Finish project',
@@ -165,6 +164,14 @@ export const DEFAULT_JOBLIST: JobList[] = [
 export type ProgressData = { 
   progress: number | null
 }
+
+// Temporary Datatype for graph 
+export type MoodTracker =  { 
+  emotion: string,
+  avgRating: number, 
+  dateTime: Date
+}
+
 
 export const DEFAULT_EMOTION = [
   { date: "2022-04-25", happy: 10, sad: 5, angry: 3 },

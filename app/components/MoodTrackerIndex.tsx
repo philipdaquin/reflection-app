@@ -42,9 +42,15 @@ export function Emoji(average: number): string {
 */
 export function getAverageMoodWeek(data: TextClassification[] | null) : string { 
   let length = data?.length;
+  const [weeklyAverage, setWeeklyAverage] = useRecoilState(AverageWeeklyIndex)
 
   //@ts-ignore
   let average: number | null | undefined = data?.reduce((total, item) => total + item.average_mood, 0) / length;
+  
+  if (average) { 
+    setWeeklyAverage(average)
+  }
+  
   let avgString = (average ? (average * 100.0).toString().slice(0, 5) : '0');
   let emoji = Emoji(average || 0)
 

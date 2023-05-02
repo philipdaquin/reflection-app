@@ -8,6 +8,7 @@ import Image from 'next/image';
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget';
 import MoodInsightWidget from '../moodWidgets/MoodInsightWidget';
 import MoodTriggersWidget from '../moodWidgets/MoodTriggersWidget';
+import DailyAudioEntries from '../moodWidgets/DailyAudioEntries';
 
 interface Props { 
   mood_graph: TextClassification[] | null
@@ -26,7 +27,7 @@ function HomeSummaryContent({mood_graph} : Props) {
 
 
   return (
-    <section> 
+    <section className=''> 
       <div className='flex flex-row items-center justify-between'>
         <div>
           <h1 className='text-left text-[25px] font-bold  '>{`Today, ${day}`}</h1>
@@ -42,11 +43,13 @@ function HomeSummaryContent({mood_graph} : Props) {
       </div>
 
       {/* Widget : Mood Changes */}
-      <div className='pt-[35px] space-y-5'>
+      {/* **Designed this way so each widget can be reused again */}
+      <div className='pt-[35px] space-y-5 pb-52'>
         <MoodAnalysisChange mood_graph={mood_graph} />
         <MoodCompositionWidget data={[]}/>
         <MoodInsightWidget />  
-        <MoodTriggersWidget />
+        <MoodTriggersWidget data={[]}/>
+        <DailyAudioEntries entries={[]}/>
       </div>
 
 
