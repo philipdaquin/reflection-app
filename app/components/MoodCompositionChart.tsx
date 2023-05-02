@@ -1,6 +1,44 @@
 import React, { useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Label, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { DEFAULT_EMOTION } from '../typings'
+import { TextClassification } from '../typings'
+
+
+
+// Assign a colour from 0 - 1 at each level 
+export function generateColours(average: number): string { 
+  let colour = ""
+  
+  // Red (indicating a very negative mood)
+  if (average <= 0.2) {
+    colour = "E84040";
+  
+  //  Orange (indicating a moderately negative mood)
+  } else if (average <= 0.4) {
+    colour = "FF7D45";
+  
+  // Yellow (indicating a neutral or mixed mood)
+  } else if (average <= 0.6) {
+    colour = "FFB800";
+
+  // Light Green (indicating a moderately positive mood)
+  } else if (average <= 0.8) {
+    colour = "78FF75";
+  } else {
+    // Dark Green (indicating a very positive mood)
+    colour = "43CB9C";
+  }
+  return colour
+}
+
+type MoodDataPoint = { 
+  emotion: string, 
+  avgMood: number, 
+  date: string 
+}
+
+interface Props { 
+  entries: TextClassification[] | null
+}
 
 function MoodCompositionChart() {
  // A state to hold the color mapping for each emotion

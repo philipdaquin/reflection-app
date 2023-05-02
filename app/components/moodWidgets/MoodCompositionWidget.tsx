@@ -9,12 +9,18 @@ interface Props {
 function MoodCompositionWidget({data} : Props) {
   return (
     <div className='w-full min-h-fit px-5 py-4 rounded-[15px] border-[1px] border-[#e0e0e0]'>
-        <h1 className='text-left font-medium text-[15px] '>
-            How your mood changes 
+        <h1 className='text-left font-medium text-[20px] '>
+            Mood Composition 
         </h1>
-        <div className='h-[200px] '>
-            <MoodCompositionChart />
-        </div>
+
+        {
+          data && (
+            <div className='h-[200px] pt-[20px]'>
+                <MoodCompositionChart entries={data} />
+            </div>
+          )
+        }
+
     </div>
   )
 }
