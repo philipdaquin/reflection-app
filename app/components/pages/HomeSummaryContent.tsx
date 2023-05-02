@@ -44,7 +44,7 @@ function HomeSummaryContent({mood_graph} : Props) {
 
       {/* Widget : Mood Changes */}
       {/* **Designed this way so each widget can be reused again */}
-      <div className='pt-[35px] space-y-5 pb-52'>
+      <div className='pt-[40px] space-y-6 pb-52'>
         <MoodAnalysisChange mood_graph={mood_graph} />
         <MoodCompositionWidget data={[]}/>
         <MoodInsightWidget />  

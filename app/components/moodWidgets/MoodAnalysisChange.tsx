@@ -56,14 +56,14 @@ function MoodAnalysisChange({mood_graph}: Props) {
     
     return (
         <div className='w-full min-h-fit px-5 py-4 rounded-[15px] border-[1px] border-[#e0e0e0]'>
-            <h1 className='text-left font-medium text-[15px] '>
-                How your mood changes 
-            </h1>
+            {/* <h1 className='text-left font-medium text-[20px] '>
+                Mood Summary
+            </h1> */}
 
-            <div className='pt-[23px]'>
+            {/* <div className='pt-4'> */}
                 <MoodSummary />
-            </div>
-            
+            {/* </div> */}
+{/*             
             <div className='pt-[38px] h-[210px]'>
                 {
                     weeklyData && (
@@ -71,7 +71,7 @@ function MoodAnalysisChange({mood_graph}: Props) {
                     )
                 }
 
-            </div>
+            </div> */}
             {/* <div>
                 {
                     mood_graph && (
@@ -94,7 +94,7 @@ function MoodAnalysisChange({mood_graph}: Props) {
                     )
                 }
             </div> */}
-            <div className=' flex flex-row justify-between w-full pt-3'>
+            {/* <div className=' flex flex-row justify-between w-full pt-3'>
                 {
                     filter.map((item, i) => { 
                         return (
@@ -108,7 +108,7 @@ function MoodAnalysisChange({mood_graph}: Props) {
                         )
                     })
                 }
-            </div>
+            </div> */}
                     
 
         </div>
