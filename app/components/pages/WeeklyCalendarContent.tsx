@@ -61,17 +61,17 @@ function WeeklyCalendarContent() {
             {
               selectedEntries && (
                 <div>
-                  <div className='pt-[40px] space-y-6 pb-52'>
+                  {/* <div className='pt-[40px] space-y-6 pb-52'>
                     <MoodAnalysisChange mood_graph={[]} />
                     <MoodCompositionWidget data={[]}/>
                     <MoodActivityWidget entries={[]}/>
                     <MoodInsightWidget />  
                     <MoodTriggersWidget data={[]}/>
                     <DailyAudioEntries entries={selectedEntries}/>
-                  </div>
+                  </div> */}
 
 
-                  {/* <ul className='space-y-2'>
+                  <ul className='space-y-2'>
                         {
                           selectedEntries?.map(({
                             _id, date, day, summary, tags, text_classification, title, transcription
@@ -98,7 +98,7 @@ function WeeklyCalendarContent() {
                               )
                           })
                         }
-                  </ul> */}
+                  </ul>
                 </div>
               )
             }

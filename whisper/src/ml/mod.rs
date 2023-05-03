@@ -8,7 +8,7 @@ use lazy_static::lazy_static;
 pub mod recommendation;
 pub mod weekly_pattern;
 pub mod response_types;
-pub mod daily_pattern;
+pub mod daily_summary;
 
 lazy_static! { 
     pub static ref ENGINE: String = std::env::var("CHAT_MODEL_ENGINE").expect("Unable to read Engine ID");

@@ -16,6 +16,15 @@ export function recentEntryTimeStamp(timestamp: string) : string {
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       return `${days[date.getDay()]} ${date.toLocaleTimeString()}`;
     } else {
-      return date.toLocaleDateString();
+
+
+      const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(date);
+      const year = date.getFullYear();
+      const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const currDay = date.getDay()
+      let day = daysOfWeek[currDay] 
+
+      let strDate = `${day}, ${date.getDate()} ${month} ${year}`
+      return strDate
     }
   }

@@ -122,3 +122,8 @@ pub async fn delete_entry(input: web::Json<Input>) -> Result<HttpResponse> {
 pub async fn filter_analysis() -> Result<HttpResponse> { 
     todo!()
 }
+
+
+pub async fn regenerate_analysis() -> Result<HttpResponse> {
+    todo!()
+} 

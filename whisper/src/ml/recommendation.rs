@@ -36,4 +36,13 @@ impl RecommendedActivity {
 
         Ok(recomm)
     }
+
+
+
+    ///
+    /// Generate Suggested Calendar Events to plan for each recommended items
+    pub async fn f() -> Result<()> { 
+        todo!()
+    }
+
 }
