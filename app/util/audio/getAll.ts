@@ -1,5 +1,5 @@
-import { AudioData, TextClassification } from "../typings"
 import {BSON} from 'bson'
+import { AudioData, TextClassification } from '../../typings'
  
 /*
     GETS WEEKLY SUMMARY 

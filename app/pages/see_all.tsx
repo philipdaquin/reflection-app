@@ -13,9 +13,9 @@ import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import SeeAllContent from '../components/pages/SeeAllContent'
 import HomeNav from '../components/navigation/mobile/HomeNav'
-import { getAll } from '../util/getAll'
 import { GetServerSideProps } from 'next'
 import { AudioData } from '../typings'
+import { getAll } from '../util/audio/getAll'
 
 
 interface Props { 
