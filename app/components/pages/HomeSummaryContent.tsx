@@ -10,6 +10,8 @@ import MoodInsightWidget from '../moodWidgets/MoodInsightWidget';
 import MoodTriggersWidget from '../moodWidgets/MoodTriggersWidget';
 import DailyAudioEntries from '../moodWidgets/DailyAudioEntries';
 import MoodActivityWidget from '../moodWidgets/MoodActivityWidget';
+import MoodSummary from '../MoodSummary';
+import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget';
 
 interface Props { 
   mood_graph: TextClassification[] | null
@@ -46,9 +48,10 @@ function HomeSummaryContent({mood_graph} : Props) {
       {/* Widget : Mood Changes */}
       {/* **Designed this way so each widget can be reused again */}
       <div className='pt-[40px] space-y-6 pb-52'>
+        <MoodSummaryWidget />
         <MoodAnalysisChange mood_graph={mood_graph} />
-        {/* <MoodCompositionWidget data={[]}/> */}
-        {/* <MoodActivityWidget entries={[]}/> */}
+        <MoodCompositionWidget data={[]}/>
+        <MoodActivityWidget entries={[]}/>
         <MoodInsightWidget />  
         <MoodTriggersWidget data={[]}/>
         <DailyAudioEntries entries={[]}/>

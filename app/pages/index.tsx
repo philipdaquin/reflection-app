@@ -22,6 +22,7 @@ import { useState } from 'react'
 import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import MoodActivityChart from '../components/MoodActivityChart'
+import HomeSummaryContent from '../components/pages/HomeSummaryContent'
 
 
 
@@ -56,10 +57,12 @@ function Home({mood_data, recent_entries}: Props) {
             </div>
             
             <PhoneView>
-              <HomeContents 
+              {/* <HomeContents 
                 mood_data={mood_data}
                 recent_entries={recent_entries}  
-              />
+              /> */}
+              <HomeSummaryContent mood_graph={mood_data}/>
+
             </PhoneView>
 
           </div>

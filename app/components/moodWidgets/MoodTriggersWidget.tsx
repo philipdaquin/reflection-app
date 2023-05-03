@@ -21,8 +21,6 @@ interface MoodTriggerProps {
 }
 
 function MoodTriggerEntry({entry: {id, emoji, numOfEntries, title}}: MoodTriggerProps) { 
-    const [currentEntries, setCurrentEntry] = useState(0)
-
     return ( 
         <div className='justify-between flex flex-row items-center w-full'>
             <div className='flex flex-row justify-center items-center w-full space-x-2'>
@@ -79,7 +77,7 @@ function MoodTriggersWidget({data}: Props) {
           numOfEntries: 5,
           emoji: "🎵"
         }
-    ];
+    ].slice(0, 3);
 
     const router = useRouter()
 
@@ -99,7 +97,7 @@ function MoodTriggersWidget({data}: Props) {
                 </h1>
             </div>
 
-            <div className='space-y-5 pt-[20px]'>
+            <div className='space-y-5 pt-[20px] w-full'>
                 {
                     testData.map((item, i) => { 
                         return (

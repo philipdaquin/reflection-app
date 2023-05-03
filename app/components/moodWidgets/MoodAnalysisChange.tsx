@@ -56,13 +56,13 @@ function MoodAnalysisChange({mood_graph}: Props) {
     
     return (
         <div className='widget_container'>
-            {/* <h1 className='text-left font-medium text-[20px] '>
+            <h1 className='text-left font-medium text-[20px] '>
                 Mood Summary
-            </h1> */}
+            </h1>
 
-            {/* <div className='pt-4'> */}
+            {/* <div className='widget_container'>
                 <MoodSummary />
-            {/* </div> */}
+            </div> */}
             <div className='pt-[38px]'>
                 <div className=' h-[210px] md:h-[157px]'>
                     {

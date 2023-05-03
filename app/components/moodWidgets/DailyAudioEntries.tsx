@@ -5,12 +5,19 @@ import { useRouter } from 'next/router'
 import { recentEntryTimeStamp } from '../../util/recentEntryTimeStamp'
 
 
-type EntryType = { 
-    id: string, 
-    date: string,
-    title: string, 
-    emoji: string, 
-    avgMood: number, 
+class EntryType { 
+    id: string; 
+    date: string;
+    title: string; 
+    emoji: string; 
+    avgMood: number; 
+    constructor(data: AudioData) {
+        this.id = data._id
+        this.date = data.date.toString()
+        this.title = data.title || ""
+        this.emoji = data.text_classification.emotion_emoji || ""
+        this.avgMood = data.text_classification.average_mood
+    }
 }
 
 interface EntryProps { 
@@ -108,6 +115,7 @@ function DailyAudioEntries({entries}: Props) {
         },
     ];
 
+    // const data: EntryType[] | undefined = entries?.map((item, i) => new EntryType(item)) || testData
 
     const router = useRouter()  
 
