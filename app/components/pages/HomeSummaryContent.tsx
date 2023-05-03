@@ -31,8 +31,8 @@ function HomeSummaryContent({mood_graph} : Props) {
     <section className=''> 
       <div className='flex flex-row items-center justify-between'>
         <div>
-          <h1 className='text-left text-[25px] font-bold  '>{`Today, ${day}`}</h1>
-          <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{currDay} {month} {year}</h2>
+          <h1 className='text-left text-[25px] font-bold  '>Hello, John Apple!</h1>
+          <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{day}, {currDay} {month} {year}</h2>
         </div>  
         <Image src={DEFAULT_IMAGE_URL} 
                 className='rounded-full object-fill w-[38px] h-[38px]' 
@@ -48,7 +48,7 @@ function HomeSummaryContent({mood_graph} : Props) {
       <div className='pt-[40px] space-y-6 pb-52'>
         <MoodAnalysisChange mood_graph={mood_graph} />
         {/* <MoodCompositionWidget data={[]}/> */}
-        <MoodActivityWidget entries={[]}/>
+        {/* <MoodActivityWidget entries={[]}/> */}
         <MoodInsightWidget />  
         <MoodTriggersWidget data={[]}/>
         <DailyAudioEntries entries={[]}/>

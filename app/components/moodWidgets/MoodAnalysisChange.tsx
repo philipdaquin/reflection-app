@@ -63,53 +63,34 @@ function MoodAnalysisChange({mood_graph}: Props) {
             {/* <div className='pt-4'> */}
                 <MoodSummary />
             {/* </div> */}
-{/*             
-            <div className='pt-[38px] h-[210px]'>
-                {
-                    weeklyData && (
-                        <MoodAreaChart data={DEFAULT_TEST_WEEKLY} />
-                    )
-                }
-
-            </div> */}
-            {/* <div>
-                {
-                    mood_graph && (
-                        <div className="flex justify-center items-center space-x-4">
-                            <label htmlFor="filter">Filter:</label>
-                            <select
-                            name="filter"
-                            id="filter"
-                            value={filterOption}
-                            onChange={handleFilterChange}
-                            className="p-2 border rounded-md"
-                            >
-                                <option value="all">All</option>
-                                <option value="1d">1 Day</option>
-                                <option value="1w">1 Week</option>
-                                <option value="1m">1 Month</option>
-                                <option value="1y">1 Year</option>
-                            </select>
-                        </div>
-                    )
-                }
-            </div> */}
-            {/* <div className=' flex flex-row justify-between w-full pt-3'>
-                {
-                    filter.map((item, i) => { 
-                        return (
-                            <div className={`text-xs cursor-pointer
-                                ${filterOption === item ? 'bg-[#e0e0e0]' : ''} 
-                            text-[#757575]  rounded-full px-4 py-1`}
-                                onClick={() => selectFilter(i)}
-                            >
-                                {item}
-                            </div>
+            <div className='pt-[38px]'>
+                <div className=' h-[210px] md:h-[157px]'>
+                    {
+                        weeklyData && (
+                            <MoodAreaChart data={DEFAULT_TEST_WEEKLY} />
                         )
-                    })
-                }
-            </div> */}
-                    
+                    }
+
+                </div>
+
+                <div className='pt-6'>
+                    <div className=' flex flex-row w-full items-center bg-[#f5f5f5] rounded-xl  px-2 py-2 md:px-1 md:py-1 justify-between'>
+                        {
+                            filter.map((item, i) => { 
+                                return (
+                                    <div className={`text-xs cursor-pointer 
+                                        ${filterOption === item ? 'bg-[#212121] text-white' : 'font-semibold'} 
+                                    text-[#757575]  rounded-lg px-5 py-2 md:px-2 md:py-1`}
+                                        onClick={() => selectFilter(i)}
+                                    >
+                                        {item}
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+            </div>
 
         </div>
     )
