@@ -87,7 +87,7 @@ function MoodTriggersWidget({data}: Props) {
         <div className='widget_container'>
             <div className='flex flex-row items-center justify-between'>
                 <div className='flex flex-col text-left space-y-1'>
-                    <h1 className='text-[15px] font-medium'>
+                    <h1 className='text-[20px] font-medium'>
                         Mood Triggers
                     </h1>
                     <p className='text-[#757575] text-xs font-medium'>

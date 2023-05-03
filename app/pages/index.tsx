@@ -21,6 +21,7 @@ import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
 import { useState } from 'react'
 import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
+import MoodActivityChart from '../components/MoodActivityChart'
 
 
 

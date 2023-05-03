@@ -48,7 +48,7 @@ function HomeSummaryContent({mood_graph} : Props) {
       <div className='pt-[40px] space-y-6 pb-52'>
         <MoodAnalysisChange mood_graph={mood_graph} />
         {/* <MoodCompositionWidget data={[]}/> */}
-        <MoodActivityWidget />
+        <MoodActivityWidget entries={[]}/>
         <MoodInsightWidget />  
         <MoodTriggersWidget data={[]}/>
         <DailyAudioEntries entries={[]}/>

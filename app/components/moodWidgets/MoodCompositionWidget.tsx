@@ -8,7 +8,7 @@ interface Props {
 
 function MoodCompositionWidget({data} : Props) {
   return (
-    <div className='w-full min-h-fit px-5 py-4 rounded-[15px] border-[1px] border-[#e0e0e0] bg-white drop-shadow-sm'>
+    <div className='widget_container'>
         <h1 className='text-left font-medium text-[20px] '>
             Mood Composition 
         </h1>
