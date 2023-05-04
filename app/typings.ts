@@ -91,11 +91,11 @@ export type CommonMoodData = {
 }
 
 export class WeeklyData {
-    name: string;
+    date: Date;
     mood: number;
 
     constructor(item: TextClassification) { 
-        this.name = item.day;
+        this.date = item.date;
         this.mood = item.average_mood
     }
 }
@@ -173,14 +173,26 @@ export type MoodTracker =  {
 }
 
 
-export const DEFAULT_TEST_WEEKLY: WeeklyData[] = [
-    { name: 'M', mood: 4 },
-    { name: 'Tu', mood: 3 },
-    { name: 'W', mood: 0 },
-    { name: 'Th', mood: 10 },
-    { name: 'F', mood: 7 },
-    { name: 'Sa', mood: 4 },
-    { name: 'Su', mood: 10 },
-];
+// export const DEFAULT_TEST_WEEKLY: WeeklyData[] = [
+//     { name: 'M', mood: 4 },
+//     { name: 'Tu', mood: 3 },
+//     { name: 'W', mood: 0 },
+//     { name: 'Th', mood: 10 },
+//     { name: 'F', mood: 7 },
+//     { name: 'Sa', mood: 4 },
+//     { name: 'Su', mood: 10 },
+// ];
+
+export type FilterOptions = { 
+  label: string, 
+  value: string, 
+  interval: string,
+  format?: string 
+}
+
+export const DefaultFilterOption: FilterOptions = { label: 'All', value: 'all', interval: 'day', format: 'MMM D' }
+
+
+
 
 export const DEFAULT_IMAGE_URL: string = 'https://www.telegraph.co.uk/content/dam/news/2021/06/04/UFO_trans_NvBQzQNjv4BqECnBSB4T3tw7hRvCORLehcLZq-j_VIcNfiYtpwBx7zI.jpg?imwidth=680'

@@ -36,6 +36,7 @@ function WeeklyCalendarContent() {
     const year = currDate?.getFullYear();
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const currDay = currDate?.getDay() || 0
+    const currDateNum = currDate.getDate()
     let day = daysOfWeek[currDay] 
     
     return (
@@ -53,7 +54,7 @@ function WeeklyCalendarContent() {
               Daily Summary
             </h1>
             <h2 className='text-[#9e9e9e] text-[15px]'>
-              {day}, {month} {year} 
+              {day}, {currDateNum} {month} {year} 
             </h2>
           </div>
             
@@ -61,14 +62,14 @@ function WeeklyCalendarContent() {
             {
               selectedEntries && (
                 <div>
-                  {/* <div className='pt-[40px] space-y-6 pb-52'>
-                    <MoodAnalysisChange mood_graph={[]} />
+                  <div className='pt-[40px] space-y-6 pb-52'>
+                    <MoodAnalysisChange all_mood_data={[]} />
                     <MoodCompositionWidget data={[]}/>
                     <MoodActivityWidget entries={[]}/>
                     <MoodInsightWidget />  
                     <MoodTriggersWidget data={[]}/>
                     <DailyAudioEntries entries={selectedEntries}/>
-                  </div> */}
+                  </div>
 
 
                   <ul className='space-y-2'>

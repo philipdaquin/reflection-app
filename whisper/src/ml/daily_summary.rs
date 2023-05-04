@@ -11,19 +11,19 @@ use super::whisper::AudioDataDTO;
 pub struct DailySummary { 
     
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    id: Option<ObjectId>,
+    pub id: Option<ObjectId>,
 
     /// Current Date 
-    date: Option<DateTime>,
+    pub date: Option<DateTime>,
 
     /// The total number of entries 
-    total_entries: i32,
+    pub total_entries: i32,
 
     /// Current Mood based on the Daily Average 
-    overall_mood: Option<String>,
+    pub overall_mood: Option<String>,
 
     /// Daily Average 
-    current_avg: Option<f32>,
+    pub current_avg: Option<f32>,
 
     /// User's change of mood 
     pub inflection: Option<AudioDataDTO>,
@@ -38,5 +38,10 @@ pub struct DailySummary {
     /// Emotion, Count 
     /// count = Map<String, I32>
     pub triggers: HashMap<String, usize>
+}
 
+impl DailySummary { 
+    fn new() -> Self { 
+        todo!()
+    }
 }

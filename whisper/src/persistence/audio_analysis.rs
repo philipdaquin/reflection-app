@@ -3,7 +3,7 @@ use chrono::{Utc, Duration, TimeZone, Datelike};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
 use mongodb::options::AggregateOptions;
-use crate::ml::text_classification::TopMood;
+use crate::ml::text_classification::MoodFrequency;
 use crate::{error::Result, ml::text_classification::TextClassification};
 use super::db::MongoDbClient;
 use futures_util::{TryStreamExt, StreamExt};
@@ -12,10 +12,11 @@ const COLL_NAME: &str = "analysis";
 
 #[async_trait]
 pub trait TextAnalysisInterface { 
+    async fn get_all_analysis() -> Result<Vec<TextClassification>>;
     async fn add_analysis(new_analysis: TextClassification) -> Result<TextClassification>;
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>>;
     async fn get_recent() -> Result<Vec<TextClassification>>;
-    async fn get_most_common_emotions() -> Result<Vec<TopMood>>;
+    async fn get_mood_frequency() -> Result<Vec<MoodFrequency>>;
     async fn delete_all_entries() -> Result<bool>;
     fn get_analysis_db() -> Collection<TextClassification>;
 }
@@ -119,6 +120,39 @@ impl AnalysisDb {
 
 #[async_trait]
 impl TextAnalysisInterface for AnalysisDb { 
+
+    /// Returns all analysis to the user, 
+    /// If empty, return [] to the user 
+    async fn get_all_analysis() -> Result<Vec<TextClassification>> { 
+        log::info!("Retrieving recent dataset...");
+        let mut result = Vec::with_capacity(10);
+        let collection = AnalysisDb::get_analysis_db();
+
+        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
+        
+        // Filter 
+        // let filter = doc! { 
+        //     "date": { 
+        //         "$gte": bson_start_date,
+        //         "$lt": bson_end_date,
+        //     } 
+        // };
+        
+        let filter = doc! { };
+        
+        // Get the matching document 
+        let mut doc = collection.find(filter, None).await?;
+        
+        while let Some(doc) = doc.try_next().await? {
+            result.push(doc);
+        }
+
+        log::info!("FOUNDED ITEMS FOR THIS: {result:#?}");
+
+        Ok(result)
+    }
+
+
     ///
     /// Retrieves Text Classification Analyses for this week 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
@@ -186,7 +220,7 @@ impl TextAnalysisInterface for AnalysisDb {
     ///
     /// Aggregate the top 3 most commonly mood / emotion over the week 
     #[tracing::instrument(level= "debug", err)]
-    async fn get_most_common_emotions() -> Result<Vec<TopMood>> {
+    async fn get_mood_frequency() -> Result<Vec<MoodFrequency>> {
         let collection = AnalysisDb::get_analysis_db();
         let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
 
@@ -213,16 +247,18 @@ impl TextAnalysisInterface for AnalysisDb {
                         "emotion": "$emotion", 
                         "emotion_emoji": "$emotion_emoji",
                     },
-                    "count": {"$sum": 1}
+                    "count": {"$sum": 1},
+                    "_audio_ids": {"$push": "$_audio_id"}
                 }
             },
+
             // Sort by count in descending order
             doc! {"$sort": {"count": -1}},
 
             // TESTING PURPOSES
             // doc! {"$sort": {"count": 1}},
             // Limit to top 3 emotions
-            doc! {"$limit": 3},
+            // doc! {"$limit": 3},
 
             // Project the result to the desired format
             doc! {
@@ -230,6 +266,7 @@ impl TextAnalysisInterface for AnalysisDb {
                     "_id": 0,
                     "emotion": "$_id.emotion",
                     "emotion_emoji": "$_id.emotion_emoji",
+                    "_audio_ids": 1,
                     "count": 1
                 }
             }
@@ -256,7 +293,20 @@ impl TextAnalysisInterface for AnalysisDb {
             let percent = count / total_records as f32 * 100.0;
             let emotion = item.get_str("emotion").unwrap_or_default().to_string();
             let emoji = item.get_str("emotion_emoji").unwrap_or_default().to_string();
-            result.push(TopMood::new(Some(emoji), Some(emotion), Some(percent)));
+            let audio_ids = item.get_array("_audio_ids")
+                .unwrap_or(&Vec::new())
+                .into_iter()
+                .map(|f| f.to_string())
+                .collect();
+ 
+
+            result.push(MoodFrequency::new(
+                Some(emoji), 
+                Some(emotion), 
+                Some(count as i64), 
+                Some(percent),
+                audio_ids
+            ));
         }
         log::info!("{result:#?}");
 

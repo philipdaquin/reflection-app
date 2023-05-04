@@ -18,6 +18,7 @@ use super::Input;
 pub fn configure_analysis_service(cfg: &mut web::ServiceConfig) { 
     cfg
     .service(get_version)
+    .service(get_all)
     .service(get_mood_summary)
     .service(get_common_mood)
     .service(get_weekly_patterns)
@@ -32,6 +33,22 @@ pub fn configure_analysis_service(cfg: &mut web::ServiceConfig) {
 pub async fn get_version() -> &'static str { 
     return env!("CARGO_PKG_VERSION")
 }
+
+///
+/// Retrieves all items from the database
+#[route("/api/analysis/get-all", method = "GET")]
+pub async fn get_all() -> Result<HttpResponse> { 
+    let res = AnalysisDb::get_all_analysis()
+        .await?
+        .into_iter()
+        .map(AudioAnalysis::from)
+        .collect::<Vec<AudioAnalysis>>();
+
+    log::info!("{res:#?}");
+
+    Ok(HttpResponse::Ok().json(res))
+}
+
 
 ///
 /// Retrieves items from the last 7 days 

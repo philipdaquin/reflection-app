@@ -14,10 +14,10 @@ import MoodSummary from '../MoodSummary';
 import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget';
 
 interface Props { 
-  mood_graph: TextClassification[] | null
+  all_mood_data: TextClassification[] | null
 }
 
-function HomeSummaryContent({mood_graph} : Props) {
+function HomeSummaryContent({all_mood_data} : Props) {
 
   const currentDate = new Date()
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -49,9 +49,9 @@ function HomeSummaryContent({mood_graph} : Props) {
       {/* **Designed this way so each widget can be reused again */}
       <div className='pt-[40px] space-y-6 pb-52'>
         <MoodSummaryWidget />
-        <MoodAnalysisChange mood_graph={mood_graph} />
-        <MoodCompositionWidget data={[]}/>
-        <MoodActivityWidget entries={[]}/>
+        <MoodAnalysisChange all_mood_data={all_mood_data} />
+        {/* <MoodCompositionWidget data={[]}/> */}
+        {/* <MoodActivityWidget entries={[]}/> */}
         <MoodInsightWidget />  
         <MoodTriggersWidget data={[]}/>
         <DailyAudioEntries entries={[]}/>

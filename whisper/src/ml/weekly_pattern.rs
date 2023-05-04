@@ -5,7 +5,7 @@ use serde::{Serialize, Deserialize};
 use crate::{error::{Result, ServerError}, persistence::{audio_db::{AudioDB, AudioInterface}, 
 weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}, audio_analysis::AnalysisDb}};
 
-use super::{text_classification::{TopMood, TextClassification}, recommendation::RecommendedActivity, whisper::{AudioDataDTO}};
+use super::{text_classification::{MoodFrequency, TextClassification}, recommendation::RecommendedActivity, whisper::{AudioDataDTO}};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ImportantEvents { 
@@ -40,7 +40,7 @@ pub struct WeeklyAnalysisDTO {
     pub end_week: Option<DateTime>,
 
     // User's common mood in the week 
-    pub common_mood: Option<Vec<TopMood>>,
+    pub common_mood: Option<Vec<MoodFrequency>>,
 
     // User's change of mood 
     pub inflection: Option<AudioDataDTO>,

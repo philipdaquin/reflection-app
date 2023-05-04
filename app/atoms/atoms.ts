@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { AudioData } from "../typings";
+import { AudioData, DefaultFilterOption } from "../typings";
 import { ELEVEN_LABS_KEY, OPENAI_KEY } from "../components/SettingsButtons";
 
 export const TimerState = atom({
@@ -39,4 +39,10 @@ export const OpenAIApiKey = atom<string | null>({
 export const AddEntryToggle = atom({
     key: 'AddEntryToggle',
     default: false,
+})
+
+
+export const SelectedFilterOption = atom({
+    key: 'SelectedFilterOption',
+    default: DefaultFilterOption
 })

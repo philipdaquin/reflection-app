@@ -1,28 +1,16 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
-  Label, Line, ResponsiveContainer,  ReferenceDot, ReferenceLine } from 'recharts';
+  Label, Line, ResponsiveContainer,  ReferenceDot, ReferenceLine, Brush } from 'recharts';
 import { WeeklyData } from '../typings';
+import { useRecoilValue } from 'recoil';
+import { SelectedFilterOption } from '../atoms/atoms';
+import { AxisInterval } from 'recharts/types/util/types';
 
-
-interface Props { 
- data: WeeklyData[]
-}
-
-function MoodAreaChart({data}: Props) {
-
-    let maxValue: number = Math.max(...data.map((v) => v.mood))
-    let maxData = data.find((v) => v.mood == maxValue)
-
-
-    let minValue = Math.min(...data.map((v) => v.mood))
-    let minData = data.find((v) => v.mood === minValue)
-
-    
-const CustomizedLabel: React.FC = () => (
-  <text x={250} y={40} fontSize={14} fill="#000" textAnchor="middle">
-    {`Max UV: ${maxValue}`}
-  </text>
-);
+// const CustomizedLabel: React.FC = () => (
+//   <text x={250} y={40} fontSize={14} fill="#000" textAnchor="middle">
+//     {`Max UV: ${maxValue}`}
+//   </text>
+// );
 
 interface CustomXAxisTickProps {
   x: number;
@@ -38,12 +26,94 @@ const CustomXAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
   );
 };
 
+// interface CustomizedBrushProps {
+//   handleBrushChange: (data: WeeklyData[]) => void;
+// }
+
+// const CustomizedBrush: React.FC<CustomizedBrushProps> = ({ handleBrushChange }) => {
+//   return (
+//     <Brush
+//       dataKey="date"
+//       height={30}
+//       stroke="#8884d8"
+//       onChange={handleBrushChange}
+//     />
+//   );
+// };
+
+
+// Fix empty X axis when there's no data 
+// - Get current Time now 
+// - Set Min and Max Data 
+function getHourData(data: WeeklyData[]) { 
+  const selectedFilter = useRecoilValue(SelectedFilterOption)
+
+
+  if (selectedFilter.label === '24H') {
+    let timeNow = new Date()
+  
+    let minData: WeeklyData = { 
+      date: new Date(
+        timeNow.getFullYear(),
+        timeNow.getMonth(),
+        timeNow.getDate(),
+        0,
+        0,
+        0
+      ),
+      mood: 0
+    }
+    let maxData: WeeklyData = { 
+      date: new Date(
+        timeNow.getFullYear(),
+        timeNow.getMonth(),
+        timeNow.getDate(),
+        23,
+        59,
+        59
+      ),
+      mood: 0
+    }
+    data.push(minData)
+    data.push(maxData)
+  }
+
+
+  return data
+}
+
+interface Props { 
+ data: WeeklyData[]
+}
+
+function MoodAreaChart({data}: Props) {
+
+
+    const selectedFilter = useRecoilValue(SelectedFilterOption)
+
+    let maxValue: number = Math.max(...data.map((v) => v.mood))
+    let maxData = data.find((v) => v.mood == maxValue)
+
+
+    let minValue = Math.min(...data.map((v) => v.mood))
+    let minData = data.find((v) => v.mood === minValue)
+    
+    const [minDate, maxDate] = useMemo(() => {
+      const dates = data.map((d) => new Date(d.date).getTime());
+      return [new Date(Math.min(...dates)), new Date(Math.max(...dates))];
+    }, [data]);
+
+    let test = getHourData(data)
+
+
     return (
         <ResponsiveContainer width="100%" height="100%">
             <AreaChart
                 width={390}
                 height={300}
-                data={data}
+                data={
+                  selectedFilter.label === '24' ? test : data
+                }
                 margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
             >
                 <defs>
@@ -56,21 +126,48 @@ const CustomXAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
                     <stop offset="95%" stopColor="rgba(255, 184, 0, 0.38)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
+            <Brush dataKey='date' height={30} stroke="#8884d8"/>
 
-                <XAxis dataKey="name" tick={CustomXAxisTick} />
+
+                {/* <XAxis 
+                  dataKey="date" 
+                  tick={CustomXAxisTick} 
+                  domain={[minDate.toString(), maxDate.toString()]} 
+                /> */}
+                <XAxis 
+                  dataKey="date" 
+                  interval={selectedFilter.interval as AxisInterval} 
+                  domain = {['auto', 'auto']}               
+                  tickCount={
+                    selectedFilter.interval === 'hour'
+                    ? 24
+                    : undefined
+                  }
+              
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    if (selectedFilter.interval === 'hour') {
+                      return date.getHours().toString().padStart(2, '0') + ':00';
+                    } else {
+                      return new Intl.DateTimeFormat('en-US', {
+                        month: selectedFilter.format ? 'long' : undefined,
+                        day:  'numeric',
+                      }).format(date);
+                    }
+                  }}
+                />
+
+
                 <Tooltip />
 
-                {/* <CartesianGrid stroke="#eee" strokeDasharray="5 5"/> */}
-
-
                 {/* MAX DATA */}
-                <ReferenceDot x={maxData?.name} y={maxData?.mood} r={7} fill="#000" className=''  
+                <ReferenceDot x={maxData?.date.toString()} y={maxData?.mood} r={7} fill="#000" className=''  
                   isFront={true}>
-                  <Label x={maxData?.name} value="MAX" position={"top"}className="font-bold text-sm"/>
+                  <Label x={maxData?.date.toString()} value="MAX" position={"top"}className="font-bold text-sm"/>
                 </ReferenceDot >
                 <ReferenceLine 
-                    x={maxData?.name} 
-                    x2={maxData?.name} 
+                    x={maxData?.date.toString()} 
+                    x2={maxData?.date.toString()} 
                     r={7} 
                     stroke="#000" 
                     strokeDasharray=" 3 3 "
@@ -78,19 +175,16 @@ const CustomXAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
                   />
 
                 {/* MIN DATA */}
-                <ReferenceDot x={minData?.name} y={minData?.mood} r={7} fill="#000" 
+                <ReferenceDot x={minData?.date.toString()} y={minData?.mood} r={7} fill="#000" 
                 isFront={true}>
-                  <Label x={maxData?.name} value="SEVERE" position={"top"} className="font-bold text-sm"/>
+                  <Label x={maxData?.date.toString()} value="SEVERE" position={"top"} className="font-bold text-sm"/>
                 </ReferenceDot>
                 <ReferenceLine 
-                  x={minData?.name}
-                  x2={minData?.name}
+                  x={minData?.date.toString()}
+                  x2={minData?.date.toString()}
                   r={7} 
                   stroke="#000" 
                   strokeDasharray="3 3" />
-
-
-
 
                 <Area type="monotone" dataKey="mood" stroke="#FFA500" fillOpacity={1} fill="url(#colorUv)" />
             </AreaChart>

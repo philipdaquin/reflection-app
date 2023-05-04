@@ -1,7 +1,7 @@
 use chrono::{ Utc, Datelike, DateTime};
 use serde::{Serialize, Deserialize};
 
-use crate::ml::{weekly_pattern::{ImportantEvents, WeeklyAnalysisDTO}, recommendation::RecommendedActivity, text_classification::TopMood};
+use crate::ml::{weekly_pattern::{ImportantEvents, WeeklyAnalysisDTO}, recommendation::RecommendedActivity, text_classification::MoodFrequency};
 
 use super::audiodata::AudioData;
 
@@ -15,7 +15,7 @@ pub struct WeeklyAnalysis {
     pub total_entries: i32,
     pub start_week: Option<DateTime<Utc>>,
     pub end_week: Option<DateTime<Utc>>,
-    pub common_mood: Option<Vec<TopMood>>,
+    pub common_mood: Option<Vec<MoodFrequency>>,
     pub inflection: Option<AudioData>,
     pub min: Option<AudioData>,
     pub max: Option<AudioData>,

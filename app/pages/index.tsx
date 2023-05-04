@@ -23,17 +23,21 @@ import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import MoodActivityChart from '../components/MoodActivityChart'
 import HomeSummaryContent from '../components/pages/HomeSummaryContent'
+import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
 
 
 
 
 interface Props { 
-  mood_data: TextClassification[] | null,
-  recent_entries: AudioData[] | null
+  // mood_data: TextClassification[] | null,
+  recent_entries: AudioData[] | null,
+  all_mood_data: TextClassification[] | null
 }
 
 
-function Home({mood_data, recent_entries}: Props) {
+function Home({
+  // mood_data, 
+  recent_entries, all_mood_data}: Props) {
 
   console.log(recent_entries)
   // Start API keys 
@@ -61,7 +65,7 @@ function Home({mood_data, recent_entries}: Props) {
                 mood_data={mood_data}
                 recent_entries={recent_entries}  
               /> */}
-              <HomeSummaryContent mood_graph={mood_data}/>
+              <HomeSummaryContent all_mood_data={all_mood_data}/>
 
             </PhoneView>
 
@@ -96,17 +100,19 @@ function Home({mood_data, recent_entries}: Props) {
 export default Home
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const [mood_data, recent_entries] = await Promise.all([
+  const [mood_data, recent_entries, all_mood] = await Promise.all([
       ( await getMoodSummary() ),
-      ( await getRecentAudioEntries() )
+      ( await getRecentAudioEntries() ),
+      ( await getAllAnalysis() )
   ]) 
 
   // console.log(response)
 
   return { 
     props: { 
-      mood_data,
-      recent_entries
+      // mood_data,
+      recent_entries,
+      all_mood_data: all_mood
     }
   }
 }

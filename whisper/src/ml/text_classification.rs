@@ -5,19 +5,29 @@ use crate::{error::Result, persistence::{audio_analysis::{AnalysisDb, TextAnalys
 use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_pattern::WeeklyAnalysisDTO};
 use bson::{ DateTime};
 #[derive(Debug, Serialize, Clone, Deserialize)]
-pub struct TopMood { 
+pub struct MoodFrequency { 
     pub emotion: Option<String>,
-    // #[serde(rename = "emoji", skip_serializing_if = "Option::is_none")]
     pub emotion_emoji: Option<String>,
-    pub percentage: Option<f32>
+    pub count: Option<i64>, 
+    pub percentage: Option<f32>,
+
+    #[serde(rename = "_audio_ids")]
+    pub audio_ref: Vec<String>
 }
 
-impl TopMood { 
-    pub fn new(emotion_emoji: Option<String>, emotion: Option<String>, percent: Option<f32>) -> Self { 
+impl MoodFrequency { 
+    pub fn new(emotion_emoji: Option<String>, 
+        emotion: Option<String>, 
+        count: Option<i64>,
+        percent: Option<f32>,
+        audio_ref: Vec<String>
+    ) -> Self { 
         Self { 
             emotion_emoji, 
             emotion,
-            percentage: percent
+            count,
+            percentage: percent,
+            audio_ref
         }
     }
 }
@@ -136,9 +146,9 @@ impl TextClassification {
     ///
     /// Aggregates the top 3 most common mood within a week 
     #[tracing::instrument(fields(input, self), level= "debug")]
-    pub async fn get_most_common_moods() -> Result<Vec<TopMood>> { 
+    pub async fn get_most_common_moods() -> Result<Vec<MoodFrequency>> { 
         
-        let weekly = AnalysisDb::get_most_common_emotions().await.unwrap();
+        let weekly = AnalysisDb::get_mood_frequency().await.unwrap();
 
         log::info!("Common Mood: {weekly:?}");
 
