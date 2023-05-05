@@ -4,6 +4,8 @@ use chrono::{NaiveDateTime, Weekday, Datelike, Utc};
 use crate::{error::Result, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}};
 use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_pattern::WeeklyAnalysisDTO};
 use bson::{ DateTime};
+
+
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct MoodFrequency { 
     pub emotion: Option<String>,

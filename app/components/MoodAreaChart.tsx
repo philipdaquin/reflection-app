@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
   Label, Line, ResponsiveContainer,  ReferenceDot, ReferenceLine, Brush } from 'recharts';
-import { WeeklyData } from '../typings';
+import { FilterOptions, WeeklyData } from '../typings';
 import { useRecoilValue } from 'recoil';
 import { SelectedFilterOption } from '../atoms/atoms';
 import { AxisInterval } from 'recharts/types/util/types';
+import { eachDayOfInterval, formatISO } from 'date-fns';
 
 // const CustomizedLabel: React.FC = () => (
 //   <text x={250} y={40} fontSize={14} fill="#000" textAnchor="middle">
@@ -53,33 +54,75 @@ function getHourData(data: WeeklyData[]) {
     let timeNow = new Date()
   
     let minData: WeeklyData = { 
-      date: new Date(
-        timeNow.getFullYear(),
-        timeNow.getMonth(),
-        timeNow.getDate(),
-        0,
-        0,
-        0
-      ),
+      date: new Date( timeNow.getFullYear(), timeNow.getMonth(), timeNow.getDate(), 0, 0, 0),
       mood: 0
     }
     let maxData: WeeklyData = { 
-      date: new Date(
-        timeNow.getFullYear(),
-        timeNow.getMonth(),
-        timeNow.getDate(),
-        23,
-        59,
-        59
-      ),
+      date: new Date( timeNow.getFullYear(), timeNow.getMonth(), timeNow.getDate(), 23, 59, 59),
       mood: 0
     }
     data.push(minData)
     data.push(maxData)
   }
-
-
   return data
+}
+
+
+const TickFormatter = (value: any, filter: FilterOptions) => { 
+  try { 
+    const date = new Date(value);
+    if (filter.interval === 'hour') {
+      return date.getHours().toString().padStart(2, '0') + ':00';
+    } else {
+      return new Intl.DateTimeFormat('en-US', {
+        month: filter.format ? 'long' : undefined,
+        day:  'numeric',
+      }).format(date);
+    }
+  } catch (e) { 
+    console.error(e)
+    return value 
+  }
+} 
+
+function fillMissingDate(data: WeeklyData[]): WeeklyData[] { 
+  let startDate = new Date(data[0].date)
+  let endDate = new Date(data[data.length - 1].date)
+
+  const dateRange = eachDayOfInterval({start: startDate, end: endDate})
+    .map(date => formatISO(date, { representation: 'date'}))
+
+
+  let dataMood: Map<Date, number> = new Map(data.map(({date,mood}, i) => [date, mood]))
+  let allData: WeeklyData[] = []
+  // If there is no date under a date, insert a default
+  // const chartData = dateRange.map((date) => {
+  //   const dateString = new Date(date);
+  //   const mood = dataMood.get(dateString) ?? 0; // Use mood from data if available, otherwise use 0
+  //   return { date: dateString, mood };
+  // });
+  console.log(dataMood)
+  console.log(dateRange)
+
+  // Create a new array with default values for any missing dates in input data 
+  // for (const date in dateRange) {
+  //   let matchingData = data.i
+
+  //   if (matchingData) { 
+  //     allData.push(matchingData)
+  //   } else  { 
+  //     let defaultValue: WeeklyData = { 
+  //       date: new Date(date),
+  //       mood: 0
+  //     }
+  //     allData.push(defaultValue)
+  //   }
+    
+  // }
+
+  console.log(dateRange)
+
+  return allData
 }
 
 interface Props { 
@@ -87,8 +130,7 @@ interface Props {
 }
 
 function MoodAreaChart({data}: Props) {
-
-
+    
     const selectedFilter = useRecoilValue(SelectedFilterOption)
 
     let maxValue: number = Math.max(...data.map((v) => v.mood))
@@ -104,6 +146,7 @@ function MoodAreaChart({data}: Props) {
     }, [data]);
 
     let test = getHourData(data)
+    // let allData = fillMissingDate(data)
 
 
     return (
@@ -144,17 +187,12 @@ function MoodAreaChart({data}: Props) {
                     : undefined
                   }
               
-                  tickFormatter={(value) => {
-                    const date = new Date(value);
-                    if (selectedFilter.interval === 'hour') {
-                      return date.getHours().toString().padStart(2, '0') + ':00';
-                    } else {
-                      return new Intl.DateTimeFormat('en-US', {
-                        month: selectedFilter.format ? 'long' : undefined,
-                        day:  'numeric',
-                      }).format(date);
-                    }
-                  }}
+                  tickFormatter={(value) => TickFormatter(value, selectedFilter)}
+                  // tickFormatter={(value) => new Intl.DateTimeFormat('en-US', { 
+                  //   month: selectedFilter.format ? 'long' : undefined , 
+                  //   day: selectedFilter.format?.includes('MMM') ? undefined : 'numeric', 
+                  //   hour: selectedFilter.interval === 'hour' ? 'numeric' : undefined 
+                  // }).format(new Date(value))} 
                 />
 
 

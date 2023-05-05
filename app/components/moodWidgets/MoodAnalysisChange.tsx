@@ -7,7 +7,7 @@ import { useRecoilState } from 'recoil'
 import { SelectedFilterOption } from '../../atoms/atoms'
 
 interface Props { 
-    all_mood_data: TextClassification[] | null
+    all_mood_data: TextClassification[] | null | undefined
 }
 
 

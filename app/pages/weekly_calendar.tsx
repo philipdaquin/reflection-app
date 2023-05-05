@@ -71,3 +71,18 @@ function weekly_record() {
 }
 
 export default weekly_record
+
+
+// export const getServerSideProps: GetServerSideProps<Props> = async () => {
+//   const [mood_data_by_date] = await Promise.all([
+//       ( await getAllAnalysis() )
+//   ]) 
+//   // console.log(response)
+//   return { 
+//     props: { 
+//       // mood_data,
+//       recent_entries,
+//       all_mood_data: all_mood
+//     }
+//   }
+// }

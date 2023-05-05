@@ -2,7 +2,7 @@ import React from 'react'
 import MoodChart from '../moodWidgets/MoodAnalysisChange';
 import { getMoodSummary } from '../../util/analysis/getMoodSummary';
 import { GetServerSideProps } from 'next';
-import { DEFAULT_IMAGE_URL, TextClassification } from '../../typings';
+import { AudioData, DEFAULT_IMAGE_URL, TextClassification } from '../../typings';
 import MoodAnalysisChange from '../moodWidgets/MoodAnalysisChange';
 import Image from 'next/image';
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget';
@@ -15,9 +15,10 @@ import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget';
 
 interface Props { 
   all_mood_data: TextClassification[] | null
+  recent_entries: AudioData[] | null,
 }
 
-function HomeSummaryContent({all_mood_data} : Props) {
+function HomeSummaryContent({all_mood_data, recent_entries} : Props) {
 
   const currentDate = new Date()
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -54,7 +55,7 @@ function HomeSummaryContent({all_mood_data} : Props) {
         {/* <MoodActivityWidget entries={[]}/> */}
         <MoodInsightWidget />  
         <MoodTriggersWidget data={[]}/>
-        <DailyAudioEntries entries={[]}/>
+        <DailyAudioEntries entries={recent_entries}/>
       </div>
 
 

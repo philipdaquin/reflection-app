@@ -65,7 +65,10 @@ function Home({
                 mood_data={mood_data}
                 recent_entries={recent_entries}  
               /> */}
-              <HomeSummaryContent all_mood_data={all_mood_data}/>
+              <HomeSummaryContent 
+                all_mood_data={all_mood_data}
+                recent_entries={recent_entries}
+              />
 
             </PhoneView>
 

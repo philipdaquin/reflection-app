@@ -115,7 +115,7 @@ function DailyAudioEntries({entries}: Props) {
         },
     ];
 
-    // const data: EntryType[] | undefined = entries?.map((item, i) => new EntryType(item)) || testData
+    const data: EntryType[] | undefined = entries?.map((item, i) => new EntryType(item)) || testData
 
     const router = useRouter()  
 
@@ -141,7 +141,7 @@ function DailyAudioEntries({entries}: Props) {
 
             <div className='space-y-5 pt-4'>
                 {
-                    testData.map((item, i) => { 
+                    data.slice(0, 3).map((item, i) => { 
                         return (
                             <div key={i}>
                                 <AudioEntry entry={item}/>

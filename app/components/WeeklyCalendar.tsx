@@ -43,7 +43,7 @@ function WeeklyCalendar({setCurrDate}: Props) {
         setShowWeekly(!showWeekly)
     }
 
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
 
     const selectDate = (day: Date) => { 
         setSelectedDate(day)

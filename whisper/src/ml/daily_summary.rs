@@ -1,9 +1,12 @@
 use std::collections::HashMap;
 
 use bson::{oid::ObjectId, DateTime};
+use chrono::{Utc, NaiveDate};
 use serde::{Serialize, Deserialize};
 
-use super::whisper::AudioDataDTO;
+use crate::error::Result;
+
+use super::{whisper::AudioDataDTO, text_classification::MoodFrequency};
 
 
 
@@ -14,7 +17,7 @@ pub struct DailySummary {
     pub id: Option<ObjectId>,
 
     /// Current Date 
-    pub date: Option<DateTime>,
+    pub date: Option<NaiveDate>,
 
     /// The total number of entries 
     pub total_entries: i32,
@@ -35,13 +38,63 @@ pub struct DailySummary {
     pub max: Option<AudioDataDTO>,
 
     /// Mood triggers
-    /// Emotion, Count 
-    /// count = Map<String, I32>
-    pub triggers: HashMap<String, usize>
+    pub mood_frequency: Vec<MoodFrequency>
 }
 
 impl DailySummary { 
+    
+    /// 
+    /// Initialise the DailySummary 
     fn new() -> Self { 
+        
+        let id = ObjectId::new();
+        let date = Utc::now().date_naive();
+        Self { 
+            id: Some(id), 
+            date: Some(date),
+            ..Default::default()
+        }
+    }
+
+    /// 
+    /// Retrieve the minimum mood entry 
+    pub async fn get_min_mood(&mut self) -> Result<Self> { 
         todo!()
     }
+
+    ///
+    /// Retrieve the turning point in the user's mood
+    pub async fn get_inflection_mood(&mut self) -> Result<Self> { 
+        todo!()
+    }
+
+    ///
+    /// Retrieve teh maximum mood entry 
+    pub async fn get_max_mood(&mut self) -> Result<Self> {
+        todo!()
+    }
+
+    ///
+    /// Retrieve mood frequencies 
+    pub async fn get_mood_frequency(&mut self) -> Result<Self> { 
+        todo!()
+    }
+
+    ///
+    /// Retrieves the new average 
+    pub async fn get_average(&mut self) -> Result<Self> { 
+        todo!()
+    }
+
+    ///
+    /// Update total entries 
+    pub async fn increment_entries(&mut self) -> Result<()> { 
+        todo!()
+    }
+
+    pub async fn save(&self) -> Result<Self> { 
+        todo!()
+    }
+
+
 }

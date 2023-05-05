@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import WeeklyCalendar from '../WeeklyCalendar'
 import { getAllByDate } from '../../util/audio/getAllByDate'
-import { AudioData } from '../../typings'
+import { AudioData, TextClassification } from '../../typings'
 import AudioEntry from '../AudioEntry'
 import Link from 'next/link'
 import DailyAudioEntries from '../moodWidgets/DailyAudioEntries'
@@ -10,20 +10,21 @@ import MoodInsightWidget from '../moodWidgets/MoodInsightWidget'
 import MoodAnalysisChange from '../moodWidgets/MoodAnalysisChange'
 import MoodActivityWidget from '../moodWidgets/MoodActivityWidget'
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget'
+import { getAll } from '../../util/audio/getAll'
 
 function WeeklyCalendarContent() {
 
 
     const [currDate, setCurrDate] = useState<Date>(new Date())
     const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>()
-    
+    const [selectedAnalsysis, setselectedAnalsysis] = useState<TextClassification[] | null>()
 
     // Set to get the DailySummary which includes all relevant data 
-    const entry = async (data: Date) => { 
-        const entries = await getAllByDate(data)
+    const entry = async (date: Date) => { 
+        // const entries = await getAll()
+        const entries = await getAllByDate(date)
         setSelectedEntries(entries)
     }
-    
     useEffect(() => {
         if (!currDate) return 
         entry(currDate)
@@ -39,6 +40,15 @@ function WeeklyCalendarContent() {
     const currDateNum = currDate.getDate()
     let day = daysOfWeek[currDay] 
     
+    useEffect(() => {
+      if (!selectedEntries) return 
+
+      const textClassification: TextClassification[] | null | undefined  = selectedEntries?.map((item, i) => item.text_classification) || []
+      setselectedAnalsysis(textClassification)
+
+    }, [selectedEntries])
+    
+
     return (
 
         <div className='w-full relative'>
@@ -61,10 +71,10 @@ function WeeklyCalendarContent() {
           <div>
             {
               selectedEntries && (
-                <div>
-                  <div className='pt-[40px] space-y-6 pb-52'>
-                    <MoodAnalysisChange all_mood_data={[]} />
-                    <MoodCompositionWidget data={[]}/>
+                <div className='pt-10  pb-52'>
+                  <div className=' space-y-6'>
+                    <MoodAnalysisChange all_mood_data={selectedAnalsysis} />
+                    {/* <MoodCompositionWidget data={[]}/>  */}
                     <MoodActivityWidget entries={[]}/>
                     <MoodInsightWidget />  
                     <MoodTriggersWidget data={[]}/>
@@ -72,7 +82,7 @@ function WeeklyCalendarContent() {
                   </div>
 
 
-                  <ul className='space-y-2'>
+                  {/* <ul className='space-y-2'>
                         {
                           selectedEntries?.map(({
                             _id, date, day, summary, tags, text_classification, title, transcription
@@ -99,7 +109,7 @@ function WeeklyCalendarContent() {
                               )
                           })
                         }
-                  </ul>
+                  </ul> */}
                 </div>
               )
             }
