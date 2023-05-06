@@ -2,7 +2,7 @@ import React from 'react'
 import MoodChart from '../moodWidgets/MoodAnalysisChange';
 import { getMoodSummary } from '../../util/analysis/getMoodSummary';
 import { GetServerSideProps } from 'next';
-import { AudioData, DEFAULT_IMAGE_URL, TextClassification } from '../../typings';
+import { AudioData, DEFAULT_IMAGE_URL, DailySummary, TextClassification } from '../../typings';
 import MoodAnalysisChange from '../moodWidgets/MoodAnalysisChange';
 import Image from 'next/image';
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget';
@@ -16,9 +16,10 @@ import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget';
 interface Props { 
   all_mood_data: TextClassification[] | null
   recent_entries: AudioData[] | null,
+  dailyMoodSummary: DailySummary | null
 }
 
-function HomeSummaryContent({all_mood_data, recent_entries} : Props) {
+function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary} : Props) {
 
   const currentDate = new Date()
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -49,7 +50,12 @@ function HomeSummaryContent({all_mood_data, recent_entries} : Props) {
       {/* Widget : Mood Changes */}
       {/* **Designed this way so each widget can be reused again */}
       <div className='pt-[40px] space-y-6 pb-52'>
-        <MoodSummaryWidget />
+        {dailyMoodSummary && 
+          (
+            <MoodSummaryWidget dailyMoodSummary={dailyMoodSummary}/>
+
+          )
+        }
         <MoodAnalysisChange all_mood_data={all_mood_data} />
         {/* <MoodCompositionWidget data={[]}/> */}
         {/* <MoodActivityWidget entries={[]}/> */}

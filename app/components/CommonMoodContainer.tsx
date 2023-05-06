@@ -1,5 +1,5 @@
 import React from 'react'
-import { CommonMoodData, TopMood } from '../typings'
+import { CommonMoodData } from '../typings'
 
 
 interface Props { 

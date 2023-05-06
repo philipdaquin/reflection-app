@@ -1,6 +1,6 @@
-import { TopMood } from "../../typings"
+import { MoodFrequency } from "../../typings"
 
-export async function getCommonMood(): Promise<TopMood[] | null> { 
+export async function getCommonMood(): Promise<MoodFrequency[] | null> { 
     return fetch('http://localhost:4001/api/analysis/get-common-mood', {
         method: "GET",
         headers: {
@@ -9,7 +9,7 @@ export async function getCommonMood(): Promise<TopMood[] | null> {
         
     })
     .then(async (resp) => { 
-        const body = await resp.json() as TopMood[]
+        const body = await resp.json() as MoodFrequency[]
         // console.log(body)
         return body
     })

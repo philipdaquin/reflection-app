@@ -7,7 +7,7 @@ import SwitchView from '../components/SwitchView'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import AudioVisualizer from '../components/AudioVisualizer'
-import { AudioData, TextClassification } from '../typings'
+import { AudioData, DailySummary, TextClassification } from '../typings'
 import { getMoodSummary } from '../util/analysis/getMoodSummary'
 import SettingsButtons from '../components/SettingsButtons'
 import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, 
@@ -24,6 +24,7 @@ import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import MoodActivityChart from '../components/MoodActivityChart'
 import HomeSummaryContent from '../components/pages/HomeSummaryContent'
 import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
+import { getDailyByDate } from '../util/daily/getDailyByDate'
 
 
 
@@ -31,13 +32,17 @@ import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
 interface Props { 
   // mood_data: TextClassification[] | null,
   recent_entries: AudioData[] | null,
-  all_mood_data: TextClassification[] | null
+  all_mood_data: TextClassification[] | null,
+  dailyMoodSummary: DailySummary | null
 }
 
 
 function Home({
   // mood_data, 
-  recent_entries, all_mood_data}: Props) {
+  recent_entries, 
+  all_mood_data,
+  dailyMoodSummary
+}: Props) {
 
   console.log(recent_entries)
   // Start API keys 
@@ -68,6 +73,7 @@ function Home({
               <HomeSummaryContent 
                 all_mood_data={all_mood_data}
                 recent_entries={recent_entries}
+                dailyMoodSummary={dailyMoodSummary}
               />
 
             </PhoneView>
@@ -103,19 +109,21 @@ function Home({
 export default Home
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const [mood_data, recent_entries, all_mood] = await Promise.all([
+  const [mood_data, recent_entries, all_mood, dailyMoodSummary] = await Promise.all([
       ( await getMoodSummary() ),
       ( await getRecentAudioEntries() ),
-      ( await getAllAnalysis() )
+      ( await getAllAnalysis() ),
+      ( await getDailyByDate(new Date()) )
   ]) 
 
-  // console.log(response)
+  console.log(dailyMoodSummary)
 
   return { 
     props: { 
       // mood_data,
       recent_entries,
-      all_mood_data: all_mood
+      all_mood_data: all_mood,
+      dailyMoodSummary
     }
   }
 }

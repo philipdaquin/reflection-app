@@ -1,10 +1,15 @@
 import React from 'react'
 import MoodSummary from '../MoodSummary'
+import { DailySummary } from '../../typings'
 
-function MoodSummaryWidget() {
+interface Props { 
+  dailyMoodSummary: DailySummary
+}
+
+function MoodSummaryWidget({dailyMoodSummary}: Props) {
   return (
     <div className='widget_container'>
-        <MoodSummary />
+        <MoodSummary dailyMoodSummary={dailyMoodSummary}/>
     </div>
   )
 }

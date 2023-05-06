@@ -63,10 +63,12 @@ export class AudioEntryType {
     }
 }
 
-export type TopMood = { 
+export type MoodFrequency = { 
     emotion: string | null, 
     emotion_emoji: string | null, 
-    percentage: string | null
+    count: number | null,
+    percentage: string | null,
+    _audio_ids: string[]
 }
   
 
@@ -113,6 +115,18 @@ export type WeeklySummary = {
     max: AudioData | null
     important_events: EventData[] | null
     recommendations: RecommendedActivity[] | null
+}
+
+export type DailySummary = { 
+  id: string,
+  date: Date | null,
+  total_entries: number,
+  overall_mood: string | null,
+  current_avg: number | null,
+  inflection: AudioData | null,
+  min: AudioData | null,
+  max: AudioData | null,
+  mood_frequency: MoodFrequency[]
 }
 
 
