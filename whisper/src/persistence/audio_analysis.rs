@@ -6,6 +6,7 @@ use mongodb::options::AggregateOptions;
 use crate::ml::text_classification::MoodFrequency;
 use crate::{error::Result, ml::text_classification::TextClassification};
 use super::db::MongoDbClient;
+use super::{get_current_week, get_current_day};
 use futures_util::{TryStreamExt, StreamExt};
 const DB_NAME: &str = "human-assistant";
 const COLL_NAME: &str = "analysis";
@@ -13,10 +14,11 @@ const COLL_NAME: &str = "analysis";
 #[async_trait]
 pub trait TextAnalysisInterface { 
     async fn get_all_analysis() -> Result<Vec<TextClassification>>;
+    async fn get_all_by_date(date: chrono::DateTime<Utc>) -> Result<Vec<TextClassification>>;
     async fn add_analysis(new_analysis: TextClassification) -> Result<TextClassification>;
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>>;
     async fn get_recent() -> Result<Vec<TextClassification>>;
-    async fn get_mood_frequency() -> Result<Vec<MoodFrequency>>;
+    async fn get_mood_frequency(start_date: DateTime, end_date: DateTime) -> Result<Vec<MoodFrequency>>;
     async fn delete_all_entries() -> Result<bool>;
     fn get_analysis_db() -> Collection<TextClassification>;
 }
@@ -29,7 +31,7 @@ impl AnalysisDb {
     /// Returns the total number of document found within the last 7 days 
     pub async fn count_documents_in_current_week() -> Result<Option<u64>> { 
         let collection = AnalysisDb::get_analysis_db();
-        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
+        let (bson_start_date, bson_end_date) = get_current_week();
         
         // Filter 
         let filter = doc! { 
@@ -50,7 +52,7 @@ impl AnalysisDb {
     #[tracing::instrument(level= "debug", err)]
     pub async fn get_data_in_current_week() -> Result<Vec<TextClassification>> {
         let collection = AnalysisDb::get_analysis_db();
-        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
+        let (bson_start_date, bson_end_date) = get_current_week();
 
         // Get all objects in database within the 7 days 
         let pipeline = vec![
@@ -92,43 +94,46 @@ impl AnalysisDb {
 
         Ok(result)
     }
-
-    /// 
-    /// Helper function to get the start of the week and end date of the week in bson 
-    fn get_current_week() -> (DateTime, DateTime) { 
-        // Get current start of the week and end of the week dates 
-        let now = Utc::now().date_naive();
-        let start_of_week = now - Duration::days(now.weekday().num_days_from_monday() as i64);
-        let end_of_week = start_of_week + Duration::days(7);
-        
-        // Convert both values into naivedatetime and set to 00:00:00
-        let start_date = start_of_week.and_hms_opt(0, 0, 0).unwrap();
-        let end_date = end_of_week.and_hms_opt(0, 0, 0).unwrap();
-
-        // Convert to DateTime in Chrono        
-        let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_date);
-        let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_date);
-
-        // Convert to Bson DateTime  
-        let bson_start_date = bson::DateTime::from_chrono(start_date_time);
-        let bson_end_date = bson::DateTime::from_chrono(end_date_time);
-
-        (bson_start_date, bson_end_date)
-    }
 }
 
 
 #[async_trait]
 impl TextAnalysisInterface for AnalysisDb { 
 
+    /// 
+    /// Return all analysis from a specific date, starting from 
+    /// DD/MM/YYYY - 00:00:00 - DD/MM/YYYY - 23:59:59 
+    #[tracing::instrument(level= "debug", err)]
+    async fn get_all_by_date(date: chrono::DateTime<Utc>) -> Result<Vec<TextClassification>> {
+        let collection = AnalysisDb::get_analysis_db();
+        let (bson_start_time, bson_end_time) = get_current_day(&date);
+        
+        // Filter 
+        let filter = doc! { 
+            "date": { 
+                "$gte": bson_start_time,
+                "$lt": bson_end_time,
+            } 
+        };      
+        let mut result = vec![];
+        let mut doc = collection.find(filter, None).await?;
+
+        while let Some(item) = doc.try_next().await? { 
+            result.push(item)
+        }
+
+        Ok(result)
+    }
+
     /// Returns all analysis to the user, 
     /// If empty, return [] to the user 
+    #[tracing::instrument(level= "debug", err)]
     async fn get_all_analysis() -> Result<Vec<TextClassification>> { 
         log::info!("Retrieving recent dataset...");
         let mut result = Vec::with_capacity(10);
         let collection = AnalysisDb::get_analysis_db();
 
-        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
+        let (bson_start_date, bson_end_date) = get_current_week();
         
         // Filter 
         // let filter = doc! { 
@@ -161,7 +166,7 @@ impl TextAnalysisInterface for AnalysisDb {
         let mut result = Vec::with_capacity(10);
         let collection = AnalysisDb::get_analysis_db();
 
-        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
+        let (bson_start_date, bson_end_date) = get_current_week();
         
         // Filter 
         let filter = doc! { 
@@ -218,11 +223,10 @@ impl TextAnalysisInterface for AnalysisDb {
     }
     
     ///
-    /// Aggregate the top 3 most commonly mood / emotion over the week 
+    /// Aggregate the mood frequencies from `start_date` to `end_date`
     #[tracing::instrument(level= "debug", err)]
-    async fn get_mood_frequency() -> Result<Vec<MoodFrequency>> {
+    async fn get_mood_frequency(start_date: DateTime, end_date: DateTime) -> Result<Vec<MoodFrequency>> {
         let collection = AnalysisDb::get_analysis_db();
-        let (bson_start_date, bson_end_date) = AnalysisDb::get_current_week();
 
         // Aggregate the top 3 most commonly recorded mood/emotion over the week or days
         let pipeline = vec![
@@ -231,8 +235,8 @@ impl TextAnalysisInterface for AnalysisDb {
 
                 "$match": {
                     "date": { 
-                        "$gte": bson_start_date,
-                        "$lt": bson_end_date,
+                        "$gte": start_date,
+                        "$lt": end_date,
                     },
 
                     "emotion": {
@@ -329,6 +333,7 @@ impl TextAnalysisInterface for AnalysisDb {
     
     ///
     /// Access to collection
+    #[tracing::instrument(level= "debug")]
     fn get_analysis_db() -> Collection<TextClassification> { 
        MongoDbClient::get_collection::<TextClassification>(COLL_NAME, DB_NAME)
     }

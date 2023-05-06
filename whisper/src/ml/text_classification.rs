@@ -146,11 +146,20 @@ impl TextClassification {
     }   
 
     ///
-    /// Aggregates the top 3 most common mood within a week 
+    /// Aggregates the frequency of moods from start to end dates 
+    /// 
+    /// ```
+    /// // Get both the starting and ending dates 
+    /// let (bson_start_date, bson_end_date): (bson::DateTime, bson::DateTime)  = AnalysisDb::get_current_week();
+    ///  
+    /// // Get mood frequencies 
+    /// let mood_frequencies: Vec<MoodFrequency> = TextClassification::get_most_common_moods(bson_start_date, bson_end_date).await?;
+    /// ```
+    /// 
     #[tracing::instrument(fields(input, self), level= "debug")]
-    pub async fn get_most_common_moods() -> Result<Vec<MoodFrequency>> { 
+    pub async fn get_most_common_moods(start_date: DateTime, end_date: DateTime) -> Result<Vec<MoodFrequency>> { 
         
-        let weekly = AnalysisDb::get_mood_frequency().await.unwrap();
+        let weekly = AnalysisDb::get_mood_frequency(start_date, end_date).await.unwrap();
 
         log::info!("Common Mood: {weekly:?}");
 
@@ -159,12 +168,12 @@ impl TextClassification {
 
     ///
     /// Collect the TextClassifications such as the inflection point, min and max within the last 7 days 
-    #[tracing::instrument(fields(input, self), level= "debug")]
-    pub async fn get_weekly_patterns() -> Result<Vec<TextClassification>> { 
+    #[tracing::instrument(level= "debug")]
+    pub async fn get_weekly_patterns(data: Vec<TextClassification>) -> Result<Vec<TextClassification>> { 
         let mut tmp = Vec::new();
-        let inflection = TextClassification::get_weekly_inflection_point().await?;
-        let max_point = TextClassification::get_max_point_in_week().await?;
-        let min_point = TextClassification::get_min_point_in_week().await?;
+        let inflection = TextClassification::get_inflection_point(&data).await?;
+        let max_point = TextClassification::get_max_point(&data).await?;
+        let min_point = TextClassification::get_min_point(&data).await?;
 
         if let Some(inflection) = inflection { 
             tmp.push(inflection);
@@ -184,13 +193,12 @@ impl TextClassification {
     ///
     /// 
     #[tracing::instrument(level= "debug")]
-    pub async fn get_weekly_inflection_point() -> Result<Option<TextClassification>> { 
+    pub async fn get_inflection_point(data: &Vec<TextClassification>) -> Result<Option<TextClassification>> { 
         // Collect all data points in the current week 
-        let data_points = AnalysisDb::get_data_in_current_week().await?;
+        // let data_points = AnalysisDb::get_data_in_current_week().await?;
 
         // Find the inflection point within the datapoint 
-        let point = find_inflection_point(data_points);
-        log::info!("{point:#?}");
+        let point = find_inflection_point(&data);
 
         Ok(point)
     }
@@ -198,22 +206,22 @@ impl TextClassification {
     ///
     /// 
     #[tracing::instrument(level= "debug")]
-    pub async fn get_min_point_in_week() -> Result<Option<TextClassification>> {
-        // Collect all data points in the current week 
-        let data_points = AnalysisDb::get_data_in_current_week().await?;
+    pub async fn get_min_point(data: &Vec<TextClassification>) -> Result<Option<TextClassification>> {
+        // // Collect all data points in the current week 
+        // let data_points = AnalysisDb::get_data_in_current_week().await?;
         
         let mut min_avg_mood = f32::MAX;
         let mut curr_avg_mood = 0.0;
         let mut min_point = None;
 
-        for point in data_points.into_iter() { 
+        for point in data.into_iter() { 
             if let Some(mood) = point.average_mood { 
                 // If the curr mood is less than the recorded min mood 
                 curr_avg_mood = f32::min(mood, curr_avg_mood);
                 
                 if curr_avg_mood < min_avg_mood { 
                     min_avg_mood = curr_avg_mood;
-                    min_point = Some(point);
+                    min_point = Some(point.to_owned());
                 }                
             }
         }
@@ -225,20 +233,20 @@ impl TextClassification {
     ///
     /// Gets the highest average mood that the user experience within the last seven days
     #[tracing::instrument(level= "debug")]
-    pub async fn get_max_point_in_week() -> Result<Option<TextClassification>> {
+    pub async fn get_max_point(data: &Vec<TextClassification>) -> Result<Option<TextClassification>> {
         // Collect all data points from the last seven days 
-        let data_points = AnalysisDb::get_data_in_current_week().await?;
+        // let data_points = AnalysisDb::get_data_in_current_week().await?;
         
         let mut max_avg_mood = f32::MIN;
         let mut curr_avg_mood = 0.0;
-        let mut max_point = None;
+        let mut max_point: Option<TextClassification> = None;
 
-        for point in data_points.into_iter() { 
+        for point in data.into_iter() { 
             if let Some(mood) = point.average_mood { 
                 curr_avg_mood = f32::min(mood, curr_avg_mood);
                 if curr_avg_mood > max_avg_mood { 
                     max_avg_mood = curr_avg_mood; 
-                    max_point = Some(point);
+                    max_point = Some(point.to_owned());
                 }
             }
         }
@@ -250,12 +258,12 @@ impl TextClassification {
 
     ///
     /// Gets the weekly average for the last seven days
-    pub async fn get_weekly_average() -> Result<Option<f32>> {
-        let data_points = AnalysisDb::get_data_in_current_week().await?;
-        let total_len = data_points.len();
+    pub async fn get_average(data: &Vec<TextClassification>) -> Result<Option<f32>> {
+        // let data_points = AnalysisDb::get_data_in_current_week().await?;
+        let total_len = data.len();
         let mut sum = 0.0;
         
-        for point in data_points.into_iter() { 
+        for point in data.into_iter() { 
             if let Some(avg) = point.average_mood { 
                 sum  += avg ;
             }
@@ -279,7 +287,7 @@ impl TextClassification {
 
 ///
 /// Helper function to find the inflection point within all data points 
-pub fn find_inflection_point(full_data: Vec<TextClassification>) -> Option<TextClassification> { 
+pub fn find_inflection_point(full_data: &Vec<TextClassification>) -> Option<TextClassification> { 
     
     if full_data.is_empty() { return None}
 
@@ -333,7 +341,7 @@ pub fn find_inflection_point(full_data: Vec<TextClassification>) -> Option<TextC
         let object = full_data.into_iter().find(|f| {
             f.id.unwrap() == *closest_object_id
         }).unwrap();
-        return Some(object)
+        return Some(object.clone())
     } 
 
     None

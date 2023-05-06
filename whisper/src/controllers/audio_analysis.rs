@@ -6,7 +6,7 @@ use crate::{ml::{
     text_classification::TextClassification, 
     recommendation::RecommendedActivity, 
     response_types::{weeklydata::WeeklyAnalysis, audioanalysis::AudioAnalysis}},
-    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, 
+    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, get_current_week, 
 }, 
 };
 use serde_derive::{Deserialize};
@@ -67,7 +67,12 @@ pub async fn get_mood_summary() -> Result<HttpResponse> {
 /// Generate the weekly summary for the user 
 #[route("/api/analysis/get-common-mood", method = "GET")]
 pub async fn get_common_mood() -> Result<HttpResponse> { 
-    let mood = TextClassification::get_most_common_moods().await.unwrap();
+
+    let (bson_start_date, bson_end_date) = get_current_week();
+
+    let mood = TextClassification::get_most_common_moods(bson_start_date, bson_end_date)
+        .await
+        .unwrap();
     Ok(HttpResponse::Ok().json(mood))
 }
 
@@ -76,7 +81,8 @@ pub async fn get_common_mood() -> Result<HttpResponse> {
 /// Gets weekly patterns based on the last 3 entries 
 #[route("/api/analysis/get-weekly-patterns", method = "GET")]
 pub async fn get_weekly_patterns() -> Result<HttpResponse>  { 
-    let mood_patterns = TextClassification::get_weekly_patterns()
+    let data_points = AnalysisDb::get_data_in_current_week().await?;
+    let mood_patterns = TextClassification::get_weekly_patterns(data_points)
         .await?
         .into_iter()
         .map(AudioAnalysis::from)

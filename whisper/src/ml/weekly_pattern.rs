@@ -3,7 +3,7 @@ use chrono::{Utc, Datelike, NaiveDate, Weekday, TimeZone, Local, Duration};
 use serde::{Serialize, Deserialize};
 
 use crate::{error::{Result, ServerError}, persistence::{audio_db::{AudioDB, AudioInterface}, 
-weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}, audio_analysis::AnalysisDb}};
+weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}, audio_analysis::AnalysisDb, get_current_week}};
 
 use super::{text_classification::{MoodFrequency, TextClassification}, recommendation::RecommendedActivity, whisper::{AudioDataDTO}};
 
@@ -110,8 +110,9 @@ impl WeeklyAnalysisDTO {
     /// - Requires atleast 3 datapoints from the current week 
     #[tracing::instrument(level= "debug")]
     pub async fn get_min_mood(&mut self) -> Result<Self> { 
+        let data = AnalysisDb::get_data_in_current_week().await?;
 
-        let analysis = TextClassification::get_min_point_in_week().await?;
+        let analysis = TextClassification::get_min_point(&data).await?;
         if let Some(text) = analysis { 
             let audio_ref = text.audio_ref.unwrap().to_string();
             let data = AudioDB::get_entry(&audio_ref).await?;
@@ -126,7 +127,9 @@ impl WeeklyAnalysisDTO {
     /// - Requires atleast 3 datapoints from the current week 
     #[tracing::instrument(level= "debug")]
     pub async fn get_max_mood(&mut self) -> Result<Self> { 
-        let analysis = TextClassification::get_max_point_in_week().await?;
+        let data= AnalysisDb::get_data_in_current_week().await?;
+
+        let analysis = TextClassification::get_max_point(&data).await?;
         if let Some(text) = analysis { 
             let audio_ref = text.audio_ref.unwrap().to_string();
             let data = AudioDB::get_entry(&audio_ref).await?;
@@ -141,7 +144,8 @@ impl WeeklyAnalysisDTO {
     /// - Inflection point in this case would be the turning point of the person mood change
     #[tracing::instrument(level= "debug")]
     pub async fn get_inflection_point(&mut self) -> Result<Self> { 
-        let analysis = TextClassification::get_weekly_inflection_point().await?;
+        let data= AnalysisDb::get_data_in_current_week().await?;
+        let analysis = TextClassification::get_inflection_point(&data).await?;
         if let Some(text) = analysis { 
             let audio_ref = text.audio_ref.unwrap().to_string();
             let data = AudioDB::get_entry(&audio_ref).await?;
@@ -153,10 +157,12 @@ impl WeeklyAnalysisDTO {
     }
     
     ///
-    /// Get the top 3 moods based on number of frequency of the mood recorded in the current week 
+    /// Get the frequency of mood from the start of the week to the end
     #[tracing::instrument(level= "debug")]
     pub async fn get_common_wood(&mut self) -> Result<Self> { 
-        let top_moods = TextClassification::get_most_common_moods().await.unwrap();
+
+        let (bson_start_date, bson_end_date) = get_current_week();
+        let top_moods = TextClassification::get_most_common_moods(bson_start_date, bson_end_date).await.unwrap();
         self.common_mood = Some(top_moods);
         Ok(self.clone())
     }
@@ -216,7 +222,8 @@ impl WeeklyAnalysisDTO {
     /// Updates the value in the database if the total entries have increased  
     #[tracing::instrument(level= "debug")]
     pub async fn get_weekly_average(&mut self) -> Result<Self> {
-        let db_val = TextClassification::get_weekly_average().await?.unwrap();
+        let data= AnalysisDb::get_data_in_current_week().await?;
+        let db_val = TextClassification::get_average(&data).await?.unwrap();
         
         // Automatically update both values in the database if new entries are added 
         let val = TextClassification::get_total_entries().await?.unwrap();

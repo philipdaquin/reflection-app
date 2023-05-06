@@ -231,6 +231,7 @@ impl AudioInterface for AudioDB {
 
     ///
     /// Access collection from database
+    #[tracing::instrument(level= "debug")]
     fn get_collection() -> Collection<AudioDataDTO> {
         MongoDbClient::get_collection::<AudioDataDTO>(COLL_NAME, DB_NAME)
     }

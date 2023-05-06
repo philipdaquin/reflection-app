@@ -48,19 +48,20 @@ function WeeklyCalendar({setCurrDate}: Props) {
     const selectDate = (day: Date) => { 
         setSelectedDate(day)
         setCurrDate(day)
+        console.log(day)
     }
 
 
-    const onHover = "hover:bg-[#f5f5f5] "
+    const onHover = "hover:bg-[#f5f5f5] active:bg-[#E0E0E0] active:rounded-full"
 
     return (
         <div className='w-full bg-white space-y-5'>
-             <div className='flex flex-row justify-between py-2 space-x-2'>
+             <div className='flex flex-row justify-between py-2 space-x-2 '>
                 <button onClick={prevWeek} className={`${onHover} p-2 rounded-full`}>
                     <ChevronLeftIcon height={20} width={20} color='#757575'/>
                 </button>
-                <div className='flex flex-row items-center space-x-4'>
-                    <div className='font-semibold text-lg '>{day}, {month} {year}</div>
+                <div className='flex cursor-pointer flex-row items-center space-x-2 px-4 hover:bg-[#f5f5f5] hover:rounded-full active:bg-[#E0E0E0] active:rounded-full'>
+                    <div className='font-semibold text-base'>{day}, {month} {year}</div>
                     <ChevronDownIcon height={20} width={20} color='#757575'/>
                 </div>
 
