@@ -1,15 +1,13 @@
 use actix_multipart::{Multipart};
 use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
 use chrono::{NaiveDate, DateTime, Utc};
-use crossbeam::channel::unbounded;
-use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 use crate::{ml::{
     whisper::{AudioDataDTO, upload_audio, batch_upload_audio}, 
     prompt::GENERAL_CONTEXT, 
     chat::get_chat_response, 
     tts::process_text_to_audio, 
-    response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}, daily_summary::DailySummary},
+    response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}, daily_summary::DailySummaryDTO},
     persistence::{audio_db::{AudioDB, AudioInterface}, 
     audio_analysis::{AnalysisDb, TextAnalysisInterface}, daily_db::{DailyAnalysisDb, DailyAnalysisInterface}}, 
     error::ServerError, controllers::openapi_key::OpenAIClient, broadcast::Broadcaster, 
@@ -58,14 +56,14 @@ pub struct InputDate {
 /// Retrieves all entries by a specific date
 #[route("/api/audio/get-all-by-date", method = "POST")]
 pub async fn get_all_by_date(date: web::Json<InputDate>) -> Result<HttpResponse> {
-    log::info!("{date:?}");
+    // log::info!("{date:?}");
     
     let res = AudioDB::get_all_by_date(date.date)
         .await?
         .into_iter()
         .map(AudioData::from)
         .collect::<Vec<AudioData>>();
-    log::info!("{res:#?}");
+    // log::info!("{res:#?}");
 
     Ok(HttpResponse::Ok().json(res))
 }
@@ -190,7 +188,7 @@ pub async fn upload(
     payload: Multipart,
     broadcast: web::Data<Broadcaster>
 ) -> Result<HttpResponse> {
-    log::info!("✅✅ Initialising the key");
+    // log::info!("✅✅ Initialising the key");
     
     if let Some(api_key) = req.headers().get("Authorization").and_then(|v| v.to_str().ok()) { 
         let key = api_key.strip_prefix("Bearer ").unwrap_or("");
@@ -281,6 +279,8 @@ pub async fn batch_upload(
     // If found, update the values
     // else, create a new summary
     // if let Some(summary) = DailyAnalysisDb
+    // log::info!("✅✅ Creating a Daily Summary");
+
     let daily_summary = DailyAnalysisDb::get_by_date(audio.date.unwrap().to_chrono()).await?;
     
     if let Some(mut summary) = daily_summary { 
@@ -288,16 +288,13 @@ pub async fn batch_upload(
         if !summary.is_expired() { 
             // Update the daily summary and save to database 
             summary.update().await?;
-        } else  { 
-            DailySummary::new()
-            .save()
-            .await?
-            .increment_entries()
-            .await?;
         } 
+    
     } else { 
         // Create a new daily summary and save to database  
-        DailySummary::new()
+        // log::info!("✅✅ Creating a new Summary");
+
+        DailySummaryDTO::new()
             .save()
             .await?
             .increment_entries()
@@ -360,12 +357,12 @@ pub async fn get_entry(input: web::Json<Input>) -> Result<HttpResponse> {
         None => return Ok(HttpResponse::BadRequest().into())
     };
     
-    log::info!("{id:?}");
+    // log::info!("{id:?}");
 
     let audio = AudioDB::get_entry(id)
         .await
         .map_err(|_| ServerError::NotFound(id.to_string()))?;
-    log::info!("{audio:#?}");
+    // log::info!("{audio:#?}");
     // let serialized = serde_json::to_string(&audio).unwrap();
     Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
@@ -384,7 +381,7 @@ pub async fn update_entry(data: web::Json<AudioData>) -> Result<HttpResponse> {
     };
     let audio = AudioDB::update_entry(&id, &audio_data).await?;
     
-    log::info!("{audio:#?}");
+    // log::info!("{audio:#?}");
     
     Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
@@ -410,7 +407,7 @@ pub async fn delete_audio_entry(input: web::Json<Input>) -> Result<HttpResponse>
     let audio = AudioDB::delete_one_entry(id).await?;
     
     if let Some(text) = audio.and_then(|analysis| analysis.text_classification)  { 
-        log::info!("🏃‍♂️");
+        // log::info!("🏃‍♂️");
         
         let bson = text.id.expect("Unable to read id for TextClassification");
         AnalysisDb::delete_one_analysis(bson).await.unwrap();

@@ -2,11 +2,12 @@
 use actix_multipart::{Multipart};
 use actix_web::{ route, HttpResponse, Result, web, HttpRequest};
 use bson::oid::ObjectId;
+use chrono::Utc;
 use crate::{ml::{
     text_classification::TextClassification, 
     recommendation::RecommendedActivity, 
     response_types::{weeklydata::WeeklyAnalysis, audioanalysis::AudioAnalysis}},
-    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, get_current_week, 
+    persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, get_current_week, get_current_day, 
 }, 
 };
 use serde_derive::{Deserialize};
@@ -44,7 +45,7 @@ pub async fn get_all() -> Result<HttpResponse> {
         .map(AudioAnalysis::from)
         .collect::<Vec<AudioAnalysis>>();
 
-    log::info!("{res:#?}");
+    // log::info!("{res:#?}");
 
     Ok(HttpResponse::Ok().json(res))
 }
@@ -68,7 +69,8 @@ pub async fn get_mood_summary() -> Result<HttpResponse> {
 #[route("/api/analysis/get-common-mood", method = "GET")]
 pub async fn get_common_mood() -> Result<HttpResponse> { 
 
-    let (bson_start_date, bson_end_date) = get_current_week();
+    // let (bson_start_date, bson_end_date) = get_current_week();
+    let (bson_start_date, bson_end_date) = get_current_day(&Utc::now());
 
     let mood = TextClassification::get_most_common_moods(bson_start_date, bson_end_date)
         .await

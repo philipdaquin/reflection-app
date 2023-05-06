@@ -90,7 +90,7 @@ impl AnalysisDb {
                 result.push(object);
             }
         }
-        log::info!("DATA WITHIN THE LAST 7 DAYS: {result:?}");
+        // log::info!("DATA WITHIN THE LAST 7 DAYS: {result:?}");
 
         Ok(result)
     }
@@ -152,7 +152,7 @@ impl TextAnalysisInterface for AnalysisDb {
             result.push(doc);
         }
 
-        log::info!("FOUNDED ITEMS FOR THIS: {result:#?}");
+        // log::info!("FOUNDED ITEMS FOR THIS: {result:#?}");
 
         Ok(result)
     }
@@ -185,7 +185,7 @@ impl TextAnalysisInterface for AnalysisDb {
             result.push(doc);
         }
 
-        log::info!("FOUNDED ITEMS FOR THIS: {result:#?}");
+        // log::info!("FOUNDED ITEMS FOR THIS: {result:#?}");
 
         Ok(result)
     }
@@ -194,7 +194,7 @@ impl TextAnalysisInterface for AnalysisDb {
     /// Insert new Analysis 
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn add_analysis(new_analysis: TextClassification) -> Result<TextClassification> {
-        log::info!("✅ Saving Analysis to database {new_analysis:#?}");
+        // log::info!("✅ Saving Analysis to database {new_analysis:#?}");
         let collection = AnalysisDb::get_analysis_db();
         let item = collection.insert_one(new_analysis, None).await?;
 

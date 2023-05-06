@@ -162,7 +162,7 @@ impl AudioInterface for AudioDB {
             result.push(doc);
         }
 
-        log::info!("{result:#?}");
+        // log::info!("{result:#?}");
 
         Ok(result)
     }
@@ -208,7 +208,7 @@ impl AudioInterface for AudioDB {
             result.push(doc);
         }
 
-        log::info!("{result:#?}");
+        // log::info!("{result:#?}");
 
         Ok(result)
     }

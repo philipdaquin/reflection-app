@@ -11,7 +11,7 @@ use super::{whisper::AudioDataDTO, text_classification::MoodFrequency};
 
 
 #[derive(Debug, Serialize, Default, Clone, Deserialize)]
-pub struct DailySummary { 
+pub struct DailySummaryDTO { 
     
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
@@ -42,7 +42,7 @@ pub struct DailySummary {
     pub mood_frequency: Vec<MoodFrequency>
 }
 
-impl DailySummary { 
+impl DailySummaryDTO { 
     
     /// 
     /// Initialise the DailySummary 
@@ -99,7 +99,7 @@ impl DailySummary {
         if let Some(min_data) = analysis { 
             let audio_ref = min_data.audio_ref.unwrap().to_string();
             let audio_data = AudioDB::get_entry(&audio_ref).await?;
-            self.min = Some(audio_data);
+            self.inflection = Some(audio_data);
         } 
 
         Ok(self.clone())
@@ -116,7 +116,7 @@ impl DailySummary {
         if let Some(min_data) = analysis { 
             let audio_ref = min_data.audio_ref.unwrap().to_string();
             let audio_data = AudioDB::get_entry(&audio_ref).await?;
-            self.min = Some(audio_data);
+            self.max = Some(audio_data);
         } 
 
         Ok(self.clone())
@@ -127,12 +127,13 @@ impl DailySummary {
     pub async fn get_mood_frequency(&mut self) -> Result<Self> { 
 
         let datetime = &self.date.unwrap().to_chrono();
-
         let (bson_start_time, bson_end_time) = get_current_day(datetime);
 
-        
+        // let (bson_start_time, bson_end_time) = get_current_day(datetime);
+
         let mood_frequency = TextClassification::get_most_common_moods(bson_start_time, bson_end_time).await?;
-        self.mood_frequency = mood_frequency;
+        self.mood_frequency = mood_frequency.clone();
+        self.overall_mood = mood_frequency[0].clone().emotion.clone();
         Ok(self.clone())
     }
 
@@ -193,7 +194,7 @@ impl DailySummary {
 
     /// Update the value under 
     pub async fn update(&mut self) -> Result<Self> { 
-        let updated = self
+        let mut update = self
             .get_average()
             .await?
             .get_inflection_mood()
@@ -203,12 +204,14 @@ impl DailySummary {
             .get_max_mood()
             .await?
             .get_min_mood()
-            .await?
-            .increment_entries()
             .await?;
+        update.increment_entries().await?;
 
-        DailyAnalysisDb::update_summary(self.id.unwrap(), self.clone()).await
+        let res = DailyAnalysisDb::update_summary(self.id.unwrap(), update).await?;
 
+        log::info!("✅✅✅ {res:#?}");
+
+        Ok(res)
     }
 
     /// Save to Database 

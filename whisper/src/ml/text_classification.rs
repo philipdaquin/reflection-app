@@ -6,7 +6,7 @@ use super::{chat::get_chat_response, prompt::ANALYSE_TEXT_SENTIMENT, weekly_patt
 use bson::{ DateTime};
 
 
-#[derive(Debug, Serialize, Clone, Deserialize)]
+#[derive(Debug, Serialize, Clone, Deserialize, Default)]
 pub struct MoodFrequency { 
     pub emotion: Option<String>,
     pub emotion_emoji: Option<String>,

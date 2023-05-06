@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc, NaiveDate, TimeZone};
 use futures_util::TryStreamExt;
 use mongodb::Collection;
 
-use crate::{ml::daily_summary::DailySummary, error::{Result, ServerError}};
+use crate::{ml::daily_summary::DailySummaryDTO, error::{Result, ServerError}};
 
 use super::db::MongoDbClient;
 
@@ -14,19 +14,19 @@ const COLL_NAME: &str = "daily";
 
 #[async_trait]
 pub trait DailyAnalysisInterface { 
-    async fn get_by_date(date: DateTime<Utc>) -> Result<Option<DailySummary>>;
+    async fn get_by_date(date: DateTime<Utc>) -> Result<Option<DailySummaryDTO>>;
     
-    async fn get_all() -> Result<Vec<DailySummary>>;
+    async fn get_all() -> Result<Vec<DailySummaryDTO>>;
 
-    async fn add_analysis(input: DailySummary) -> Result<DailySummary>;
+    async fn add_analysis(input: DailySummaryDTO) -> Result<DailySummaryDTO>;
 
-    async fn delete_one(id: &str) -> Result<DailySummary>;
+    async fn delete_one(id: &str) -> Result<DailySummaryDTO>;
     
     async fn update_total_entry(id: ObjectId) -> Result<()>;
 
-    async fn update_summary(id: ObjectId, input: DailySummary) -> Result<DailySummary>;
+    async fn update_summary(id: ObjectId, input: DailySummaryDTO) -> Result<DailySummaryDTO>;
 
-    fn get_analysis_db() -> Collection<DailySummary>;
+    fn get_analysis_db() -> Collection<DailySummaryDTO>;
     
 }
 
@@ -40,7 +40,7 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
     ///
     /// Insert new Daily Summary on Db 
     #[tracing::instrument(level= "debug", err)]
-    async fn add_analysis(input: DailySummary) -> Result<DailySummary> {
+    async fn add_analysis(input: DailySummaryDTO) -> Result<DailySummaryDTO> {
         let collection = DailyAnalysisDb::get_analysis_db();
         
         let item = collection.insert_one(input, None).await?;
@@ -58,7 +58,7 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
     ///
     /// Retrieves all DailySummary in the Database 
     #[tracing::instrument(level= "debug", err)]
-    async fn get_all() -> Result<Vec<DailySummary>> {
+    async fn get_all() -> Result<Vec<DailySummaryDTO>> {
         let collection = DailyAnalysisDb::get_analysis_db();
         let mut res = vec![];
 
@@ -79,7 +79,7 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
     /// 
     /// Note: The input here must be converted to NaiveDateTime with 00:00:00 as stored in the database  
     #[tracing::instrument(level= "debug", err)]
-    async fn get_by_date(date: DateTime<Utc>) -> Result<Option<DailySummary>> {
+    async fn get_by_date(date: DateTime<Utc>) -> Result<Option<DailySummaryDTO>> {
         let collection = DailyAnalysisDb::get_analysis_db();
         
         // Set to date - 00:00:00 to 24:00:00
@@ -118,7 +118,7 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
     ///
     /// Retrieve one daily summary and delete it 
     #[tracing::instrument(level= "debug", err)]
-    async fn delete_one(id: &str) -> Result<DailySummary> { 
+    async fn delete_one(id: &str) -> Result<DailySummaryDTO> { 
         let collection = DailyAnalysisDb::get_analysis_db();
 
         let filter = doc! {"_id" : id};
@@ -149,7 +149,7 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
 
     /// 
     /// Update each fields on DailySummary 
-    async fn update_summary(id: ObjectId, input: DailySummary) -> Result<DailySummary> { 
+    async fn update_summary(id: ObjectId, input: DailySummaryDTO) -> Result<DailySummaryDTO> { 
         let collection = DailyAnalysisDb::get_analysis_db();
         
         let query = doc! { "_id": id  };
@@ -168,8 +168,8 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
     /// 
     /// Access to daily collections
     #[tracing::instrument(level= "debug")]
-    fn get_analysis_db() -> Collection<DailySummary> {
-        MongoDbClient::get_collection::<DailySummary>(COLL_NAME, DB_NAME)
+    fn get_analysis_db() -> Collection<DailySummaryDTO> {
+        MongoDbClient::get_collection::<DailySummaryDTO>(COLL_NAME, DB_NAME)
     }
 }
 
