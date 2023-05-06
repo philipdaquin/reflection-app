@@ -76,8 +76,8 @@ function WeeklyCalendarContent() {
                     <MoodAnalysisChange all_mood_data={selectedAnalsysis} />
                     {/* <MoodCompositionWidget data={[]}/>  */}
                     <MoodActivityWidget entries={[]}/>
-                    <MoodInsightWidget />  
-                    <MoodTriggersWidget data={[]}/>
+                    <MoodInsightWidget  dailySummary={null} />  
+                    {/* <MoodTriggersWidget data={[]}/> */}
                     <DailyAudioEntries entries={selectedEntries}/>
                   </div>
 

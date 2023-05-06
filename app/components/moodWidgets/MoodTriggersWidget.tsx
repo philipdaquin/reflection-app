@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
-import { TextClassification } from '../../typings'
+import { DailySummary, TextClassification } from '../../typings'
 import {ChevronRightIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 
 interface Props { 
-    data: TextClassification[] | null
+    data: DailySummary | null
 }
 
 type MoodTriggerType = { 
     id: string,
-    title: string, 
+    emotion: string, 
     numOfEntries: number, 
     emoji: string
 }
@@ -20,7 +20,7 @@ interface MoodTriggerProps {
     entry: MoodTriggerType
 }
 
-function MoodTriggerEntry({entry: {id, emoji, numOfEntries, title}}: MoodTriggerProps) { 
+function MoodTriggerEntry({entry: {id, emoji, numOfEntries, emotion}}: MoodTriggerProps) { 
     return ( 
         <div className='justify-between flex flex-row items-center w-full'>
             <div className='flex flex-row justify-center items-center w-full space-x-2'>
@@ -29,7 +29,7 @@ function MoodTriggerEntry({entry: {id, emoji, numOfEntries, title}}: MoodTrigger
                 </div>
                 <div className='w-full space-y-1'>
                     <h1 className='text-sm text-left font-medium'>
-                        {title}
+                        {emotion}
                     </h1>
                     {numOfEntries > 0 && (
                         <div className='items-center flex flex-row space-x-1'>
@@ -52,34 +52,43 @@ function MoodTriggerEntry({entry: {id, emoji, numOfEntries, title}}: MoodTrigger
 function MoodTriggersWidget({data}: Props) {
 
     // Mock data 
-    const testData: MoodTriggerType[] = [
-        {
-          id: "1",
-          title: "Exercise",
-          numOfEntries: 10,
-          emoji: "🏋️‍♀️"
-        },
-        {
-          id: "2",
-          title: "Meditation",
-          numOfEntries: 7,
-          emoji: "🧘‍♀️"
-        },
-        {
-          id: "3",
-          title: "Socializing",
-          numOfEntries: 15,
-          emoji: "👥"
-        },
-        {
-          id: "4",
-          title: "Music",
-          numOfEntries: 5,
-          emoji: "🎵"
-        }
-    ].slice(0, 3);
+    // const testData: MoodTriggerType[] = [
+    //     {
+    //       id: "1",
+    //       title: "Exercise",
+    //       numOfEntries: 10,
+    //       emoji: "🏋️‍♀️"
+    //     },
+    //     {
+    //       id: "2",
+    //       title: "Meditation",
+    //       numOfEntries: 7,
+    //       emoji: "🧘‍♀️"
+    //     },
+    //     {
+    //       id: "3",
+    //       title: "Socializing",
+    //       numOfEntries: 15,
+    //       emoji: "👥"
+    //     },
+    //     {
+    //       id: "4",
+    //       title: "Music",
+    //       numOfEntries: 5,
+    //       emoji: "🎵"
+    //     }
+    // ].slice(0, 3);
 
     const router = useRouter()
+    const dataa: MoodTriggerType[] | undefined = data?.mood_frequency.map((item, i) => { 
+        const s: MoodTriggerType = { 
+            id: data.id,
+            emoji: item.emotion_emoji || "",
+            numOfEntries: item.count || 0,
+            emotion: item.emotion || ""
+        }
+        return s
+    }).slice(0, 3)
 
     return (
         <div className='widget_container'>
@@ -99,7 +108,7 @@ function MoodTriggersWidget({data}: Props) {
 
             <div className='space-y-5 pt-[20px] w-full'>
                 {
-                    testData.map((item, i) => { 
+                    dataa!.map((item, i) => { 
                         return (
                             <div key={i}>
                                 <Link href={`/${item.id}`}>
