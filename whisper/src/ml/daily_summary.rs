@@ -46,7 +46,7 @@ impl DailySummary {
     
     /// 
     /// Initialise the DailySummary 
-    fn new() -> Self { 
+    pub fn new() -> Self { 
         
         let id = ObjectId::new();
         
@@ -189,6 +189,26 @@ impl DailySummary {
         let end_dt = Utc.from_utc_datetime(&end_date);
 
         time_now > end_dt
+    }       
+
+    /// Update the value under 
+    pub async fn update(&mut self) -> Result<Self> { 
+        let updated = self
+            .get_average()
+            .await?
+            .get_inflection_mood()
+            .await?
+            .get_mood_frequency()
+            .await?
+            .get_max_mood()
+            .await?
+            .get_min_mood()
+            .await?
+            .increment_entries()
+            .await?;
+
+        DailyAnalysisDb::update_summary(self.id.unwrap(), self.clone()).await
+
     }
 
     /// Save to Database 

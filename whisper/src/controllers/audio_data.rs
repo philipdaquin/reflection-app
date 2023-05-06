@@ -9,9 +9,9 @@ use crate::{ml::{
     prompt::GENERAL_CONTEXT, 
     chat::get_chat_response, 
     tts::process_text_to_audio, 
-    response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}},
+    response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}, daily_summary::DailySummary},
     persistence::{audio_db::{AudioDB, AudioInterface}, 
-    audio_analysis::{AnalysisDb, TextAnalysisInterface}}, 
+    audio_analysis::{AnalysisDb, TextAnalysisInterface}, daily_db::{DailyAnalysisDb, DailyAnalysisInterface}}, 
     error::ServerError, controllers::openapi_key::OpenAIClient, broadcast::Broadcaster, 
 };
 use actix_web_lab::sse::{self, ChannelStream, Sse};
@@ -274,6 +274,36 @@ pub async fn batch_upload(
 
         progress.progress += 30;
         broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
+
+    //
+    // Initialise / Update the Daily Summary 
+    // - Check if there's a summary for the current day
+    // If found, update the values
+    // else, create a new summary
+    // if let Some(summary) = DailyAnalysisDb
+    let daily_summary = DailyAnalysisDb::get_by_date(audio.date.unwrap().to_chrono()).await?;
+    
+    if let Some(mut summary) = daily_summary { 
+        // Check if its expired
+        if !summary.is_expired() { 
+            // Update the daily summary and save to database 
+            summary.update().await?;
+        } else  { 
+            DailySummary::new()
+            .save()
+            .await?
+            .increment_entries()
+            .await?;
+        } 
+    } else { 
+        // Create a new daily summary and save to database  
+        DailySummary::new()
+            .save()
+            .await?
+            .increment_entries()
+            .await?;
+    }   
+
 
     Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }

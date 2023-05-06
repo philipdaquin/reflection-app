@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use bson::{doc, oid::ObjectId};
+use bson::{doc, oid::ObjectId, Document};
 use chrono::{DateTime, Utc, NaiveDate, TimeZone};
 use futures_util::TryStreamExt;
 use mongodb::Collection;
@@ -23,6 +23,8 @@ pub trait DailyAnalysisInterface {
     async fn delete_one(id: &str) -> Result<DailySummary>;
     
     async fn update_total_entry(id: ObjectId) -> Result<()>;
+
+    async fn update_summary(id: ObjectId, input: DailySummary) -> Result<DailySummary>;
 
     fn get_analysis_db() -> Collection<DailySummary>;
     
@@ -144,6 +146,25 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
 
         Ok(())
     }
+
+    /// 
+    /// Update each fields on DailySummary 
+    async fn update_summary(id: ObjectId, input: DailySummary) -> Result<DailySummary> { 
+        let collection = DailyAnalysisDb::get_analysis_db();
+        
+        let query = doc! { "_id": id  };
+        let update = doc! { "$set": bson::to_document(&input).unwrap()};
+
+        let _ = collection.update_one(query, update, None).await?;
+
+        let id = doc! { "_id": id.to_owned()};
+
+        collection.find_one(id, None)
+            .await?
+            .ok_or(ServerError::NotFound(format!("{}", input.id.unwrap())))
+    }
+
+
     /// 
     /// Access to daily collections
     #[tracing::instrument(level= "debug")]

@@ -7,6 +7,7 @@ pub mod ws;
 pub mod weekly_controller;
 pub mod eleven_labs;
 pub mod sse;
+pub mod daily_data;
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Input { 
