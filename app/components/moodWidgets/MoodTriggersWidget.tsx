@@ -108,7 +108,7 @@ function MoodTriggersWidget({data}: Props) {
 
             <div className='space-y-5 pt-[20px] w-full'>
                 {
-                    dataa!.map((item, i) => { 
+                    dataa?.map((item, i) => { 
                         return (
                             <div key={i}>
                                 <Link href={`/${item.id}`}>

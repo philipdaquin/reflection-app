@@ -13,14 +13,13 @@ import { AverageWeeklyIndex } from "../atoms/atoms";
     Error: null 
 
 */
-export default function changeInPercentage(rating: number): string | null { 
+export default function changeInPercentage(rating: number, compareWith?: number | null): string | null { 
     // const currentWeeklyAvg = useRecoilValue(AverageWeeklyIndex);
-    const currentWeeklyAvg = 0.88
-    if (!currentWeeklyAvg) return null
+    if (!compareWith) return null
 
     // Get from the database CurrentAvg 
 
-    const changeIn = (rating - currentWeeklyAvg) / currentWeeklyAvg * 100 
+    const changeIn = (rating - compareWith) / compareWith * 100 
 
 
     return changeIn.toFixed(2) 

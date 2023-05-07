@@ -12,6 +12,11 @@ import MoodActivityWidget from '../moodWidgets/MoodActivityWidget'
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget'
 import { getAll } from '../../util/audio/getAll'
 
+
+interface Props { 
+  
+}
+
 function WeeklyCalendarContent() {
 
 

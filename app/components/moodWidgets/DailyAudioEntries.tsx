@@ -1,8 +1,9 @@
-import React from 'react'
-import { AudioData } from '../../typings'
+import React, { useEffect, useState } from 'react'
+import { AudioData, WeeklySummary } from '../../typings'
 import changeInPercentage from '../../util/changeInPercentage'
 import { useRouter } from 'next/router'
 import { recentEntryTimeStamp } from '../../util/recentEntryTimeStamp'
+import { getWeeklySummary } from '../../util/weekly/getWeeklySummary'
 
 
 class EntryType { 
@@ -28,7 +29,22 @@ function AudioEntry({entry: {avgMood, date, emoji, id, title}}: EntryProps) {
     
     const adate =  recentEntryTimeStamp(date)
 
-    const changeIn = changeInPercentage(avgMood)
+    // Get the current weeks overall mood average 
+    const [currentWeek, setCurrentWeek] = useState<WeeklySummary | null>(null)
+    const weekly = async () => { 
+        let week = await getWeeklySummary()
+            .then((item) => item)
+            .catch((e) => null)
+        setCurrentWeek(week)
+
+        console.log(week)
+
+    }
+    
+    useEffect(() => {weekly()}, [])
+    
+
+    const changeIn = changeInPercentage(avgMood, currentWeek?.weekly_avg)
     const changeNum = parseFloat(changeIn!)
     const sign = changeNum > 0 ? "+" : "";
     const formattedChangeIn = sign + changeNum.toFixed(2) + "%";
@@ -55,7 +71,7 @@ function AudioEntry({entry: {avgMood, date, emoji, id, title}}: EntryProps) {
                         {adate} 
                     </h3>
                     <h1 className='font-medium text-sm'>
-                        {title}
+                        {title.slice(0, 30) + "..."}
                     </h1>
                 </div>
             </div>

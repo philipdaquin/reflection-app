@@ -17,8 +17,26 @@ import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { AddEntryToggle } from '../atoms/atoms'
 import { useRecoilValue } from 'recoil'
+import { getMoodSummary } from '../util/analysis/getMoodSummary'
+import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
+import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
+import { getDailyByDate } from '../util/daily/getDailyByDate'
+import { GetServerSideProps } from 'next'
+import { AudioData, DailySummary, TextClassification } from '../typings'
 
-function weekly_record() {
+
+interface Props { 
+  recent_entries: AudioData[] | null,
+  all_mood_data: TextClassification[] | null,
+  dailyMoodSummary: DailySummary | null
+}
+
+function weekly_record({
+  // mood_data, 
+  recent_entries, 
+  all_mood_data,
+  dailyMoodSummary
+}: Props) {
     const showModel = useRecoilValue(AddEntryToggle);
 
     return (
@@ -29,11 +47,11 @@ function weekly_record() {
         </Head>
 
         <div className="md:bg-[#EEEEEE] bg-white flex 
-            md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
+            md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px] relative">
             <main className="justify-center flex flex-col items-center space-y-[27px] ">
                 <div className="flex items-center md:relative md:right-10 h-full">
                     
-                    <div className='md:block hidden'>
+                    <div className='relative right-10 hidden md:block'>
                         <NavigationButtons />       
                     </div>
 
@@ -73,16 +91,19 @@ function weekly_record() {
 export default weekly_record
 
 
-// export const getServerSideProps: GetServerSideProps<Props> = async () => {
-//   const [mood_data_by_date] = await Promise.all([
-//       ( await getAllAnalysis() )
-//   ]) 
-//   // console.log(response)
-//   return { 
-//     props: { 
-//       // mood_data,
-//       recent_entries,
-//       all_mood_data: all_mood
-//     }
-//   }
-// }
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const [mood_data, recent_entries, all_mood, dailyMoodSummary] = await Promise.all([
+      ( await getMoodSummary() ),
+      ( await getRecentAudioEntries() ),
+      ( await getAllAnalysis() ),
+      ( await getDailyByDate(new Date()) )
+  ]) 
+
+  return { 
+    props: { 
+      recent_entries,
+      all_mood_data: all_mood,
+      dailyMoodSummary
+    }
+  }
+}

@@ -116,11 +116,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
       ( await getDailyByDate(new Date()) )
   ]) 
 
-  console.log(dailyMoodSummary)
-
   return { 
     props: { 
-      // mood_data,
       recent_entries,
       all_mood_data: all_mood,
       dailyMoodSummary
