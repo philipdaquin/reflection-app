@@ -192,7 +192,7 @@ impl DailySummaryDTO {
         time_now > end_dt
     }       
 
-    /// Update the value under 
+    /// Update the values in DailySummary and increment the total entries 
     pub async fn update(&mut self) -> Result<Self> { 
         let mut update = self
             .get_average()

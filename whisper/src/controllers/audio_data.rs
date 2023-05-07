@@ -228,6 +228,34 @@ pub async fn upload(
         progress.progress += 30;
         broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
 
+     //
+    // Initialise / Update the Daily Summary 
+    // - Check if there's a summary for the current day
+    // If found, update the values
+    // else, create a new summary
+    // if let Some(summary) = DailyAnalysisDb
+    // log::info!("✅✅ Creating a Daily Summary");
+
+    let daily_summary = DailyAnalysisDb::get_by_date(audio.date.unwrap().to_chrono()).await?;
+    
+    if let Some(mut summary) = daily_summary { 
+        // Check if its expired
+        if !summary.is_expired() { 
+            // Update the daily summary and save to database 
+            summary.update().await?;
+        } 
+    
+    } else { 
+        // Create a new daily summary and save to database  
+        // log::info!("✅✅ Creating a new Summary");
+
+        DailySummaryDTO::new()
+            .save()
+            .await?
+            .increment_entries()
+            .await?;
+    }   
+
     Ok(HttpResponse::Ok().json(AudioData::from(audio)))
 }
 

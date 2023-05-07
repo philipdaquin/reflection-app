@@ -20,6 +20,9 @@ pub trait WeeklyAnalysisInterface {
     async fn get_corresponding_week(start_date: DateTime) -> Result<Option<WeeklyAnalysisDTO>>;
     async fn get_current_week() -> Result<Option<WeeklyAnalysisDTO>>;
     async fn update_total_entry(id: ObjectId) -> Result<()>;
+
+    async fn update_fields(id: ObjectId, input: WeeklyAnalysisDTO) -> Result<WeeklyAnalysisDTO>;
+
     fn get_analysis_db() -> Collection<WeeklyAnalysisDTO>;
 
 }
@@ -177,6 +180,22 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
         collection.update_one(filter, increment, None).await?;
 
         Ok(())
+    }
+
+    /// Update each fields on WeeklySummary
+    async fn update_fields(id: ObjectId, input: WeeklyAnalysisDTO) -> Result<WeeklyAnalysisDTO> { 
+        let collection = WeeklyAnalysisDB::get_analysis_db();
+        
+        let query = doc! { "_id": id  };
+        let update = doc! { "$set": bson::to_document(&input).unwrap()};
+
+        let _ = collection.update_one(query, update, None).await?;
+
+        let id = doc! { "_id": id.to_owned()};
+
+        collection.find_one(id, None)
+            .await?
+            .ok_or(ServerError::NotFound(format!("{}", input.id.unwrap())))
     }
 
     ///

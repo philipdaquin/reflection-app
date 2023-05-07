@@ -78,26 +78,22 @@ impl TextClassification {
         let week = WeeklyAnalysisDB::get_corresponding_week(bson_date_time)
             .await
             .unwrap();
-        
-        let mut weekly_analysis = match week { 
-            Some(i) => i,
+
+        // Get updated weekly analysis 
+        let weekly_analysis = match week { 
+            Some(mut i) if !i.is_expired() => i.update().await.unwrap(),
             _ => {
-                // create a new Weekly Analysis and save to database 
-                WeeklyAnalysisDTO::new()
+                // create a new Weekly Analysis, increment total count and save to database 
+                let mut new = WeeklyAnalysisDTO::new()
                     .save()
                     .await
-                    .unwrap()
+                    .unwrap();
+                new.increment_entries().await.unwrap();
+                new
             }
         };  
 
-        // Increment total entries by 1 
-        let _ = weekly_analysis
-            .increment_entries()
-            .await
-            .unwrap();
-
         let weekly_ref = weekly_analysis.id;
-
 
         Self { 
             id: Some(id), 

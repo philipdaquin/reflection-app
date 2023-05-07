@@ -304,6 +304,31 @@ impl WeeklyAnalysisDTO {
         ))
     }
 
+    ///
+    /// Update each fields for weekly data and increment total entries 
+    #[tracing::instrument(level= "debug")]
+    pub async fn update(&mut self) -> Result<Self> { 
+        let mut input = WeeklyAnalysisDTO::new()
+            .get_min_mood()
+            .await?
+            .get_max_mood()
+            .await?
+            .get_inflection_point()
+            .await?
+            .get_common_wood()
+            .await?
+            .get_weekly_average()
+            .await?
+            .get_total_entries()
+            .await?
+            .generate_recommendations()
+            .await?;
+        input.increment_entries().await?;
+        let res = WeeklyAnalysisDB::update_fields(self.id.unwrap(), input).await?;
+        Ok(res)
+    }
+
+
     /// 
     /// Save the current weekly analysis to database 
     #[tracing::instrument(level= "debug")]
