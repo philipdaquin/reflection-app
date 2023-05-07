@@ -2,6 +2,7 @@ import useLocalStorage, { OPENAI_KEY } from "../../hooks/useLocalStorage";
 import { AudioData } from "../../typings";
 
 // Send the WAV fle to the server 
+// Updates both DailySummary and WeeklySummary
 export async function uploadAudioRecording(wavFile: Blob | File): Promise<AudioData> {
 
     

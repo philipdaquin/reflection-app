@@ -35,8 +35,8 @@ function MoodSummary({dailyMoodSummary}: Props) {
     }, [dailyMoodSummary, currentDate])
     
 
-    let changeInPercent = changeInPercentage(dailyMoodSummary.current_avg || 0, pastDayDate?.current_avg) || 0
-    const sign = parseFloat(changeInPercent as string) 
+    let changeInPercent = changeInPercentage(dailyMoodSummary.current_avg || 0, pastDayDate?.current_avg || 0)?.toFixed(2) || 0
+    const sign = parseFloat(changeInPercent.toString()) 
     const colour = changeInPercent as number > 0 ? 
         "text-[#41d475] " 
     : changeInPercent as number < 0 ? 

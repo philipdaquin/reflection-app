@@ -4,6 +4,9 @@ import changeInPercentage from '../../util/changeInPercentage'
 import { useRouter } from 'next/router'
 import { recentEntryTimeStamp } from '../../util/recentEntryTimeStamp'
 import { getWeeklySummary } from '../../util/weekly/getWeeklySummary'
+import { getCurrentWeeklySummary } from '../../util/weekly/getCurrentWeeklySummary'
+import { useRecoilValue } from 'recoil'
+import { CurrentWeekSummary } from '../../atoms/atoms'
 
 
 class EntryType { 
@@ -22,32 +25,20 @@ class EntryType {
 }
 
 interface EntryProps { 
-    entry: EntryType
+    entry: EntryType,
+    currentWeek: WeeklySummary | null
 }
 
-function AudioEntry({entry: {avgMood, date, emoji, id, title}}: EntryProps) {
+function AudioEntry({entry: {avgMood, date, emoji, id, title}, currentWeek}: EntryProps) {
     
     const adate =  recentEntryTimeStamp(date)
-
-    // Get the current weeks overall mood average 
-    const [currentWeek, setCurrentWeek] = useState<WeeklySummary | null>(null)
-    const weekly = async () => { 
-        let week = await getWeeklySummary()
-            .then((item) => item)
-            .catch((e) => null)
-        setCurrentWeek(week)
-
-        console.log(week)
-
-    }
     
-    useEffect(() => {weekly()}, [])
-    
-
-    const changeIn = changeInPercentage(avgMood, currentWeek?.weekly_avg)
-    const changeNum = parseFloat(changeIn!)
+    const changeIn = changeInPercentage(avgMood, currentWeek?.weekly_avg || 0) || 0
+    console.log("112", changeIn, currentWeek?.weekly_avg, currentWeek)
+    const changeNum = parseFloat(changeIn.toString())
     const sign = changeNum > 0 ? "+" : "";
     const formattedChangeIn = sign + changeNum.toFixed(2) + "%";
+
 
     const colour = changeNum > 0 ? 
         "text-[#1CC16A] bg-[#1CC16A]/20 " 
@@ -65,7 +56,6 @@ function AudioEntry({entry: {avgMood, date, emoji, id, title}}: EntryProps) {
                         {emoji}
                     </h1>
                 </div>
-
                 <div className='text-left'>
                     <h3 className='text-[10px] text-[#757575]'>
                         {adate} 
@@ -77,7 +67,7 @@ function AudioEntry({entry: {avgMood, date, emoji, id, title}}: EntryProps) {
             </div>
             <div className={` ${colour} 
              text-[13px] font-semibold items-center text-center rounded-md px-2 py-1` }>
-                {formattedChangeIn}
+                {formattedChangeIn} 
             </div>
         </div>
     )
@@ -134,6 +124,7 @@ function DailyAudioEntries({entries}: Props) {
     const data: EntryType[] | undefined = entries?.map((item, i) => new EntryType(item)) || testData
 
     const router = useRouter()  
+    const currentWeek = useRecoilValue<WeeklySummary | null>(CurrentWeekSummary)
 
     return (
         <div className='widget_container'>
@@ -160,7 +151,7 @@ function DailyAudioEntries({entries}: Props) {
                     data.slice(0, 3).map((item, i) => { 
                         return (
                             <div key={i}>
-                                <AudioEntry entry={item}/>
+                                <AudioEntry entry={item} currentWeek={currentWeek}/>
                             </div>
                         )
                     })

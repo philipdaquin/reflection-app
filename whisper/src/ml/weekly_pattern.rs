@@ -287,10 +287,10 @@ impl WeeklyAnalysisDTO {
         
         // If the current end date of the week is greater than the recorded end data of the week 
         // it means, that we have overpassed the end_week of the previous analyis
-        end_date > self.end_week
+        self.end_week
             .expect("Missing `end_week` on Weekly Analysis")
-            .to_chrono()
-            .naive_utc()
+            .to_chrono().naive_utc() >= end_date
+           
     }   
     ///
     /// Sends an update query to the database, Increments the number of total entries, else return Database error 
@@ -308,7 +308,9 @@ impl WeeklyAnalysisDTO {
     /// Update each fields for weekly data and increment total entries 
     #[tracing::instrument(level= "debug")]
     pub async fn update(&mut self) -> Result<Self> { 
-        let mut input = WeeklyAnalysisDTO::new()
+
+        log::info!("✅✅ Updating the value for weekly data analysis ");
+        let mut input = self
             .get_min_mood()
             .await?
             .get_max_mood()
@@ -323,7 +325,9 @@ impl WeeklyAnalysisDTO {
             .await?
             .generate_recommendations()
             .await?;
-        input.increment_entries().await?;
+        log::info!("⌛⌛⌛⌛⌛⌛⌛UPDATING THE WEEKLY {input:#?}");
+        self.increment_entries().await?;
+
         let res = WeeklyAnalysisDB::update_fields(self.id.unwrap(), input).await?;
         Ok(res)
     }

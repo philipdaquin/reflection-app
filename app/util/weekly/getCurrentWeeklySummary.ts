@@ -5,8 +5,8 @@ import { WeeklySummary } from "../../typings"
 /*
     GETS WEEKLY SUMMARY 
 */
-export async function getWeeklySummary(): Promise<WeeklySummary | null> { 
-    return fetch("http://localhost:4001/api/weekly/get-weekly-summary", {
+export async function getCurrentWeeklySummary(): Promise<WeeklySummary | null> { 
+    return fetch("http://localhost:4001/api/weekly/get-current-week", {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'
@@ -14,7 +14,7 @@ export async function getWeeklySummary(): Promise<WeeklySummary | null> {
     })
     .then(async (resp) => { 
         const body = await resp.json() as WeeklySummary
-        // console.log(body)
+        console.log(body)
         return body
     })
     .catch((e) => {

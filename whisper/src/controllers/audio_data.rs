@@ -7,9 +7,9 @@ use crate::{ml::{
     prompt::GENERAL_CONTEXT, 
     chat::get_chat_response, 
     tts::process_text_to_audio, 
-    response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}, daily_summary::DailySummaryDTO},
+    response_types::{audiodata::AudioData, audioanalysis::AudioAnalysis}, daily_summary::DailySummaryDTO, weekly_pattern::WeeklyAnalysisDTO},
     persistence::{audio_db::{AudioDB, AudioInterface}, 
-    audio_analysis::{AnalysisDb, TextAnalysisInterface}, daily_db::{DailyAnalysisDb, DailyAnalysisInterface}}, 
+    audio_analysis::{AnalysisDb, TextAnalysisInterface}, daily_db::{DailyAnalysisDb, DailyAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}, 
     error::ServerError, controllers::openapi_key::OpenAIClient, broadcast::Broadcaster, 
 };
 use actix_web_lab::sse::{self, ChannelStream, Sse};

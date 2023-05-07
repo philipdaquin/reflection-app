@@ -7,24 +7,25 @@ import SwitchView from '../components/SwitchView'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import AudioVisualizer from '../components/AudioVisualizer'
-import { AudioData, DailySummary, TextClassification } from '../typings'
+import { AudioData, DailySummary, TextClassification, WeeklySummary } from '../typings'
 import { getMoodSummary } from '../util/analysis/getMoodSummary'
 import SettingsButtons from '../components/SettingsButtons'
 import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, 
   // initialiseAPIKeys 
 } from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
+import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import MoodActivityChart from '../components/MoodActivityChart'
 import HomeSummaryContent from '../components/pages/HomeSummaryContent'
 import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
 import { getDailyByDate } from '../util/daily/getDailyByDate'
+import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
 
 
 
@@ -33,7 +34,8 @@ interface Props {
   // mood_data: TextClassification[] | null,
   recent_entries: AudioData[] | null,
   all_mood_data: TextClassification[] | null,
-  dailyMoodSummary: DailySummary | null
+  dailyMoodSummary: DailySummary | null,
+  currentWeeklySummary: WeeklySummary | null
 }
 
 
@@ -41,13 +43,25 @@ function Home({
   // mood_data, 
   recent_entries, 
   all_mood_data,
-  dailyMoodSummary
+  dailyMoodSummary,
+  currentWeeklySummary
 }: Props) {
 
   console.log(recent_entries)
   // Start API keys 
   const [isOpen, setIsOpen] = useState(false);
   const showModel = useRecoilValue(AddEntryToggle);
+
+  // Get the current weeks overall mood average 
+  const [currentWeek, setCurrentWeek] = useRecoilState<WeeklySummary | null>(CurrentWeekSummary)
+
+  useEffect(() => {
+      if (!currentWeeklySummary) return
+      setCurrentWeek(currentWeeklySummary) 
+      
+  }, [currentWeeklySummary]);
+
+  console.log(currentWeek)
 
   return (
     <>
@@ -74,6 +88,7 @@ function Home({
                 all_mood_data={all_mood_data}
                 recent_entries={recent_entries}
                 dailyMoodSummary={dailyMoodSummary}
+                currentWeeklySummary={currentWeeklySummary}
               />
 
             </PhoneView>
@@ -109,18 +124,26 @@ function Home({
 export default Home
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const [mood_data, recent_entries, all_mood, dailyMoodSummary] = await Promise.all([
+  const [
+    mood_data, 
+    recent_entries, 
+    all_mood, 
+    dailyMoodSummary,
+    currentWeeklySummary
+  ] = await Promise.all([
       ( await getMoodSummary() ),
       ( await getRecentAudioEntries() ),
       ( await getAllAnalysis() ),
-      ( await getDailyByDate(new Date()) )
+      ( await getDailyByDate(new Date()) ),
+      ( await getCurrentWeeklySummary() ),
   ]) 
 
   return { 
     props: { 
       recent_entries,
       all_mood_data: all_mood,
-      dailyMoodSummary
+      dailyMoodSummary,
+      currentWeeklySummary
     }
   }
 }

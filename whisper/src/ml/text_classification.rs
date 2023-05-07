@@ -75,7 +75,10 @@ impl TextClassification {
         let day = date.weekday().to_string();
 
         // Find the week or create a new one, get the id 
-        let week = WeeklyAnalysisDB::get_corresponding_week(bson_date_time)
+        // let week = WeeklyAnalysisDB::get_corresponding_week(bson_date_time)
+        //     .await
+        //     .unwrap();
+        let week = WeeklyAnalysisDB::get_current_week()
             .await
             .unwrap();
 
@@ -83,6 +86,7 @@ impl TextClassification {
         let weekly_analysis = match week { 
             Some(mut i) if !i.is_expired() => i.update().await.unwrap(),
             _ => {
+                log::info!("✅✅✅✅ Initialising a new Weekly DTO");
                 // create a new Weekly Analysis, increment total count and save to database 
                 let mut new = WeeklyAnalysisDTO::new()
                     .save()

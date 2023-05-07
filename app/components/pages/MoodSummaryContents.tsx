@@ -152,9 +152,9 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
             {/* Common Mood  */}
             <div className='pt-[24px] space-y-3'>
                 <h1 className='text-left font-bold text-[#757575] text-[14px]'>Most Common Moods</h1>
-                <div className='flex flex-wrap '>
+                <div className='flex '>
                     {
-                        most_common_mood?.map((data, k) => {
+                        most_common_mood?.slice(0, 3).map((data, k) => {
                             return (
                                 
                                 <div key={k}>

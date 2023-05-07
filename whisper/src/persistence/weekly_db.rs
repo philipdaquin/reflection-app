@@ -3,9 +3,11 @@ use crate::{error::Result, ml::weekly_pattern::WeeklyAnalysisDTO};
 use async_trait::async_trait;
 use bson::DateTime;
 use chrono::{Utc, Duration, TimeZone, Datelike};
+use futures_util::TryStreamExt;
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, };
 use super::audio_analysis::AnalysisDb;
+use super::get_current_week;
 use super::{db::MongoDbClient};
 
 const DB_NAME: &str = "human-assistant";
@@ -20,7 +22,7 @@ pub trait WeeklyAnalysisInterface {
     async fn get_corresponding_week(start_date: DateTime) -> Result<Option<WeeklyAnalysisDTO>>;
     async fn get_current_week() -> Result<Option<WeeklyAnalysisDTO>>;
     async fn update_total_entry(id: ObjectId) -> Result<()>;
-
+    async fn get_all() -> Result<Vec<WeeklyAnalysisDTO>>;
     async fn update_fields(id: ObjectId, input: WeeklyAnalysisDTO) -> Result<WeeklyAnalysisDTO>;
 
     fn get_analysis_db() -> Collection<WeeklyAnalysisDTO>;
@@ -45,6 +47,24 @@ impl WeeklyAnalysisDB {
 
 #[async_trait]
 impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
+
+    ///
+    /// Retrieve all weekly analysis 
+    #[tracing::instrument(fields(id), level= "debug", err)]
+    async fn get_all() -> Result<Vec<WeeklyAnalysisDTO>> { 
+        let collection = WeeklyAnalysisDB::get_analysis_db();
+
+        let filter = doc! { };
+
+        let mut doc = collection.find(filter, None).await?;
+
+        let mut res = vec![];
+        while let Some(summary) = doc.try_next().await? { 
+            res.push(summary);
+        }
+        Ok(res)
+    }
+
     ///
     /// Retrieve one weekly analysis on id 
     #[tracing::instrument(fields(id), level= "debug", err)]
@@ -131,24 +151,7 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
     async fn get_current_week() -> Result<Option<WeeklyAnalysisDTO>> {
         let collection = WeeklyAnalysisDB::get_analysis_db();
 
-
-         // Get current start of the week and end of the week dates 
-         let now = Utc::now().date_naive();
-         let start_of_week = now - Duration::days(now.weekday().num_days_from_monday() as i64);
-         let end_of_week = start_of_week + Duration::days(7);
-         
-         // Convert both values into naivedatetime and set to 00:00:00
-         let start_date = start_of_week.and_hms_opt(0, 0, 0).unwrap();
-         let end_date = end_of_week.and_hms_opt(0, 0, 0).unwrap();
- 
-         // Convert to DateTime in Chrono        
-         let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_date);
-         let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_date);
- 
-         // Convert to Bson DateTime  
-         let bson_start_date = bson::DateTime::from_chrono(start_date_time);
-         let bson_end_date = bson::DateTime::from_chrono(end_date_time);
-
+        let (bson_start_date, bson_end_date) = get_current_week();
 
         let filter = doc! { 
             "start_week": { 
@@ -186,16 +189,11 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
     async fn update_fields(id: ObjectId, input: WeeklyAnalysisDTO) -> Result<WeeklyAnalysisDTO> { 
         let collection = WeeklyAnalysisDB::get_analysis_db();
         
-        let query = doc! { "_id": id  };
-        let update = doc! { "$set": bson::to_document(&input).unwrap()};
-
-        let _ = collection.update_one(query, update, None).await?;
-
-        let id = doc! { "_id": id.to_owned()};
-
-        collection.find_one(id, None)
+        let query = doc! { "_id": &id  };
+        collection
+            .find_one_and_replace(query, input, None)
             .await?
-            .ok_or(ServerError::NotFound(format!("{}", input.id.unwrap())))
+            .ok_or(ServerError::NotFound(format!("{}", &id)))
     }
 
     ///

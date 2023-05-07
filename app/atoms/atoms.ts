@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { AudioData, DefaultFilterOption } from "../typings";
+import { AudioData, DefaultFilterOption, WeeklySummary } from "../typings";
 import { ELEVEN_LABS_KEY, OPENAI_KEY } from "../components/SettingsButtons";
 
 export const TimerState = atom({
@@ -41,8 +41,13 @@ export const AddEntryToggle = atom({
     default: false,
 })
 
-
 export const SelectedFilterOption = atom({
     key: 'SelectedFilterOption',
     default: DefaultFilterOption
+})
+
+
+export const CurrentWeekSummary = atom<WeeklySummary | null>({
+    key: 'CurrentWeekSummary',
+    default: null
 })

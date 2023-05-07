@@ -12,6 +12,10 @@ import { getWeeklySummary } from '../util/weekly/getWeeklySummary'
 import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
+import { useRecoilValue } from 'recoil'
+import { AddEntryToggle } from '../atoms/atoms'
+import ModalView from '../components/ModalView'
+import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 
 
 
@@ -24,6 +28,9 @@ function mood_summary({
   mood_graph, 
   weekly_summary
 }: Props) {
+
+    const showModel = useRecoilValue(AddEntryToggle);
+
     return (
         <>
           <Head>
@@ -65,6 +72,14 @@ function mood_summary({
                   <NavigationMobile children={<HomeNav/>} />        
               </div>
             </div>
+
+            {/* <RecordComponent /> */}
+            {showModel && (
+              <ModalView>
+                <AddEntryContent />
+              </ModalView>
+            )}
+
           </div>
         </>
       )
