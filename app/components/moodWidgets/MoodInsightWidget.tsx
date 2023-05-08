@@ -1,7 +1,9 @@
-import React from 'react'
-import { AudioData, DailySummary, MoodFrequency } from '../../typings'
+import React, { useEffect, useState } from 'react'
+import { AudioData, DailySummary, MoodFrequency, WeeklySummary } from '../../typings'
 import { recentEntryTimeStamp } from '../../util/recentEntryTimeStamp'
 import { fullTimeFormat } from '../../util/fullTimeFormat'
+import { useRecoilValue } from 'recoil'
+import { SelectedFilterOption } from '../../atoms/atoms'
 
 
 interface Props {
@@ -10,8 +12,10 @@ interface Props {
 }
 
 function InsightContainer({title, date}: Props) { 
+    const onHover = "hover:bg-[#f5f5f5] active:bg-[#f5f5f5] rounded-xl "
+
     return (
-        <div className='widget_container space-y-2'>
+        <div className={`widget_container space-y-2 ${onHover} cursor-pointer`}>
             <h2 className='text-left text-xs font-medium text-[#757575]'>{title}</h2>
             <h1 className='text-left text-[17px] font-semibold'>
                 {date}
@@ -22,14 +26,39 @@ function InsightContainer({title, date}: Props) {
 
 
 interface MoodProps { 
-    dailySummary: DailySummary | null
+    dailySummary: DailySummary | null,
+    currentWeeklySummary: WeeklySummary | null
+
 }
-function MoodInsightWidget({dailySummary}: MoodProps) {
+function MoodInsightWidget({dailySummary, currentWeeklySummary}: MoodProps) {
     
-    let best: AudioData | null | undefined = dailySummary?.max
-    let worst: AudioData | null | undefined = dailySummary?.max
-    let inflection: AudioData | null | undefined = dailySummary?.max
-    let frequency: MoodFrequency | undefined = dailySummary?.mood_frequency[0]
+
+    const selectedFilter = useRecoilValue(SelectedFilterOption)
+
+    const [best, setBestData] = useState<AudioData | null | undefined>(currentWeeklySummary?.max)
+    const [worst, setWorstData] = useState<AudioData | null | undefined>(currentWeeklySummary?.min)
+    const [inflection, setInflectedData] = useState<AudioData | null | undefined>(currentWeeklySummary?.inflection)
+    
+    
+    let f = currentWeeklySummary?.mood_frequency?.at(0)
+    
+    const [frequency, setDominantData] = useState<MoodFrequency | null | undefined>(f)
+
+    // If 24hr then only show DailySummary
+    // If 1W or more, then only show WeeklySummary
+    useEffect(() => {
+        if (selectedFilter.label === '24H') {
+            setBestData(dailySummary?.max)
+            setWorstData(dailySummary?.min)
+            setInflectedData(dailySummary?.inflection)
+            setDominantData(dailySummary?.mood_frequency[0])
+        } else { 
+            setBestData(currentWeeklySummary?.max)
+            setWorstData(currentWeeklySummary?.min)
+            setInflectedData(currentWeeklySummary?.inflection)
+            setDominantData(currentWeeklySummary?.mood_frequency ? currentWeeklySummary?.mood_frequency[0] : null)
+        }
+    }, [selectedFilter])
     
     
     const bestTime =  fullTimeFormat(best?.date.toString() || "")

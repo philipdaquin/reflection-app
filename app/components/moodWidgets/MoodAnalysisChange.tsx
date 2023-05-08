@@ -36,23 +36,42 @@ function MoodAnalysisChange({all_mood_data}: Props) {
         setFilter(filter[idx])
     }
 
+    // todo!
     const getFilteredData = (data: TextClassification[], filter: FilterOptions) => {
+        const currentDate = new Date();
+
         switch (filter.value) {
-          case '1d':
-            return data.slice(-1);
-          case '1w':
-            return data.slice(-7);
-          case '2w':
-            return data.slice(-14);
-          case '1m':
+        
+        case '1d':
+            return data.filter(
+                (item) =>
+                  new Date(item.date).getDate() === currentDate.getDate() &&
+                  new Date(item.date).getMonth() === currentDate.getMonth() &&
+                  new Date(item.date).getFullYear() === currentDate.getFullYear()
+              );
+
+        case '1w':
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            return data.filter((item) => new Date(item.date) >= oneWeekAgo);
+          
+        case '2w':
+            const twoWeekAgo = new Date();
+            twoWeekAgo.setDate(twoWeekAgo.getDate() - 14);
+
+            return data.filter((item) => new Date(item.date) >= twoWeekAgo);
+        
+        case '1m':
             const oneMonthAgo = new Date();
             oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
             return data.filter((item) => new Date(item.date) >= oneMonthAgo);
-          case '1y':
+        
+        case '1y':
             const oneYearAgo = new Date();
             oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
             return data.filter((item) => new Date(item.date) >= oneYearAgo);
-          default:
+        
+        default:
             return data;
         }
       };
@@ -80,7 +99,7 @@ function MoodAnalysisChange({all_mood_data}: Props) {
                     <div tabIndex={0} className="capitalize bg-[#f5f5f5] rounded-lg px-5 py-1 text-sm border-2 font-medium cursor-pointer active:scale-90  hover:bg-[#eaeaea]">
                         {filterOption.label}
                     </div>
-                    <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-fit">
+                    <ul tabIndex={0} className="dropdown-content menu p-2 shadow  bg-base-100 rounded-box w-fit">
                         {
                             filter.map((item, i ) => { 
                                 return (

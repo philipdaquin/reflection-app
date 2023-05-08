@@ -40,7 +40,7 @@ pub struct WeeklyAnalysisDTO {
     pub end_week: Option<DateTime>,
 
     // User's common mood in the week 
-    pub common_mood: Option<Vec<MoodFrequency>>,
+    pub mood_frequency: Option<Vec<MoodFrequency>>,
 
     // User's change of mood 
     pub inflection: Option<AudioDataDTO>,
@@ -163,7 +163,7 @@ impl WeeklyAnalysisDTO {
 
         let (bson_start_date, bson_end_date) = get_current_week();
         let top_moods = TextClassification::get_most_common_moods(bson_start_date, bson_end_date).await.unwrap();
-        self.common_mood = Some(top_moods);
+        self.mood_frequency = Some(top_moods);
         Ok(self.clone())
     }
 

@@ -17,6 +17,8 @@ impl RecommendedActivity {
     /// 
     #[tracing::instrument(level= "debug")]
     pub async fn get_personalised_recommendations(summaries: Vec<String>) -> Result<Vec<Self>> { 
+        if summaries.is_empty() { return Ok(Vec::new())}
+
         // Testing 
         // let summaries_ = vec![
         //     "A person is feeling incredibly lonely and empty, unable to shake off the weight of loneliness. They wake up to a silent apartment and miss the sound of laughter, conversations, and hugs. Music is a painful reminder of what they have lost and they feel like they're drowning in a sea of sorrow. They are scared to reach out to someone and instead stay silent and pretend everything is fine, but it's not. They sit in the silence, listening to their own sadness, hoping to find".to_string(),
@@ -31,7 +33,7 @@ impl RecommendedActivity {
             .await
             .unwrap();
         // Deserialize the result 
-        let recomm: Vec<RecommendedActivity> = serde_json::from_str(&resp).unwrap();
+        let recomm: Vec<RecommendedActivity> = serde_json::from_str(&resp).unwrap_or(Vec::new());
         log::info!("🛏️🛏️ RESULT {recomm:#?}");
 
         Ok(recomm)

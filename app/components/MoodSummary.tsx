@@ -25,6 +25,7 @@ function MoodSummary({dailyMoodSummary}: Props) {
     useEffect(() => {
         if (!dailyMoodSummary?.current_avg || !currentDate) return 
         
+        ``
         let inputDate = new Date(currentDate);
         inputDate.setDate(inputDate.getDate() - 1)
         console.log(inputDate)

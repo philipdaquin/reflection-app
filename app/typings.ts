@@ -86,11 +86,11 @@ export type RecommendedActivity = {
 
 
 
-export type CommonMoodData = {  
-    emotion: string,
-    emotion_emoji: string, 
-    percentage: number
-}
+// export type CommonMoodData = {  
+//     emotion: string,
+//     emotion_emoji: string, 
+//     percentage: number
+// }
 
 export class WeeklyData {
     date: Date;
@@ -109,7 +109,7 @@ export type WeeklySummary = {
     total_entries: number | null
     start_week: Date | null
     end_week: Date | null
-    common_mood: CommonMoodData[] | null
+    mood_frequency: MoodFrequency[] 
     inflection: AudioData | null
     min: AudioData | null
     max: AudioData | null

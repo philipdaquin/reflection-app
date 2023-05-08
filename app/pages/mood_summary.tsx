@@ -16,6 +16,7 @@ import { useRecoilValue } from 'recoil'
 import { AddEntryToggle } from '../atoms/atoms'
 import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
+import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
 
 
 
@@ -94,7 +95,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     weekly_summary
   ] = await Promise.all([
     ( await getMoodSummary() ),
-    ( await getWeeklySummary() )
+    ( await getCurrentWeeklySummary() )
   ]) 
 
   return { 

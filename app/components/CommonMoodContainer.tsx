@@ -1,9 +1,9 @@
 import React from 'react'
-import { CommonMoodData } from '../typings'
+import { MoodFrequency } from '../typings'
 
 
 interface Props { 
-    moodData: CommonMoodData 
+    moodData: MoodFrequency 
 }
 function CommonMoodContainer({moodData}: Props) {
 

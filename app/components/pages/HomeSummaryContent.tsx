@@ -61,7 +61,7 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
         <MoodAnalysisChange all_mood_data={all_mood_data} />
         {/* <MoodCompositionWidget data={[]}/> */}
         {/* <MoodActivityWidget entries={[]}/> */}
-        <MoodInsightWidget dailySummary={dailyMoodSummary}/>
+        <MoodInsightWidget dailySummary={dailyMoodSummary} currentWeeklySummary={currentWeeklySummary}/>
         <MoodTriggersWidget data={dailyMoodSummary}/>
         <DailyAudioEntries entries={recent_entries}/>
       </div>

@@ -62,7 +62,7 @@ function getHourData(data: WeeklyData[]) {
       mood: 0
     }
     // data.push(minData)
-    data.push(maxData)
+    // data.push(maxData)
   }
   return data
 }
@@ -157,7 +157,7 @@ function MoodAreaChart({data}: Props) {
                 data={
                   selectedFilter.label === '24' ? test : data
                 }
-                margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
+                margin={{ top: 0, right: 0, left: -60, bottom: 0 }}
             >
                 <defs>
                   <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
@@ -169,14 +169,19 @@ function MoodAreaChart({data}: Props) {
                     <stop offset="95%" stopColor="rgba(255, 184, 0, 0.38)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-            <Brush dataKey='date' height={30} stroke="#8884d8"/>
+               <Brush dataKey='date' height={30} stroke="#8884d8"/>
+
+                
+               <YAxis 
+                  dataKey="mood" 
+                  type='number'
 
 
-                {/* <XAxis 
-                  dataKey="date" 
+                  tickCount={0}
                   tick={CustomXAxisTick} 
-                  domain={[minDate.toString(), maxDate.toString()]} 
-                /> */}
+                  domain={[0, maxValue + 0.4]} 
+                /> 
+
                 <XAxis 
                   dataKey="date" 
                   interval={selectedFilter.interval as AxisInterval} 
@@ -184,7 +189,7 @@ function MoodAreaChart({data}: Props) {
                   tickCount={
                     selectedFilter.interval === 'hour'
                     ? 24
-                    : undefined
+                    : 24
                   }
               
                   tickFormatter={(value) => TickFormatter(value, selectedFilter)}
@@ -194,7 +199,6 @@ function MoodAreaChart({data}: Props) {
                   //   hour: selectedFilter.interval === 'hour' ? 'numeric' : undefined 
                   // }).format(new Date(value))} 
                 />
-
 
                 <Tooltip />
 

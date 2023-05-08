@@ -21,10 +21,12 @@ interface MoodTriggerProps {
 }
 
 function MoodTriggerEntry({entry: {id, emoji, numOfEntries, emotion}}: MoodTriggerProps) { 
+    const onHover = "hover:bg-[#f5f5f5] active:bg-[#f5f5f5] rounded-xl "
+
     return ( 
-        <div className='justify-between flex flex-row items-center w-full'>
+        <div className={`justify-between flex flex-row items-center w-full py-2 ${onHover}`}>
             <div className='flex flex-row justify-center items-center w-full space-x-2'>
-                <div className='text-xl p-2 rounded-lg bg-[#f5f5f5]'>
+                <div className={`text-xl p-2 rounded-lg bg-[#f5f5f5] `}>
                     {emoji}
                 </div>
                 <div className='w-full space-y-1'>
@@ -80,6 +82,9 @@ function MoodTriggersWidget({data}: Props) {
     // ].slice(0, 3);
 
     const router = useRouter()
+    
+    const [showToggle, setShowToggle] = useState(false)
+
     const dataa: MoodTriggerType[] | undefined = data?.mood_frequency.map((item, i) => { 
         const s: MoodTriggerType = { 
             id: data.id,
@@ -88,7 +93,15 @@ function MoodTriggersWidget({data}: Props) {
             emotion: item.emotion || ""
         }
         return s
-    }).slice(0, 3)
+    })
+
+    const filteredData = showToggle ? dataa : dataa?.slice(0, 3)
+
+    const openToggle = () => {
+        setShowToggle(true)
+    }
+
+
 
     return (
         <div className='widget_container'>
@@ -101,14 +114,19 @@ function MoodTriggersWidget({data}: Props) {
                         Triggers that cause your mood
                     </p>
                 </div>
-                <h1 onClick={() => router.push('')} className='text-[#2e9dfb] text-[13px] text-left font-regular hover:underline cursor-pointer'>
-                    See All
-                </h1>
+                {
+                    !showToggle && dataa && dataa?.length > 3 && (
+                        <h1 onClick={openToggle} hidden={showToggle} className='text-[#2e9dfb] text-[13px] text-left font-regular hover:underline cursor-pointer'>
+                            See All
+                        </h1>
+                    )
+                }
+                
             </div>
 
-            <div className='space-y-5 pt-[20px] w-full'>
+            <div className='space-y-3 pt-[20px] w-full'>
                 {
-                    dataa?.map((item, i) => { 
+                    filteredData?.map((item, i) => { 
                         return (
                             <div key={i}>
                                 <Link href={`/${item.id}`}>

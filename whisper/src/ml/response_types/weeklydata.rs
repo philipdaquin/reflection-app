@@ -15,7 +15,7 @@ pub struct WeeklyAnalysis {
     pub total_entries: i32,
     pub start_week: Option<DateTime<Utc>>,
     pub end_week: Option<DateTime<Utc>>,
-    pub common_mood: Option<Vec<MoodFrequency>>,
+    pub mood_frequency: Option<Vec<MoodFrequency>>,
     pub inflection: Option<AudioData>,
     pub min: Option<AudioData>,
     pub max: Option<AudioData>,
@@ -38,7 +38,7 @@ impl From<WeeklyAnalysisDTO> for WeeklyAnalysis {
             
             end_week: value.end_week.map(|f| f.into()),
             
-            common_mood: value.common_mood,
+            mood_frequency: value.mood_frequency,
             
             inflection: value.inflection.map(|f| AudioData::from(f)),
             
