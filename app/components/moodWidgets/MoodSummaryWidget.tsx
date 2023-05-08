@@ -3,7 +3,7 @@ import MoodSummary from '../MoodSummary'
 import { DailySummary } from '../../typings'
 
 interface Props { 
-  dailyMoodSummary: DailySummary
+  dailyMoodSummary: DailySummary | null
 }
 
 function MoodSummaryWidget({dailyMoodSummary}: Props) {

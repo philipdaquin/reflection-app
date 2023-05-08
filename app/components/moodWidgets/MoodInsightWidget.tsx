@@ -35,19 +35,19 @@ function MoodInsightWidget({dailySummary}: MoodProps) {
     const bestTime =  fullTimeFormat(best?.date.toString() || "")
     const worstTime =  fullTimeFormat(worst?.date.toString() || "")
     const inflectionTime =  fullTimeFormat(inflection?.date.toString() || "")
-
-    const percentage = frequency?.emotion_emoji + " " +  ((frequency?.percentage ?? 0) as number).toFixed(2) + "%"
+    const percentage = ((frequency?.percentage ?? 0) as number).toFixed(2) 
+    const fullPercentage = (frequency?.emotion_emoji || "NaN") + " " +   percentage + "%"
 
 
     return (
         <div className='flex flex-col space-y-4 '>
             <div className='flex space-x-4'>
-                { best && ( <InsightContainer date={bestTime} title='🏆 Best Day'/>)}
-                { worst && (  <InsightContainer date={worstTime} title='😖 Worst Day'/>)}
+                <InsightContainer date={`${best ? bestTime: 'NaN' }`} title='🏆 Best Day'/>
+                <InsightContainer date={`${worst ? worstTime : 'NaN'}`} title='😖 Worst Day'/>
             </div>
             <div className='flex space-x-4'>
-               { inflection && ( <InsightContainer date={inflectionTime} title='😐 Change in Mood'/>)}
-                <InsightContainer date={percentage} title='💪 Dominant Mood'/>
+                <InsightContainer date={`${inflection ? inflectionTime : 'NaN'}`} title='😐 Change in Mood'/>
+                <InsightContainer date={fullPercentage} title='💪 Dominant Mood'/>
             </div>
         </div>
     )

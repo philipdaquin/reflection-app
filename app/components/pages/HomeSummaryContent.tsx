@@ -57,16 +57,11 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
       {/* Widget : Mood Changes */}
       {/* **Designed this way so each widget can be reused again */}
       <div className='pt-[40px] space-y-6 pb-52'>
-        {dailyMoodSummary && 
-          (
-            <MoodSummaryWidget dailyMoodSummary={dailyMoodSummary}/>
-
-          )
-        }
+        <MoodSummaryWidget dailyMoodSummary={dailyMoodSummary}/>
         <MoodAnalysisChange all_mood_data={all_mood_data} />
         {/* <MoodCompositionWidget data={[]}/> */}
         {/* <MoodActivityWidget entries={[]}/> */}
-       { dailyMoodSummary && ( <MoodInsightWidget dailySummary={dailyMoodSummary}/>  )}
+        <MoodInsightWidget dailySummary={dailyMoodSummary}/>
         <MoodTriggersWidget data={dailyMoodSummary}/>
         <DailyAudioEntries entries={recent_entries}/>
       </div>

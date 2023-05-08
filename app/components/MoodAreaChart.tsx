@@ -61,7 +61,7 @@ function getHourData(data: WeeklyData[]) {
       date: new Date( timeNow.getFullYear(), timeNow.getMonth(), timeNow.getDate(), 23, 59, 59),
       mood: 0
     }
-    data.push(minData)
+    // data.push(minData)
     data.push(maxData)
   }
   return data

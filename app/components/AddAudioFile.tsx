@@ -69,10 +69,9 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
                 setProgress(percent)
             }
         })
-
         xhr.onload = async () => { 
             if (xhr.status === 200) { 
-                const resp: AudioData = JSON.parse(xhr.response)
+                const resp = JSON.parse(xhr.response)
                 router.push({ 
                     pathname: `/post_analysis/${resp._id}`
                 })
