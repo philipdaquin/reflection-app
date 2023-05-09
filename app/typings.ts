@@ -221,6 +221,13 @@ export class EntryType {
       this.avgMood = data.text_classification.average_mood
   }
 }
+export type MoodTriggerType = { 
+  id: number,
+  emotion: string, 
+  numOfEntries: number, 
+  emoji: string
+}
 
 
 export const DEFAULT_IMAGE_URL: string = 'https://www.telegraph.co.uk/content/dam/news/2021/06/04/UFO_trans_NvBQzQNjv4BqECnBSB4T3tw7hRvCORLehcLZq-j_VIcNfiYtpwBx7zI.jpg?imwidth=680'
+

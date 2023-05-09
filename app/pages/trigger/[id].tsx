@@ -1,11 +1,15 @@
 import Head from 'next/head'
 import React from 'react'
-import ListeningContent from '../components/pages/ListeningContent'
-import PhoneView from '../components/PhoneView'
-import SwitchView from '../components/SwitchView'
+import ListeningContent from '../../components/pages/ListeningContent'
+import PhoneView from '../../components/PhoneView'
+import SwitchView from '../../components/SwitchView'
+
+interface Props { 
+    
+}
 
 
-function listen() {
+function trigger() {
     return (
         <>
           <Head>
@@ -35,4 +39,4 @@ function listen() {
       )
 }
 
-export default listen
+export default trigger
