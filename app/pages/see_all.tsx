@@ -16,6 +16,7 @@ import HomeNav from '../components/navigation/mobile/HomeNav'
 import { GetServerSideProps } from 'next'
 import { AudioData } from '../typings'
 import { getAll } from '../util/audio/getAll'
+import { Toaster } from 'react-hot-toast'
 
 
 interface Props { 

@@ -2,7 +2,7 @@ use crate::error::ServerError;
 use crate::{error::Result, ml::weekly_pattern::WeeklyAnalysisDTO};
 use async_trait::async_trait;
 use bson::DateTime;
-use chrono::{Utc, Duration, TimeZone, Datelike};
+use chrono::{Utc, Duration, TimeZone, Datelike, NaiveDate, Weekday};
 use futures_util::TryStreamExt;
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, };
@@ -19,7 +19,7 @@ pub trait WeeklyAnalysisInterface {
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<WeeklyAnalysisDTO>>;
     async fn delete_all_entries() -> Result<bool>;
     async fn get_one_analysis(id: ObjectId) -> Result<WeeklyAnalysisDTO>;
-    async fn get_corresponding_week(start_date: DateTime) -> Result<Option<WeeklyAnalysisDTO>>;
+    async fn get_corresponding_week(date: chrono::DateTime<Utc>) -> Result<Option<WeeklyAnalysisDTO>>;
     async fn get_current_week() -> Result<Option<WeeklyAnalysisDTO>>;
     async fn update_total_entry(id: ObjectId) -> Result<()>;
     async fn get_all() -> Result<Vec<WeeklyAnalysisDTO>>;
@@ -126,23 +126,39 @@ impl WeeklyAnalysisInterface for WeeklyAnalysisDB {
     ///
     /// Get the weekly record based on the date of the daily input       
     #[tracing::instrument(fields(id), level= "debug", err)]
-    async fn get_corresponding_week(created_date: DateTime) -> Result<Option<WeeklyAnalysisDTO>> { 
-
+    async fn get_corresponding_week(date: chrono::DateTime<Utc>) -> Result<Option<WeeklyAnalysisDTO>> { 
         let collection = WeeklyAnalysisDB::get_analysis_db();
         
+        let iso_week = date.date_naive().iso_week();
+        
+        // Get the dates from the start to the end of the week 
+        let start_week = NaiveDate::from_isoywd_opt(iso_week.year(), iso_week.week(), Weekday::Mon)
+            .unwrap()
+            .and_hms_opt(0,0, 0)
+            .unwrap();
+        let end_week = NaiveDate::from_isoywd_opt(iso_week.year(), iso_week.week(), Weekday::Sun)
+            .unwrap()
+            .and_hms_opt(0,0, 0)
+            .unwrap();
+
+        // Into date time 
+        let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_week);
+        let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_week);
+        
+        // Into bson 
+        let bson_start_date = bson::DateTime::from_chrono(start_date_time);
+        let bson_end_date = bson::DateTime::from_chrono(end_date_time);
+
+
         let filter = doc! { 
             "start_week": { 
-                "$lte": created_date,
+                "$lte": bson_start_date,
             },
             "end_week": { 
-                "$gte": created_date
+                "$gte": bson_end_date
             }
         };
         let res = collection.find_one(filter, None).await?;
-
-
-        log::info!("❌❌❌❌❌ {res:#?}");
-
         Ok(res)
     }
 

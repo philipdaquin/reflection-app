@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import MoodAreaChart from '../MoodAreaChart'
 import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
 import CommonMoodContainer from '../CommonMoodContainer'
@@ -6,6 +6,8 @@ import { TextClassification, WeeklyData, WeeklySummary } from '../../typings'
 import { AverageWeeklyIndex } from '../../atoms/atoms'
 import { useRecoilValue } from 'recoil'
 import { getAverageMoodWeek } from '../MoodTrackerIndex'
+import { getWeeklyByDate } from '../../util/weekly/getWeeklyByDate'
+import changeInPercentage from '../../util/changeInPercentage'
 
 
 interface Props { 
@@ -24,24 +26,59 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
     // console.log(weeklyIndex)
     const weeklyIndex = getAverageMoodWeek(mood_graph)
 
+    
+
+    // Fetch previous week data 
+    const [previousWeek, setPreviousWeek] = useState<WeeklySummary | null>(null)
+    const oneWeek = async (date: Date) => { 
+        const lastWeek = await getWeeklyByDate(date)
+        setPreviousWeek(lastWeek || null)
+    }
+    
+    useEffect(() => {
+      let currentDate = new Date()
+      let oneWeekAgo = new Date(
+        currentDate.getFullYear(), 
+        currentDate.getMonth(), 
+        currentDate.getDate() - currentDate.getDay() - 7)
+        oneWeek(oneWeekAgo)
+    }, [])
+    
+
+    let changeInPercent = changeInPercentage(weekly_summary?.weekly_avg || 0, previousWeek?.weekly_avg || 0)?.toFixed(2) || 0
+    const sign = parseFloat(changeInPercent.toString()) 
+    const colour = changeInPercent as number > 0 ? 
+        "text-[#41d475] " 
+    : changeInPercent as number < 0 ? 
+        "text-[#E84040]" 
+
+    : "text-[#757575] ";
+
     return (
-        <section className=''>
+        <section className='pb-52'>
 
             <h1 className='items-center flex justify-center font-bold text-center text-base text-[#212121]'>
                 Weekly Summary
             </h1>
 
             <div className='pt-[20px] space-y-1'>
-                <h1 className='text-left font-bold text-[#757575] text-[14px]'>
+                <h1 className='text-left font-semibold text-[#757575] text-lg'>
                     Weekly Mood Score
                 </h1>
                 <div className='flex justify-between items-center'>
                     <h1 className='text-[30px] font-bold'>{weeklyIndex || ''}</h1>
                     <div className='flex items-center space-x-1'>
-                        <ArrowDownCircleIcon height={20} width={20} color="#757575"/>
+                        {/* <ArrowDownCircleIcon height={20} width={20} color="#757575"/>
                         <p className='text-center text-[#757575] text-[12px]'>
                             10% Down from lastweek
-                        </p>
+                        </p> */}
+                        <h1 className={`text-left font-semibold text-[23px] ${colour}`}>
+                            {changeInPercent || "0.00" } <span className={`text-[15px] ${colour}`}>%</span>
+                        </h1>
+
+                        <p className='pt-[1px]  text-left font-semibold text-xs text-[#757575]'>
+                            from lastweek
+                        </p>   
                     </div>
                 </div>
             </div>
@@ -49,7 +86,10 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
             {/* Mood trend Graph */}
             { weeklyData && (
             
-            <div className='w-full items-center pt-12'>
+            <div className='w-full items-center pt-6 h-[310px] space-y-5 pb-10'>
+                <h1 className='text-left font-semibold text-[#757575] text-lg'>
+                    Weekly Data Patterns 
+                </h1>
                 <MoodAreaChart data={weeklyData}/>
             </div>
             
@@ -57,7 +97,7 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
 
             {/* Common Mood  */}
             <div className='pt-[24px] space-y-3'>
-                <h1 className='text-left font-bold text-[#757575] text-[14px]'>Most Common Moods</h1>
+                <h1 className='text-left font-semibold text-[#757575] text-lg'>Most Common Moods</h1>
                 <div className='flex '>
                     {
                         most_common_mood?.slice(0, 3).map((data, k) => {
@@ -75,7 +115,7 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
             
             {/* Events that influenced your emotions */}
             <div className='pt-8 space-y-3'>
-                <h1 className='text-left font-bold text-[#757575] text-[14px]'>Events that affected your mood</h1>
+                <h1 className='text-left font-semibold text-[#757575] text-lg'>Events that affected your mood</h1>
                 <div className='space-y-3'>
                     {
                         eventData.map((v) => { 
@@ -95,7 +135,7 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
             </div>
             {/* Events that influenced your emotions */}
             <div className='pt-8 space-y-3'>
-                <h1 className='text-left font-bold text-[#757575] text-[14px]'>Recommended Activities</h1>
+                <h1 className='text-left font-semibold text-[#757575] text-lg'>Recommended Activities</h1>
                 <div className='space-y-3'>
                     {
                         recommendedActivities.map((v) => { 

@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use chrono::{ Utc, Datelike, DateTime};
 use serde::{Serialize, Deserialize};
 
@@ -19,7 +21,7 @@ pub struct WeeklyAnalysis {
     pub inflection: Option<AudioData>,
     pub min: Option<AudioData>,
     pub max: Option<AudioData>,
-    pub important_events: Vec<ImportantEvents>,
+    pub important_events: HashSet<ImportantEvents>,
     pub recommendations: Option<Vec<RecommendedActivity>>,
 }
 
@@ -46,7 +48,7 @@ impl From<WeeklyAnalysisDTO> for WeeklyAnalysis {
             
             max: value.max.map(|f| AudioData::from(f)),
             
-            important_events: value.important_events,
+            important_events: value.important_events.into_iter().collect(),
             
             recommendations: value.recommendations,
         }

@@ -62,7 +62,7 @@ function PlayerContents({entry}: PlayerContentProps) {
     return (
         <section className='flex flex-col h-full justify-between'>
             <div className='flex flex-row items-center justify-between pb-5'>
-                <BackButton link='' />
+                <BackButton/>
                 <h1 className='font-semibold text-[15px] text-center text-[#757575]'>Now Playing</h1>
                 <div className='px-4 bg-black'></div>
             </div>

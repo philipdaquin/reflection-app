@@ -8,7 +8,7 @@ use crate::{ml::{
     persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}}, error::ServerError};
 use serde_derive::{Deserialize};
 
-use super::{Input, openapi_key::OpenAIClient};
+use super::{Input, openapi_key::OpenAIClient, audio_data::InputDate};
 
 ///
 /// The configure service for text analysis services 
@@ -20,8 +20,22 @@ pub fn configure_weekly_analysis_service(cfg: &mut web::ServiceConfig) {
     .service(get_current_week)
     .service(get_all)
     .service(get_one)
+    
     ;
 }
+
+/// 
+/// Retrieve a Weekly Summary using a specific date
+/// Uses:
+/// - Get Last Week's Data
+#[route("/api/weekly/get-by-date", method = "POST")]
+pub async fn get_by_date(date: web::Json<InputDate>) -> Result<HttpResponse> { 
+    let data = WeeklyAnalysisDB::get_corresponding_week(date.date)
+        .await?
+        .and_then(|f| Some(WeeklyAnalysis::from(f)));
+    Ok(HttpResponse::Ok().json(data))
+}
+
 
 #[route("/api/weekly/get-all", method = "GET")]
 pub async fn get_all() -> Result<HttpResponse> { 

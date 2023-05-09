@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { AudioData, WeeklySummary } from '../../typings'
+import { AudioData, EntryType, WeeklySummary } from '../../typings'
 import changeInPercentage from '../../util/changeInPercentage'
 import { useRouter } from 'next/router'
 import { recentEntryTimeStamp } from '../../util/recentEntryTimeStamp'
@@ -9,20 +9,6 @@ import { useRecoilValue } from 'recoil'
 import { CurrentWeekSummary } from '../../atoms/atoms'
 
 
-class EntryType { 
-    id: string; 
-    date: string;
-    title: string; 
-    emoji: string; 
-    avgMood: number; 
-    constructor(data: AudioData) {
-        this.id = data._id
-        this.date = data.date.toString()
-        this.title = data.title || ""
-        this.emoji = data.text_classification.emotion_emoji || ""
-        this.avgMood = data.text_classification.average_mood
-    }
-}
 
 interface EntryProps { 
     entry: EntryType,
@@ -128,6 +114,18 @@ function DailyAudioEntries({entries}: Props) {
     const router = useRouter()  
     const currentWeek = useRecoilValue<WeeklySummary | null>(CurrentWeekSummary)
 
+    const currentDate = new Date()
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const currDay = currentDate.getDay()
+    
+    let day = daysOfWeek[currDay]
+
+    const d = currentDate.getDate()
+
+    const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
+    const year = currentDate.getFullYear();
+
+
     return (
         <div className='widget_container'>
             <div className='flex flex-row items-center justify-between'>
@@ -142,10 +140,12 @@ function DailyAudioEntries({entries}: Props) {
                     </h1>
                 </div>
             </div>
-            <div className='flex flex-row-reverse pt-1'>
+            <div className='flex flex-row pt-1 justify-between items-center'>
+                <h2 className='flex flex-row text-[13px] text-[#757575] font-regular'>{day}, {d} {month} {year}</h2>
                 <p className='text-[10px] text-[#757575]'>
                         vs. Weekly Avg.
                 </p>
+
             </div>
 
             <div className='space-y-5 pt-4'>

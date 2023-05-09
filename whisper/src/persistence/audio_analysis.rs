@@ -163,7 +163,7 @@ impl TextAnalysisInterface for AnalysisDb {
     #[tracing::instrument(fields(repository = "TextAnalysis", id), level= "debug", err)]
     async fn get_recent() -> Result<Vec<TextClassification>> {
         log::info!("Retrieving recent dataset...");
-        let mut result = Vec::with_capacity(10);
+        let mut result = vec![];
         let collection = AnalysisDb::get_analysis_db();
 
         let (bson_start_date, bson_end_date) = get_current_week();
@@ -176,17 +176,12 @@ impl TextAnalysisInterface for AnalysisDb {
             } 
         };
         
-        // let filter = doc! { };
-        
         // Get the matching document 
         let mut doc = collection.find(filter, None).await?;
         
         while let Some(doc) = doc.try_next().await? {
             result.push(doc);
         }
-
-        // log::info!("FOUNDED ITEMS FOR THIS: {result:#?}");
-
         Ok(result)
     }
     

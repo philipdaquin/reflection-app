@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use bson::{oid::ObjectId, DateTime};
 use chrono::{Utc, Datelike, NaiveDate, Weekday, TimeZone, Local, Duration};
 use serde::{Serialize, Deserialize};
@@ -7,7 +9,7 @@ weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}, audio_analysis::Analysis
 
 use super::{text_classification::{MoodFrequency, TextClassification}, recommendation::RecommendedActivity, whisper::{AudioDataDTO}};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct ImportantEvents { 
     pub emoji: Option<String>,
     pub title: Option<String>,
@@ -210,7 +212,7 @@ impl WeeklyAnalysisDTO {
         if self.important_events.len() <= 3 { 
             self.important_events.push(event);
         } else { 
-            self.important_events.remove(0);
+            self.important_events.pop();
             self.important_events.push(event);
         }
 

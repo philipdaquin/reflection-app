@@ -20,7 +20,7 @@ function RecordContent() {
     return (
         <>  
             <div className='flex flex-row items-center justify-between'>
-                <BackButton link='' />
+                <BackButton/>
                 <h1 className='font-bold text-[15px] text-center '>Record Audio</h1>
                 <div className='px-4 bg-black'></div>
             </div>

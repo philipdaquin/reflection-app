@@ -8,8 +8,23 @@ use super::audio_data::InputDate;
 
 
 pub fn configure_daily_summary(cfg: &mut web::ServiceConfig) { 
-    cfg.service(get_by_date);
+    cfg
+    .service(get_by_date)
+    .service(get_all)
+    ;
 } 
+
+#[route("/api/daily/get-all", method = "GET")]
+pub async fn get_all() -> Result<HttpResponse> { 
+    let analysis = DailyAnalysisDb::get_all()
+        .await?
+        .into_iter()
+        .map(DailySummary::from)
+        .collect::<Vec<DailySummary>>();
+
+    Ok(HttpResponse::Ok().json(analysis))
+}
+
 
 /// 
 /// 

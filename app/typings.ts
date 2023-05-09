@@ -207,6 +207,20 @@ export type FilterOptions = {
 export const DefaultFilterOption: FilterOptions = { label: 'All', value: 'all', interval: 'day', format: 'MMM D' }
 
 
+export class EntryType { 
+  id: string; 
+  date: string;
+  title: string; 
+  emoji: string; 
+  avgMood: number; 
+  constructor(data: AudioData) {
+      this.id = data._id
+      this.date = data.date.toString()
+      this.title = data.title || ""
+      this.emoji = data.text_classification.emotion_emoji || ""
+      this.avgMood = data.text_classification.average_mood
+  }
+}
 
 
 export const DEFAULT_IMAGE_URL: string = 'https://www.telegraph.co.uk/content/dam/news/2021/06/04/UFO_trans_NvBQzQNjv4BqECnBSB4T3tw7hRvCORLehcLZq-j_VIcNfiYtpwBx7zI.jpg?imwidth=680'

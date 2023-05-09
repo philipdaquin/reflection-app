@@ -71,7 +71,8 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
         })
         xhr.onload = async () => { 
             if (xhr.status === 200) { 
-                const resp: AudioData = JSON?.parse(xhr.response)
+                const preResp = JSON.parse(xhr.response)
+                const resp: AudioData = preResp
                 router.push({ 
                     pathname: `/post_analysis/${resp._id}`
                 })
@@ -103,8 +104,8 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
         const eventSource = new EventSource('http://localhost:4001/api/audio/events');
         
         eventSource.addEventListener('message', (event) => {
-          const data: ProgressData = JSON?.parse(event.data);
-            
+          const preData = JSON.parse(event.data);
+          const data: ProgressData = preData  
 
           console.log(data)
             if (!data.progress) return

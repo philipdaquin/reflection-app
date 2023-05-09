@@ -211,16 +211,13 @@ impl TextClassification {
         // let data_points = AnalysisDb::get_data_in_current_week().await?;
         
         let mut min_avg_mood = f32::MAX;
-        let mut curr_avg_mood = 0.0;
         let mut min_point = None;
 
         for point in data.into_iter() { 
             if let Some(mood) = point.average_mood { 
                 // If the curr mood is less than the recorded min mood 
-                curr_avg_mood = f32::min(mood, curr_avg_mood);
-                
-                if curr_avg_mood < min_avg_mood { 
-                    min_avg_mood = curr_avg_mood;
+                if mood < min_avg_mood { 
+                    min_avg_mood = mood;
                     min_point = Some(point.to_owned());
                 }                
             }
@@ -238,14 +235,12 @@ impl TextClassification {
         // let data_points = AnalysisDb::get_data_in_current_week().await?;
         
         let mut max_avg_mood = f32::MIN;
-        let mut curr_avg_mood = 0.0;
         let mut max_point: Option<TextClassification> = None;
 
         for point in data.into_iter() { 
             if let Some(mood) = point.average_mood { 
-                curr_avg_mood = f32::min(mood, curr_avg_mood);
-                if curr_avg_mood > max_avg_mood { 
-                    max_avg_mood = curr_avg_mood; 
+                if mood > max_avg_mood { 
+                    max_avg_mood = mood; 
                     max_point = Some(point.to_owned());
                 }
             }
