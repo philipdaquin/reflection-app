@@ -6,6 +6,7 @@ import useLocalStorage from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
 import { deleteLocalStorage, initialiseAPIKeys } from '../pages'
+import QRCode from './QRCode'
 
 
 export const ELEVEN_LABS_KEY: string = "eleven_labs_api_key"
@@ -231,12 +232,17 @@ function SettingsButtons() {
     initialiseAPIKeys()
 
   return (
-    <div>
+    <div className='flex flex-row w-full justify-between items-end '>
         <div className='flex items-center space-x-10'>
             <SettingsToggle />
             <div className='w-[2px] h-4 rounded-full bg-[#9e9e9e]'></div>
             <div className='text-[#757575]  text-left text-sm'>Donate</div>
         </div>
+                  
+        <div className='w-fit '>
+            <QRCode />
+          </div>
+
     </div>
   )
 }
