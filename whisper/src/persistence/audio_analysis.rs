@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use bson::Bson;
 use chrono::{Utc, Duration, TimeZone, Datelike};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
@@ -292,12 +293,17 @@ impl TextAnalysisInterface for AnalysisDb {
             let percent = count / total_records as f32 * 100.0;
             let emotion = item.get_str("emotion").unwrap_or_default().to_string();
             let emoji = item.get_str("emotion_emoji").unwrap_or_default().to_string();
-            let audio_ids = item.get_array("_audio_ids")
+            let audio_ids = item
+                .get_array("_audio_ids")
                 .unwrap_or(&Vec::new())
                 .into_iter()
-                .map(|f| f.to_string())
-                .collect();
- 
+                .filter_map(|f| match f {
+                    Bson::ObjectId(object_id) => Some(object_id.to_hex()),
+                    _ => None,
+                }).collect::<Vec<String>>();
+            
+            log::info!("{audio_ids:#?}");
+                
 
             result.push(MoodFrequency::new(
                 Some(emoji), 
@@ -307,7 +313,6 @@ impl TextAnalysisInterface for AnalysisDb {
                 audio_ids
             ));
         }
-        log::info!("{result:#?}");
 
     
         Ok(result)

@@ -22,6 +22,9 @@ pub trait DailyAnalysisInterface {
 
     async fn delete_one(id: &str) -> Result<DailySummaryDTO>;
     
+
+    async fn delete_all() -> Result<()>;
+
     async fn update_total_entry(id: ObjectId) -> Result<()>;
 
     async fn update_summary(id: ObjectId, input: DailySummaryDTO) -> Result<DailySummaryDTO>;
@@ -164,6 +167,17 @@ impl DailyAnalysisInterface for DailyAnalysisDb {
             .ok_or(ServerError::NotFound(format!("{}", input.id.unwrap())))
     }
 
+    ///
+    /// Clears out all Daily Summary entries 
+    async fn delete_all() -> Result<()> { 
+        let collection = DailyAnalysisDb::get_analysis_db();
+        
+        let filter = doc! {};
+        collection.delete_many(filter, None).await?;
+        
+
+        Ok(())
+    }
 
     /// 
     /// Access to daily collections

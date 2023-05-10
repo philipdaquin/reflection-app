@@ -11,6 +11,7 @@ pub fn configure_daily_summary(cfg: &mut web::ServiceConfig) {
     cfg
     .service(get_by_date)
     .service(get_all)
+    .service(delete_all)
     ;
 } 
 
@@ -39,4 +40,13 @@ pub async fn get_by_date(date: web::Json<InputDate>) -> Result<HttpResponse> {
 
 
     Ok(HttpResponse::Ok().json(summary))
+}
+
+
+///
+/// Delete all Entries 
+#[route("/api/daily/delete-all", method = "DELETE")]
+pub async fn delete_all() -> Result<HttpResponse> { 
+    let _ = DailyAnalysisDb::delete_all().await?;
+    Ok(HttpResponse::Ok().body("Successfully deleted all items!"))
 }

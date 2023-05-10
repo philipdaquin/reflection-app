@@ -415,7 +415,7 @@ pub async fn update_entry(data: web::Json<AudioData>) -> Result<HttpResponse> {
 }
 
 ///
-/// 
+/// Delete all Audio Data entries
 #[route("/api/audio/delete-all", method = "DELETE")]
 pub async fn delete_all_audio_entries() -> Result<HttpResponse> { 
     let _ = AudioDB::delete_all_entries().await?;
