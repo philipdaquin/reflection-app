@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import MoodSummary from '../MoodSummary'
 import MoodAreaChart from '../MoodAreaChart'
-import { DefaultFilterOption, FilterOptions, TextClassification, WeeklyData } from '../../typings'
+import { DefaultFilterOption, FilterOptions, TextClassification, MoodDataPoint } from '../../typings'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useRecoilState } from 'recoil'
 import { SelectedFilterOption } from '../../atoms/atoms'
@@ -17,7 +17,7 @@ function MoodAnalysisChange({all_mood_data}: Props) {
 
     const [, setFilter] = useRecoilState(SelectedFilterOption)
 
-    const [chartData, setChartData] = useState<WeeklyData[] | null>();
+    const [chartData, setChartData] = useState<MoodDataPoint[] | null>();
     const [filterOption, setFilterOption] = useState<FilterOptions>(DefaultFilterOption);
 
     const filter: FilterOptions[] = [
@@ -82,7 +82,7 @@ function MoodAnalysisChange({all_mood_data}: Props) {
         if (!all_mood_data) return 
 
         let data = getFilteredData(all_mood_data, filterOption)
-            .map((i) => new WeeklyData(i))
+            .map((i) => new MoodDataPoint(i))
         
         setChartData(data)
 

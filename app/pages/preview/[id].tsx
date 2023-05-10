@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
-import ListeningContent from '../../components/pages/ListeningContent'
+import ListeningContent from '../../components/pages/TriggerContent'
 import PhoneView from '../../components/PhoneView'
 import SwitchView from '../../components/SwitchView'
 import { AudioData } from '../../typings'

@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
-import { DailySummary, MoodTriggerType, TextClassification } from '../../typings'
+import { DailySummary, MoodFrequency, MoodTriggerType, TextClassification } from '../../typings'
 import {ChevronRightIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useRecoilState } from 'recoil'
+import { MoodTriggerPage } from '../../atoms/atoms'
 
 
 interface Props { 
@@ -11,30 +13,30 @@ interface Props {
 
 
 interface MoodTriggerProps { 
-    entry: MoodTriggerType
+    entry: MoodFrequency
 }
 
-function MoodTriggerEntry({entry: {id, emoji, numOfEntries, emotion}}: MoodTriggerProps) { 
+function MoodTriggerEntry({entry: {_audio_ids, count, emotion, emotion_emoji, percentage}}: MoodTriggerProps) { 
     const onHover = "hover:bg-[#f5f5f5] active:bg-[#f5f5f5]  "
 
     return ( 
         <div className={`justify-between flex flex-row items-center w-full py-2  px-5 ${onHover}`}>
             <div className='flex flex-row justify-center items-center w-full space-x-2'>
                 <div className={`text-xl p-2 rounded-full bg-[#f5f5f5] `}>
-                    {emoji}
+                    {emotion_emoji}
                 </div>
                 <div className='w-full space-y-1'>
                     <h1 className='text-sm text-left font-medium'>
                         {emotion}
                     </h1>
-                    {numOfEntries > 0 && (
+                    {count && count > 0 && (
                         <div className='items-center flex flex-row space-x-1'>
                             
                                 <div className='bg-[#00a3ff] h-1 rounded-full w-full ' 
-                                    style={{width: `${(numOfEntries)}%`}}>
+                                    style={{width: `${(count)}%`}}>
                                 </div>
 
-                            <p className='text-xs px-1 text-left items-start text-[#757575]'>{numOfEntries}</p>
+                            <p className='text-xs px-1 text-left items-start text-[#757575]'>{count}</p>
                         </div>
                     )}
                 </div>
@@ -50,18 +52,16 @@ function MoodTriggersWidget({data}: Props) {
     const router = useRouter()
     const [showToggle, setShowToggle] = useState(false)
     console.log(data)
-    const dataa: MoodTriggerType[] | undefined = data?.mood_frequency.map((item, i) => { 
-        const s: MoodTriggerType = { 
-            id: i + 1,
-            emoji: item.emotion_emoji || "",
-            numOfEntries: item.count || 0,
-            emotion: item.emotion || ""
-        }
-        return s
-    })
+    const dataa: MoodFrequency[] | undefined = data?.mood_frequency
 
     const filteredData = showToggle ? dataa : dataa?.slice(0, 3)
     const openToggle = () => setShowToggle(true)
+
+
+    // Sets the MoodTriggerType 
+    const [showTrigger, setTrigger] = useRecoilState(MoodTriggerPage)
+    const selectTrigger = (data: MoodFrequency) => setTrigger(data)
+    
 
     return (
         <div className='widget_container px-0'>
@@ -89,7 +89,7 @@ function MoodTriggersWidget({data}: Props) {
                     filteredData?.map((item, i) => { 
                         return (
                             <div key={i}>
-                                <Link href={`/trigger/${item.id}`}>
+                                <Link href={`/trigger/${i}`} onClick={() => selectTrigger(item)}>
                                     <MoodTriggerEntry entry={item}/>
                                 </Link>
                             </div>

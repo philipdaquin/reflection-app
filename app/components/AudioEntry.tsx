@@ -80,7 +80,7 @@ function AudioEntry({
     <>
       <div className='items-end flex-row flex justify-between bg-[#F5F5F5] rounded-2xl px-2 py-2'>
         <Link href={{
-            pathname: `/play/${id.toString()}`,
+            pathname: `/preview/${id.toString()}`,
             // query: { id: item.id }
           }}> 
           <div className='w-full  h-full '>

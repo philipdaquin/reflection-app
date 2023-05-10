@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
   Label, Line, ResponsiveContainer,  ReferenceDot, ReferenceLine, Brush } from 'recharts';
-import { FilterOptions, WeeklyData } from '../typings';
+import { FilterOptions, MoodDataPoint } from '../typings';
 import { useRecoilValue } from 'recoil';
 import { SelectedFilterOption } from '../atoms/atoms';
 import { AxisInterval } from 'recharts/types/util/types';
@@ -46,18 +46,18 @@ const CustomXAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
 // Fix empty X axis when there's no data 
 // - Get current Time now 
 // - Set Min and Max Data 
-function getHourData(data: WeeklyData[]) { 
+function getHourData(data: MoodDataPoint[]) { 
   const selectedFilter = useRecoilValue(SelectedFilterOption)
 
 
   if (selectedFilter.label === '24H') {
     let timeNow = new Date()
   
-    let minData: WeeklyData = { 
+    let minData: MoodDataPoint = { 
       date: new Date( timeNow.getFullYear(), timeNow.getMonth(), timeNow.getDate(), 0, 0, 0),
       mood: 0
     }
-    let maxData: WeeklyData = { 
+    let maxData: MoodDataPoint = { 
       date: new Date( timeNow.getFullYear(), timeNow.getMonth(), timeNow.getDate(), 23, 59, 59),
       mood: 0
     }
@@ -72,7 +72,10 @@ const TickFormatter = (value: any, filter: FilterOptions) => {
   try { 
     const date = new Date(value);
     if (filter.interval === 'hour') {
-      return date.getHours().toString().padStart(2, '0') + ':00';
+      const timeString = date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
+      const formattedTimeString = `${timeString}`
+
+      return formattedTimeString
     } else {
       return new Intl.DateTimeFormat('en-US', {
         month: filter.format ? 'long' : undefined,
@@ -85,7 +88,7 @@ const TickFormatter = (value: any, filter: FilterOptions) => {
   }
 } 
 
-function fillMissingDate(data: WeeklyData[]): WeeklyData[] { 
+function fillMissingDate(data: MoodDataPoint[]): MoodDataPoint[] { 
   let startDate = new Date(data[0].date)
   let endDate = new Date(data[data.length - 1].date)
 
@@ -94,7 +97,7 @@ function fillMissingDate(data: WeeklyData[]): WeeklyData[] {
 
 
   let dataMood: Map<Date, number> = new Map(data.map(({date,mood}, i) => [date, mood]))
-  let allData: WeeklyData[] = []
+  let allData: MoodDataPoint[] = []
   // If there is no date under a date, insert a default
   // const chartData = dateRange.map((date) => {
   //   const dateString = new Date(date);
@@ -126,7 +129,7 @@ function fillMissingDate(data: WeeklyData[]): WeeklyData[] {
 }
 
 interface Props { 
- data: WeeklyData[]
+ data: MoodDataPoint[]
 }
 
 function MoodAreaChart({data}: Props) {
@@ -149,6 +152,7 @@ function MoodAreaChart({data}: Props) {
     // let allData = fillMissingDate(data)
 
 
+    
     return (
         <ResponsiveContainer width="100%" height="100%">
             <AreaChart
@@ -175,8 +179,6 @@ function MoodAreaChart({data}: Props) {
                <YAxis 
                   dataKey="mood" 
                   type='number'
-
-
                   tickCount={0}
                   tick={CustomXAxisTick} 
                   domain={[0, maxValue + 0.4]} 

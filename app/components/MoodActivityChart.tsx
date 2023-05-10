@@ -1,13 +1,6 @@
 import React from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-
-type MoodDataPoint = { 
-    id: string,
-    emotion: string, 
-    avgMood: number, 
-    date: Date 
-}
-
+import { MoodDataPoint, TextClassification } from '../typings'
 
 const CustomXAxisTick = (props: any) => {
     const { x, y, payload } = props;
@@ -33,6 +26,16 @@ const CustomXAxisTick = (props: any) => {
     );
 }
 
+const MoodTickFormat  = (value: any) => { 
+  //TypeError: value.toLocaleTimeString is not a function
+  const date = new Date(value)
+
+  const timeString = date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
+  const formattedTimeString = `${timeString}`
+
+  return formattedTimeString
+}
+
 interface CustomXAxisTickProps {
     x: number;
     y: number;
@@ -40,30 +43,34 @@ interface CustomXAxisTickProps {
   }
 const CustomYAxisTick = ({ x, y, payload }: CustomXAxisTickProps) => {
     return (
-      <text x={x} y={y} dy={16} textAnchor="middle" fill="#666" fontSize={12}>
+      <text x={x + 4} y={y} dy={20 } textAnchor="middle" fill="#666" fontSize={12}>
         {payload.value}
       </text>
     );
   };
-  
-function MoodActivityChart() {
 
-    const data: MoodDataPoint[] = [
-        { id: '1', emotion: 'Happy', avgMood: 0.8, date: new Date('2023-05-02T08:30:00Z') },
-        { id: '2', emotion: 'Sad', avgMood: 0.2, date: new Date('2023-05-02T11:45:00Z') },
-        { id: '3', emotion: 'Angry', avgMood: 0.5, date: new Date('2023-05-02T14:20:00Z') },
-        { id: '4', emotion: 'Excited', avgMood: 0.9, date: new Date('2023-05-02T17:10:00Z') },
-        { id: '5', emotion: 'Tired', avgMood: 0.3, date: new Date('2023-05-02T20:00:00Z') },
-        { id: '5', emotion: 'Tired', avgMood: 0.8, date: new Date('2023-06-02T20:00:00Z') },
-        { id: '5', emotion: 'Tired', avgMood: 0.3, date: new Date('2023-07-02T20:00:00Z') },
+interface Props { 
+  entries: TextClassification[] | null
+}
+  
+
+function MoodActivityChart({entries}: Props) {
+
+    const mockData: MoodDataPoint[] = [
+        { mood: 0.8, date: new Date('2023-05-02T08:30:00Z') },
+        { mood: 0.2, date: new Date('2023-05-02T11:45:00Z') },
+        { mood: 0.5, date: new Date('2023-05-02T14:20:00Z') },
+        { mood: 0.9, date: new Date('2023-05-02T17:10:00Z') },
+        { mood: 0.3, date: new Date('2023-05-02T20:00:00Z') },
+        { mood: 0.8, date: new Date('2023-06-02T20:00:00Z') },
+        { mood: 0.3, date: new Date('2023-07-02T20:00:00Z') },
       ];
     
-    // const formattedData = data.map(({ id, emotion, avgMood, date }) => ({
-    //   id,
-    //   emotion,
-    //   avgMood,
-    //   date: new Date(date).toLocaleDateString()
-    // }));
+    // const data: MoodDataPoint[] | null | undefined = mood_graph?.map((i) => new MoodDataPoint(i))
+    const data: MoodDataPoint[] | null | undefined = entries?.map((i) => new MoodDataPoint(i))
+    let maxValue: number = Math.max(...data!.map((v) => v.mood))
+    let maxData = data?.find((v) => v.mood == maxValue)
+
 
     const now = new Date();
     const MIN_DATE = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0)
@@ -85,28 +92,25 @@ function MoodActivityChart() {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
                 dataKey="date" 
-                ticks={TICK_VALUES} 
-                tickCount={4}
+                // ticks={TICK_VALUES} 
+                // tickCount={4}
                 domain={['auto', 'auto']} 
-                tick={CustomXAxisTick}
-                interval={"preserveStartEnd"}
-                // scale={'time'}
-                includeHidden={true}
+                tickFormatter={(value) => MoodTickFormat(value)}
+
             />
 
 
             <YAxis 
                axisLine={false}  
                tickLine={false}
-               dataKey="avgMood" 
+               dataKey="mood" 
                tick={CustomYAxisTick} 
-
                allowDataOverflow={true}
                orientation='right' 
-               domain={[0, 2]}
+               domain={['auto', maxValue]}
              />
             <Tooltip />
-            <Bar barSize={20}  dataKey="avgMood" fill="#8884d8" />
+            <Bar barSize={20}  dataKey="mood" fill="#8884d8" />
             </BarChart>
         </ResponsiveContainer>
     )

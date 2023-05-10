@@ -13,7 +13,7 @@ function MoodActivityWidget({entries} : Props) {
         Mood Activity 
       </h1>
       <div className='h-[200px] pt-[20px]'>
-        <MoodActivityChart />
+        <MoodActivityChart entries={entries}/>
       </div>
     </div>
   )

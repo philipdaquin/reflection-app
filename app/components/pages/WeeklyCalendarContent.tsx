@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import WeeklyCalendar from '../WeeklyCalendar'
 import { getAllByDate } from '../../util/audio/getAllByDate'
-import { AudioData, TextClassification } from '../../typings'
+import { AudioData, DailySummary, TextClassification } from '../../typings'
 import AudioEntry from '../AudioEntry'
 import Link from 'next/link'
 import DailyAudioEntries from '../moodWidgets/DailyAudioEntries'
@@ -14,12 +14,16 @@ import { getAll } from '../../util/audio/getAll'
 
 
 interface Props { 
-  
+  recent_entries: AudioData[] | null,
+  all_mood_data: TextClassification[] | null,
+  dailyMoodSummary: DailySummary | null
 }
 
-function WeeklyCalendarContent() {
-
-
+function WeeklyCalendarContent( {
+  recent_entries, 
+  all_mood_data,
+  dailyMoodSummary
+}: Props) {
     const [currDate, setCurrDate] = useState<Date>(new Date())
     const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>()
     const [selectedAnalsysis, setselectedAnalsysis] = useState<TextClassification[] | null>()

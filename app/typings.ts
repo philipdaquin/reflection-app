@@ -92,7 +92,7 @@ export type RecommendedActivity = {
 //     percentage: number
 // }
 
-export class WeeklyData {
+export class MoodDataPoint {
     date: Date;
     mood: number;
 
@@ -223,9 +223,7 @@ export class EntryType {
 }
 export type MoodTriggerType = { 
   id: number,
-  emotion: string, 
-  numOfEntries: number, 
-  emoji: string
+  mood_frequency: MoodFrequency
 }
 
 

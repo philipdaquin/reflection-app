@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { AudioData, DefaultFilterOption, WeeklySummary } from "../typings";
+import { AudioData, DefaultFilterOption, MoodFrequency, MoodTriggerType, WeeklySummary } from "../typings";
 import { ELEVEN_LABS_KEY, OPENAI_KEY } from "../components/SettingsButtons";
 
 export const TimerState = atom({
@@ -16,7 +16,6 @@ export const AudioUrl = atom<string | null>({
     key: 'AudioUrl',
     default: null
 })
-
 
 export const AudioSummaryAtom = atom<AudioData | null>({ 
     key: 'AudioSummaryAtom',
@@ -49,5 +48,10 @@ export const SelectedFilterOption = atom({
 
 export const CurrentWeekSummary = atom<WeeklySummary | null>({
     key: 'CurrentWeekSummary',
+    default: null
+})
+
+export const MoodTriggerPage = atom<MoodFrequency | null>({ 
+    key: 'MoodTriggerPage',
     default: null
 })

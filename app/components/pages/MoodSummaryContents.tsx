@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import MoodAreaChart from '../MoodAreaChart'
 import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
 import CommonMoodContainer from '../CommonMoodContainer'
-import { TextClassification, WeeklyData, WeeklySummary } from '../../typings'
+import { TextClassification, WeeklySummary, MoodDataPoint } from '../../typings'
 import { AverageWeeklyIndex } from '../../atoms/atoms'
 import { useRecoilValue } from 'recoil'
 import { getAverageMoodWeek } from '../MoodTrackerIndex'
@@ -20,7 +20,7 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
     const eventData = weekly_summary?.important_events || []
     const recommendedActivities = weekly_summary?.recommendations || []
 
-    const weeklyData: WeeklyData[] | null | undefined = mood_graph?.map((i) => new WeeklyData(i))
+    const weeklyData: MoodDataPoint[] | null | undefined = mood_graph?.map((i) => new MoodDataPoint(i))
     
     // const weeklyIndex = useRecoilValue(AverageWeeklyIndex);
     // console.log(weeklyIndex)

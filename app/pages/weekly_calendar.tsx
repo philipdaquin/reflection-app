@@ -56,7 +56,11 @@ function weekly_record({
                     </div>
 
                     <PhoneView>
-                        <WeeklyCalendarContent/>
+                        <WeeklyCalendarContent 
+                          all_mood_data={all_mood_data}
+                          recent_entries={recent_entries}
+                          dailyMoodSummary={dailyMoodSummary}
+                        />
                     </PhoneView>
                 
                 </div>

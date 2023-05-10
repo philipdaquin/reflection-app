@@ -11,7 +11,7 @@ interface Props {
     date: string 
 }
 
-function InsightContainer({title, date}: Props) { 
+export function InsightContainer({title, date}: Props) { 
     const onHover = "hover:bg-[#f5f5f5] active:bg-[#f5f5f5] rounded-xl "
 
     return (
