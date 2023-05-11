@@ -70,9 +70,13 @@ function Home({
         <title>Hello John 👋</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      
+        
+      {/*  md:px-[104px]  */}
       <div className="md:bg-[#EEEEEE] bg-white flex 
-        md:h-screen flex-col h-screen md:py-14 md:px-[104px] relative">
+        md:h-screen flex-col h-screen md:py-14 
+        md:px-4
+        
+        relative">
 
         <main className="justify-center flex flex-col items-center space-y-[27px]">
           <div className="flex items-center md:relative md:right-5 h-full">
@@ -94,17 +98,17 @@ function Home({
             </PhoneView>
 
           </div>
-          <div className='md:block hidden '>
+          <div className='sm:block hidden '>
               <SwitchView />
           </div>
         </main> 
         {/* Settings / Footer  */}
         <div className="flex-grow"></div>
-        <div className='relative bottom-[180px] md:block hidden w-full'>
+        <div className='relative bottom-[170px] lg:block hidden w-full'>
           <SettingsButtons />
         </div>
         <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-          <div className='flex items-center  md:hidden justify-center mb-10 '>
+          <div className='flex items-center  md:hidden justify-center mb-5 '>
               <NavigationMobile children={<HomeNav/>} />        
           </div>
         </div>

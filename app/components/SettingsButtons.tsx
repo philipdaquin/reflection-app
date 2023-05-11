@@ -239,9 +239,9 @@ function SettingsButtons() {
             <div className='text-[#757575]  text-left text-sm'>Donate</div>
         </div>
                   
-        <div className='w-fit '>
+        <div className='w-fit relative bottom-2'>
             <QRCode />
-          </div>
+        </div>
 
     </div>
   )
