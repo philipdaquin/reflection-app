@@ -1,6 +1,6 @@
 
 use async_trait::async_trait;
-use chrono::{Utc, Duration, TimeZone, NaiveTime, NaiveDate, DateTime};
+use chrono::{Utc, Duration, TimeZone, NaiveTime, NaiveDate, DateTime, Datelike, Weekday};
 use futures::TryStreamExt;
 use uuid::Uuid;
 use crate::error::{Result, ServerError};
@@ -9,6 +9,7 @@ use mongodb::Collection;
 use mongodb::bson::{doc, oid::ObjectId, Document};
 
 use super::db::MongoDbClient;
+use super::get_current_week;
 const DB_NAME: &str = "human-assistant";
 const COLL_NAME: &str = "metadata";
 
@@ -22,7 +23,8 @@ pub trait AudioInterface {
     async fn update_entry(id: &str, updated_meta: &AudioDataDTO) -> Result<AudioDataDTO>;
     async fn get_recent() -> Result<Vec<AudioDataDTO>>;
     async fn get_all_by_date(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>>;
-    async fn get_all_by_week_number(week_number: i32) -> Result<Vec<AudioDataDTO>>; 
+    async fn get_all_by_week(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>>; 
+    async fn get_current_week() -> Result<Vec<AudioDataDTO>>; 
     
     fn get_collection() -> Collection<AudioDataDTO>;
 }
@@ -170,6 +172,7 @@ impl AudioInterface for AudioDB {
     ///
     /// Retrieve entries by a specific date 
     /// input: January 1, 2023
+    #[tracing::instrument(level= "debug", err)]
     async fn get_all_by_date(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>> {
         let collection = AudioDB::get_collection();
         let mut result = Vec::new();
@@ -214,18 +217,72 @@ impl AudioInterface for AudioDB {
     }
 
     ///
-    /// Retrieve all entries by the week number 
-    async fn get_all_by_week_number(week_number: i32) -> Result<Vec<AudioDataDTO>> { 
+    /// Retrieve all entries by week. 
+    /// 
+    /// Finds the corresponding week using a specific date 
+    /// and retrieves all Audio Entries within this week  
+    #[tracing::instrument(level= "debug", err)]
+    async fn get_all_by_week(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>> { 
         let collection = AudioDB::get_collection();
-        let mut result = Vec::new();
-        let filter = doc! { "week_number": week_number};
         
+        let iso_week = date.date_naive().iso_week();
+        
+        // Get the dates from the start to the end of the week 
+        let start_week = NaiveDate::from_isoywd_opt(iso_week.year(), iso_week.week(), Weekday::Mon)
+            .unwrap()
+            .and_hms_opt(0,0, 0)
+            .unwrap();
+        let end_week = NaiveDate::from_isoywd_opt(iso_week.year(), iso_week.week(), Weekday::Sun)
+            .unwrap()
+            .and_hms_opt(0,0, 0)
+            .unwrap();
+
+        // Into date time 
+        let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_week);
+        let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_week);
+        
+        // Into bson 
+        let bson_start_date = bson::DateTime::from_chrono(start_date_time);
+        let bson_end_date = bson::DateTime::from_chrono(end_date_time);
+   
+        let filter = doc! { 
+            "date": { 
+                "$gte": bson_start_date,
+                "$lt": bson_end_date,
+            } 
+        };  
+
+
+        let mut result = vec![];
         let mut doc = collection.find(filter, None).await?;
         
         while let Some(doc) = doc.try_next().await? {
             result.push(doc);
         }
 
+        Ok(result)
+    }
+
+    ///
+    /// Retrieves all audio entries by the current week 
+    #[tracing::instrument(level= "debug", err)]
+    async fn get_current_week() -> Result<Vec<AudioDataDTO>> { 
+        let collection = AudioDB::get_collection();
+
+        let (bson_start_date, bson_end_date) = get_current_week();
+        let filter = doc! { 
+            "date": { 
+                "$gte": bson_start_date,
+                "$lt": bson_end_date,
+            } 
+        };  
+
+        let mut result = vec![];
+        let mut doc = collection.find(filter, None).await?;
+        
+        while let Some(doc) = doc.try_next().await? {
+            result.push(doc);
+        }
         Ok(result)
     }
 

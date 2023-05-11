@@ -226,9 +226,10 @@ impl WeeklyAnalysisDTO {
     pub async fn get_weekly_average(&mut self) -> Result<Self> {
         let data= AnalysisDb::get_data_in_current_week().await?;
         let db_val = TextClassification::get_average(&data).await?.unwrap();
+        let (bson_start_date, bson_end_date) = get_current_week();
         
         // Automatically update both values in the database if new entries are added 
-        let val = TextClassification::get_total_entries().await?.unwrap();
+        let val = TextClassification::get_total_entries(bson_start_date, bson_end_date).await?.unwrap();
 
         // 
         // If the value exist, check if we can update the value 
@@ -258,7 +259,9 @@ impl WeeklyAnalysisDTO {
     /// Updates the value in the database if the total entries have increased  
     #[tracing::instrument(level= "debug")]
     pub async fn get_total_entries(&mut self) -> Result<Self> { 
-        let val = TextClassification::get_total_entries().await?.unwrap();
+        let (bson_start_date, bson_end_date) = get_current_week();
+        // Automatically update both values in the database if new entries are added 
+        let val = TextClassification::get_total_entries(bson_start_date, bson_end_date).await?.unwrap();
         // If there is a value under the current object 
             
         if self.total_entries < val { 

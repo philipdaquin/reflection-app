@@ -25,6 +25,8 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     .service(upload)
     .service(get_all_entries)
     .service(get_all_by_date)
+    .service(get_all_by_week)
+    .service(get_current_week)
     .service(get_recent_entries)
     .service(get_text_summary)
     .service(get_text_analysis)
@@ -63,7 +65,30 @@ pub async fn get_all_by_date(date: web::Json<InputDate>) -> Result<HttpResponse>
         .into_iter()
         .map(AudioData::from)
         .collect::<Vec<AudioData>>();
-    // log::info!("{res:#?}");
+
+    Ok(HttpResponse::Ok().json(res))
+}
+///
+/// Retrieves all entries within the corresponding week by a specific date
+#[route("/api/audio/get-all-by-week", method = "POST")]
+pub async fn get_all_by_week(date: web::Json<InputDate>) -> Result<HttpResponse> {
+    let res = AudioDB::get_all_by_week(date.date)
+        .await?
+        .into_iter()
+        .map(AudioData::from)
+        .collect::<Vec<AudioData>>();
+
+    Ok(HttpResponse::Ok().json(res))
+}
+///
+/// Retrieves all entries within the corresponding week by a specific date
+#[route("/api/audio/get-current-week", method = "GET")]
+pub async fn get_current_week() -> Result<HttpResponse> {
+    let res = AudioDB::get_current_week()
+        .await?
+        .into_iter()
+        .map(AudioData::from)
+        .collect::<Vec<AudioData>>();
 
     Ok(HttpResponse::Ok().json(res))
 }

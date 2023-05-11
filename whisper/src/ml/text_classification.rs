@@ -269,9 +269,9 @@ impl TextClassification {
         Ok(Some(avg))
     }
     ///
-    /// Count the number of documents in the same week 
-    pub async fn get_total_entries() -> Result<Option<i32>> { 
-        let count = AnalysisDb::count_documents_in_current_week()
+    /// Count the number of documents within a starting date to end date
+    pub async fn get_total_entries(start_date: DateTime, end_date: DateTime) -> Result<Option<i32>> { 
+        let count = AnalysisDb::count_documents_within_date(start_date, end_date)
             .await?
             .unwrap() as i32;
         Ok(Some(count))

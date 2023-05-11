@@ -29,17 +29,17 @@ pub struct AnalysisDb;
 impl AnalysisDb { 
 
     ///
-    /// Returns the total number of document found within the last 7 days 
-    pub async fn count_documents_in_current_week() -> Result<Option<u64>> { 
+    /// Returns the total number of document found within the `start_date` to `end_date`
+    pub async fn count_documents_within_date(start_date: DateTime , end_date: DateTime) -> Result<Option<u64>> { 
         let collection = AnalysisDb::get_analysis_db();
-        let (bson_start_date, bson_end_date) = get_current_week();
+        // let (bson_start_date, bson_end_date) = get_current_week();
         
         // Filter 
         let filter = doc! { 
             "date": { 
                 // "$exists": true,
-                "$gte": bson_start_date,
-                "$lt": bson_end_date,
+                "$gte": start_date,
+                "$lt": end_date,
             } 
         };
         
@@ -91,8 +91,6 @@ impl AnalysisDb {
                 result.push(object);
             }
         }
-        // log::info!("DATA WITHIN THE LAST 7 DAYS: {result:?}");
-
         Ok(result)
     }
 }
@@ -281,7 +279,7 @@ impl TextAnalysisInterface for AnalysisDb {
         // Testing purposes 
         let default = collection.count_documents(None, None).await?;
         
-        let total_records = AnalysisDb::count_documents_in_current_week()
+        let total_records = AnalysisDb::count_documents_within_date(start_date, end_date)
             .await?
             .unwrap_or(default);
         
