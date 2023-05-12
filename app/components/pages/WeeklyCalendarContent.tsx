@@ -10,6 +10,11 @@ import { getWeeklyByDate } from '../../util/weekly/getWeeklyByDate'
 import { fullTimeFormat } from '../../util/fullTimeFormat'
 import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate'
 import MoodSummaryContents from './MoodSummaryContents'
+import { getAnalysisByWeek } from '../../util/analysis/getAnalysisByWeek'
+import { CurrentWeekSummary } from '../../atoms/atoms'
+import { useRecoilState } from 'recoil'
+import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget'
+import { getDailyByDate } from '../../util/daily/getDailyByDate'
 
 
 interface WeeklyProps { 
@@ -48,10 +53,11 @@ interface DailyProps {
   selectedDate: Date,
   selectedEntries: AudioData[] | null | undefined, 
   selectedAnalsysis: TextClassification[] | null | undefined,
-
+  selectedDaily: DailySummary | null,
+  selectedWeekly: WeeklySummary | null
 }
 
-function DailyContent({selectedDate, selectedEntries, selectedAnalsysis}: DailyProps) { 
+function DailyContent({selectedDate, selectedEntries, selectedAnalsysis, selectedDaily, selectedWeekly}: DailyProps) { 
 
   const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(selectedDate);
   const year = selectedDate?.getFullYear();
@@ -73,20 +79,23 @@ function DailyContent({selectedDate, selectedEntries, selectedAnalsysis}: DailyP
       </div>
 
       <div>
-        {
-          selectedEntries && (
+        {/* { */}
+          // selectedEntries && (
             <div className='pt-10  pb-52'>
               <div className=' space-y-6'>
-                <MoodAnalysisChange all_mood_data={selectedAnalsysis} />
+                <MoodSummaryWidget 
+                  dailyMoodSummary={selectedDaily} 
+                  currentWeeklySummary={selectedWeekly}/>
+                {/* <MoodAnalysisChange all_mood_data={selectedAnalsysis} /> */}
                 {/* <MoodCompositionWidget data={[]}/>  */}
-                <MoodActivityWidget entries={[]}/>
-                <MoodInsightWidget  dailySummary={null} currentWeeklySummary={null} />  
+                {/* <MoodActivityWidget entries={[]}/> */}
+                <MoodInsightWidget  dailySummary={selectedDaily} currentWeeklySummary={selectedWeekly} />  
                 {/* <MoodTriggersWidget data={[]}/> */}
-                <DailyAudioEntries entries={selectedEntries}/>
+                {/* <DailyAudioEntries entries={selectedEntries}/> */}
               </div>
             </div>
-          )
-        }
+          {/* ) */}
+        {/* } */}
       </div>          
     </>
   )
@@ -105,18 +114,29 @@ function WeeklyCalendarContent( {
   dailyMoodSummary
 }: Props) {
     const [selectedDate, setCurrDate] = useState<Date>(new Date())
-    const [selectedAnalsysis, setselectedAnalsysis] = useState<TextClassification[] | null>()
+    const [selectedAnalsysis, setselectedAnalsysis] = useState<TextClassification[] | null>(null)
     
     const [showWeekly, setShowWeekly] = useState('Daily')
+    const [dailySummary, setDailySummary] = useState<DailySummary | null>(null)
+    const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>(null)
 
-    const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>()
-    const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null)
-
+    // const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null)
+    const [weeklySummary, setWeeklySummary] = useRecoilState<WeeklySummary | null>(CurrentWeekSummary)
     // Set to get the DailySummary which includes all relevant data 
-    const entry = async (date: Date) => { 
-        const entries = await getAllByDate(date)
-        setSelectedEntries(entries)
+    const getDailySummary = async (date: Date) => { 
+      const summary = await getDailyByDate(date)
+      setDailySummary(summary)
     }
+    // const getDailyEntries = async (date: Date) => { 
+    //     const entries = await getAllByDate(date)
+    //     setSelectedEntries(entries)
+    // }
+
+    const getWeeklyAnalysis = async (date: Date) => { 
+      const weeklyAnalysis = await getAnalysisByWeek(date)
+      setselectedAnalsysis(weeklyAnalysis)
+    }
+
     // Toggle to show Daily or Weekly Sumamry 
     const getWeeklySummary = async (date: Date) => { 
       const summary = await getWeeklyByDate(date)
@@ -124,25 +144,30 @@ function WeeklyCalendarContent( {
     }
 
     useEffect(() => {
-        if (!selectedDate) return 
-        entry(selectedDate)
-        getWeeklySummary(selectedDate)
-    }, [selectedDate])
 
+      // if (selectedDate && showWeekly === 'Daily') {
+        getDailySummary(selectedDate)
+        // getDailyEntries(selectedDate)
+      // }/
+        // getWeeklyAnalysis(selectedDate)
+        // getWeeklySummary(selectedDate)
+    }, [showWeekly, selectedDate])
 
-    useEffect(() => {
-      if (!selectedEntries) return 
-      const textClassification: TextClassification[] | null | undefined  = selectedEntries?.map((item, i) => item.text_classification) || []
-      setselectedAnalsysis(textClassification)
-    }, [selectedEntries])
+    const handleDateChange = (date: Date) => {
+      setCurrDate(date)
+    }
 
-    
+    // useEffect(() => {
+    //   if (!selectedEntries) return 
+    //   const textClassification: TextClassification[] | null | undefined  = selectedEntries?.map((item, i) => item.text_classification) || []
+    //   setselectedAnalsysis(textClassification)
+    // }, [selectedEntries])
 
     return (
 
         <div className='w-full relative'>
           <WeeklyCalendar 
-            setCurrDate={setCurrDate} 
+            setCurrDate={handleDateChange } 
             setShowWeekly={setShowWeekly}
             showWeekly={showWeekly}
           />
@@ -151,13 +176,15 @@ function WeeklyCalendarContent( {
             <hr />
           </div>
 
-          <section className='pt-[26px]'>
+          {/* <section className='pt-[26px]'>
             { 
               showWeekly === 'Daily' ? 
                 <DailyContent 
                   selectedDate={selectedDate}
                   selectedAnalsysis={selectedAnalsysis}
                   selectedEntries={selectedEntries}
+                  selectedDaily={dailySummary}
+                  selectedWeekly={weeklySummary}
                 /> 
               : 
                 <WeeklyContent 
@@ -166,7 +193,7 @@ function WeeklyCalendarContent( {
                   selectedDate={selectedDate}
                 />
             }
-          </section>
+          </section> */}
           
         </div>
     )
