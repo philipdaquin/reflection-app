@@ -1,16 +1,96 @@
 import React, { useEffect, useState } from 'react'
 import WeeklyCalendar from '../WeeklyCalendar'
 import { getAllByDate } from '../../util/audio/getAllByDate'
-import { AudioData, DailySummary, TextClassification } from '../../typings'
-import AudioEntry from '../AudioEntry'
-import Link from 'next/link'
+import { AudioData, DailySummary, TextClassification, WeeklySummary } from '../../typings'
 import DailyAudioEntries from '../moodWidgets/DailyAudioEntries'
-import MoodTriggersWidget from '../moodWidgets/MoodTriggersWidget'
 import MoodInsightWidget from '../moodWidgets/MoodInsightWidget'
 import MoodAnalysisChange from '../moodWidgets/MoodAnalysisChange'
 import MoodActivityWidget from '../moodWidgets/MoodActivityWidget'
-import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget'
-import { getAll } from '../../util/audio/getAll'
+import { getWeeklyByDate } from '../../util/weekly/getWeeklyByDate'
+import { fullTimeFormat } from '../../util/fullTimeFormat'
+import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate'
+import MoodSummaryContents from './MoodSummaryContents'
+
+
+interface WeeklyProps { 
+  mood_graph: TextClassification[] | null,
+  weekly_summary: WeeklySummary | null,
+  selectedDate: Date
+}
+
+function WeeklyContent({mood_graph, weekly_summary, selectedDate}: WeeklyProps) { 
+  
+  const {startDate, endDate } = getWeekStartAndEndDates(selectedDate) 
+
+  let start = fullTimeFormat(weekly_summary?.start_week?.toString() || startDate.toString())
+  let end = fullTimeFormat(weekly_summary?.end_week?.toString() || endDate.toString())
+  
+  return (
+    <>
+      <div className=''>
+        <h1 className='text-[25px] font-semibold'>
+          Weekly Summary
+        </h1>
+        <h2 className='text-[#9e9e9e] text-[15px]'>
+          {start} - {end}
+        </h2>
+      </div>
+      <MoodSummaryContents 
+        mood_graph={mood_graph}
+        weekly_summary={weekly_summary}
+      />
+    </>
+  )
+}
+
+
+interface DailyProps { 
+  selectedDate: Date,
+  selectedEntries: AudioData[] | null | undefined, 
+  selectedAnalsysis: TextClassification[] | null | undefined,
+
+}
+
+function DailyContent({selectedDate, selectedEntries, selectedAnalsysis}: DailyProps) { 
+
+  const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(selectedDate);
+  const year = selectedDate?.getFullYear();
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const currDay = selectedDate?.getDay() || 0
+  const currDateNum = selectedDate.getDate()
+  let day = daysOfWeek[currDay] 
+  
+  return (
+    <>
+      
+      <div className='space-y-0'>
+        <h1 className='text-[25px] font-semibold'>
+          Daily Summary
+        </h1>
+        <h2 className='text-[#9e9e9e] text-[15px]'>
+          {day}, {currDateNum} {month} {year} 
+        </h2>
+      </div>
+
+      <div>
+        {
+          selectedEntries && (
+            <div className='pt-10  pb-52'>
+              <div className=' space-y-6'>
+                <MoodAnalysisChange all_mood_data={selectedAnalsysis} />
+                {/* <MoodCompositionWidget data={[]}/>  */}
+                <MoodActivityWidget entries={[]}/>
+                <MoodInsightWidget  dailySummary={null} currentWeeklySummary={null} />  
+                {/* <MoodTriggersWidget data={[]}/> */}
+                <DailyAudioEntries entries={selectedEntries}/>
+              </div>
+            </div>
+          )
+        }
+      </div>          
+    </>
+  )
+}
 
 
 interface Props { 
@@ -24,105 +104,69 @@ function WeeklyCalendarContent( {
   all_mood_data,
   dailyMoodSummary
 }: Props) {
-    const [currDate, setCurrDate] = useState<Date>(new Date())
-    const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>()
+    const [selectedDate, setCurrDate] = useState<Date>(new Date())
     const [selectedAnalsysis, setselectedAnalsysis] = useState<TextClassification[] | null>()
+    
+    const [showWeekly, setShowWeekly] = useState('Daily')
+
+    const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>()
+    const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null)
 
     // Set to get the DailySummary which includes all relevant data 
     const entry = async (date: Date) => { 
-        // const entries = await getAll()
         const entries = await getAllByDate(date)
         setSelectedEntries(entries)
     }
+    // Toggle to show Daily or Weekly Sumamry 
+    const getWeeklySummary = async (date: Date) => { 
+      const summary = await getWeeklyByDate(date)
+      setWeeklySummary(summary)
+    }
+
     useEffect(() => {
-        if (!currDate) return 
-        entry(currDate)
+        if (!selectedDate) return 
+        entry(selectedDate)
+        getWeeklySummary(selectedDate)
+    }, [selectedDate])
 
-    }, [currDate])
 
-    console.log(selectedEntries)
-
-    const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currDate);
-    const year = currDate?.getFullYear();
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const currDay = currDate?.getDay() || 0
-    const currDateNum = currDate.getDate()
-    let day = daysOfWeek[currDay] 
-    
     useEffect(() => {
       if (!selectedEntries) return 
-
       const textClassification: TextClassification[] | null | undefined  = selectedEntries?.map((item, i) => item.text_classification) || []
       setselectedAnalsysis(textClassification)
-
     }, [selectedEntries])
+
     
 
     return (
 
         <div className='w-full relative'>
-          <WeeklyCalendar setCurrDate={setCurrDate} />
-          
-          {/* Temporary */}
+          <WeeklyCalendar 
+            setCurrDate={setCurrDate} 
+            setShowWeekly={setShowWeekly}
+            showWeekly={showWeekly}
+          />
+   
           <div className='pt-5'>
             <hr />
           </div>
-          
-          <div className='pt-[26px] space-y-0'>
-            <h1 className='text-[25px] font-semibold'>
-              Daily Summary
-            </h1>
-            <h2 className='text-[#9e9e9e] text-[15px]'>
-              {day}, {currDateNum} {month} {year} 
-            </h2>
-          </div>
-            
-          <div>
-            {
-              selectedEntries && (
-                <div className='pt-10  pb-52'>
-                  <div className=' space-y-6'>
-                    <MoodAnalysisChange all_mood_data={selectedAnalsysis} />
-                    {/* <MoodCompositionWidget data={[]}/>  */}
-                    <MoodActivityWidget entries={[]}/>
-                    <MoodInsightWidget  dailySummary={null} currentWeeklySummary={null} />  
-                    {/* <MoodTriggersWidget data={[]}/> */}
-                    <DailyAudioEntries entries={selectedEntries}/>
-                  </div>
 
-
-                  {/* <ul className='space-y-2'>
-                        {
-                          selectedEntries?.map(({
-                            _id, date, day, summary, tags, text_classification, title, transcription
-                          }, k) => { 
-                              return (
-                                <li key={k}>
-                                  <Link href={{
-                                      pathname: `/play/${_id.toString()}`,
-                                      // query: { id: item.id }
-                                    }}>
-                                    <AudioEntry  
-                                        id= {_id}
-                                        title= {title}
-                                        duration={10} 
-                                        date={date.toString()} 
-                                        emotion={text_classification.emotion}
-                                        emoji={text_classification.emotion_emoji} 
-                                        average_mood={text_classification.average_mood}   
-                                        thumbnailUrl={""}
-                                    />
-                                        
-                                  </Link>
-                                </li>
-                              )
-                          })
-                        }
-                  </ul> */}
-                </div>
-              )
+          <section className='pt-[26px]'>
+            { 
+              showWeekly === 'Daily' ? 
+                <DailyContent 
+                  selectedDate={selectedDate}
+                  selectedAnalsysis={selectedAnalsysis}
+                  selectedEntries={selectedEntries}
+                /> 
+              : 
+                <WeeklyContent 
+                  mood_graph={all_mood_data} 
+                  weekly_summary={weeklySummary}
+                  selectedDate={selectedDate}
+                />
             }
-          </div>
+          </section>
           
         </div>
     )
