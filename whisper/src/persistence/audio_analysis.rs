@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use bson::Bson;
-use chrono::{Utc, Duration, TimeZone, Datelike};
+use chrono::{Utc, Duration, TimeZone, Datelike, NaiveDate, Weekday};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
 use mongodb::options::AggregateOptions;
@@ -16,6 +16,7 @@ const COLL_NAME: &str = "analysis";
 pub trait TextAnalysisInterface { 
     async fn get_all_analysis() -> Result<Vec<TextClassification>>;
     async fn get_all_by_date(date: chrono::DateTime<Utc>) -> Result<Vec<TextClassification>>;
+    async fn get_all_by_week(date: chrono::DateTime<Utc>) -> Result<Vec<TextClassification>>;
     async fn add_analysis(new_analysis: TextClassification) -> Result<TextClassification>;
     async fn delete_one_analysis(id: ObjectId) -> Result<Option<TextClassification>>;
     async fn get_recent() -> Result<Vec<TextClassification>>;
@@ -315,7 +316,49 @@ impl TextAnalysisInterface for AnalysisDb {
     
         Ok(result)
     }
-    
+
+    #[tracing::instrument(level= "debug", err)]
+    async fn get_all_by_week(date: chrono::DateTime<Utc>) -> Result<Vec<TextClassification>> { 
+        let collection = AnalysisDb::get_analysis_db();
+
+        let iso_week = date.date_naive().iso_week();
+        
+        // Get the dates from the start to the end of the week 
+        let start_week = NaiveDate::from_isoywd_opt(iso_week.year(), iso_week.week(), Weekday::Mon)
+            .unwrap()
+            .and_hms_opt(0,0, 0)
+            .unwrap();
+        let end_week = NaiveDate::from_isoywd_opt(iso_week.year(), iso_week.week(), Weekday::Sun)
+            .unwrap()
+            .and_hms_opt(0,0, 0)
+            .unwrap();
+
+        // Into date time 
+        let start_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&start_week);
+        let end_date_time: chrono::DateTime<Utc> =  Utc.from_utc_datetime(&end_week);
+        
+        // Into bson 
+        let bson_start_date = bson::DateTime::from_chrono(start_date_time);
+        let bson_end_date = bson::DateTime::from_chrono(end_date_time);
+   
+        let filter = doc! { 
+            "date": { 
+                "$gte": bson_start_date,
+                "$lt": bson_end_date,
+            } 
+        };  
+        
+        let mut result = vec![];
+        let mut doc = collection.find(filter, None).await?;
+        
+        while let Some(doc) = doc.try_next().await? {
+            result.push(doc);
+        }
+
+        Ok(result)
+    }
+
+
     ///
     /// Cleans out the collection 
     #[tracing::instrument(level= "debug", err)]

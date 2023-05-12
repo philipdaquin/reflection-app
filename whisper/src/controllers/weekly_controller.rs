@@ -20,6 +20,7 @@ pub fn configure_weekly_analysis_service(cfg: &mut web::ServiceConfig) {
     .service(get_current_week)
     .service(get_all)
     .service(get_one)
+    .service(get_by_date)
     
     ;
 }

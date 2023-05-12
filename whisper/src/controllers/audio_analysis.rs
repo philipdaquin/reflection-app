@@ -12,7 +12,7 @@ use crate::{ml::{
 };
 use serde_derive::{Deserialize};
 
-use super::Input;
+use super::{Input, audio_data::InputDate};
 
 ///
 /// The configure service for text analysis services 
@@ -21,6 +21,7 @@ pub fn configure_analysis_service(cfg: &mut web::ServiceConfig) {
     .service(get_version)
     .service(get_all)
     .service(get_mood_summary)
+    .service(get_all_by_week)
     .service(get_common_mood)
     .service(get_weekly_patterns)
     .service(delete_all_entries_analysis)
@@ -34,6 +35,22 @@ pub fn configure_analysis_service(cfg: &mut web::ServiceConfig) {
 pub async fn get_version() -> &'static str { 
     return env!("CARGO_PKG_VERSION")
 }
+
+///
+/// Get all Text Analyis within a week based on the corressponding week  
+#[route("/api/analysis/get-all-by-week", method = "POST")]
+pub async fn get_all_by_week(date: web::Json<InputDate>) -> Result<HttpResponse> { 
+    let res = AnalysisDb::get_all_by_week(date.date)
+        .await?
+        .into_iter()
+        .map(AudioAnalysis::from)
+        .collect::<Vec<AudioAnalysis>>();
+
+    log::info!("{res:#?}");
+
+    Ok(HttpResponse::Ok().json(res))
+}
+
 
 ///
 /// Retrieves all items from the database
