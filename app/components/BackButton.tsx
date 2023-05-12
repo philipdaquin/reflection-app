@@ -1,17 +1,37 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {ChevronLeftIcon} from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
-function BackButton() {
+interface Props { 
+  link?: string
+}
+
+
+function BackButton({link}: Props) {
+
+  const [canGoBack, setCanGoBack] = useState(false)
+
+  const router = useRouter()
+
   const goBack = () => {
-    window.history.back()
+    if (canGoBack) window.history.back()
   }
+
+  const handleClick = () => { 
+    if (link) { 
+      router.push(`/ + ${link}`)
+    } else { 
+      setCanGoBack(true)
+      goBack()
+    }
+  }
+
+    
   return (
-    // <Link href={"/" + `${link}`} className="cursor-pointer">
-        <div onClick={goBack} className='cursor-pointer h-[42px] w-[42px] bg-[#212121] rounded-full items-center justify-center flex'>
-            <ChevronLeftIcon height={24} width={24} color="white" strokeWidth={2} />
-        </div>
-    // </Link>
+    <div onClick={handleClick} className='cursor-pointer h-[42px] w-[42px] bg-[#212121] rounded-full items-center justify-center flex'>
+        <ChevronLeftIcon height={24} width={24} color="white" strokeWidth={2} />
+    </div>
   )
 }
 

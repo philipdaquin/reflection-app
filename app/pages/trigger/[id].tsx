@@ -15,6 +15,7 @@ import NavigationMobile from '../../components/navigation/mobile/NavigationMobil
 import ModalView from '../../components/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
 import NavigationButtons from '../../components/navigation/NavigationButtons'
+import { getAll } from '../../util/audio/getAll'
 
 interface Props { 
   data: AudioData[] | null
@@ -105,7 +106,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [
     recent_entries, 
   ] = await Promise.all([
-      ( await getRecentAudioEntries() ),
+      ( await getAll() ),
   ]) 
 
   return { 

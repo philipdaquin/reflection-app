@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import MoodChart from '../moodWidgets/MoodAnalysisChange';
 import { getMoodSummary } from '../../util/analysis/getMoodSummary';
 import { GetServerSideProps } from 'next';
-import { AudioData, DEFAULT_IMAGE_URL, DailySummary, TextClassification, WeeklySummary } from '../../typings';
+import { AudioData, DEFAULT_IMAGE_URL, DailySummary, MoodFrequency, TextClassification, WeeklySummary } from '../../typings';
 import MoodAnalysisChange from '../moodWidgets/MoodAnalysisChange';
 import Image from 'next/image';
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget';
@@ -20,7 +20,7 @@ interface Props {
   all_mood_data: TextClassification[] | null
   recent_entries: AudioData[] | null,
   dailyMoodSummary: DailySummary | null,
-  currentWeeklySummary: WeeklySummary | null
+  currentWeeklySummary: WeeklySummary | null,
 
 }
 
@@ -57,12 +57,12 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
       {/* Widget : Mood Changes */}
       {/* **Designed this way so each widget can be reused again */}
       <div className='pt-[40px] space-y-6 pb-52'>
-        <MoodSummaryWidget dailyMoodSummary={dailyMoodSummary}/>
+        <MoodSummaryWidget dailyMoodSummary={dailyMoodSummary} currentWeeklySummary={currentWeeklySummary}/>
         <MoodAnalysisChange all_mood_data={all_mood_data} />
         {/* <MoodCompositionWidget data={[]}/> */}
         {/* <MoodActivityWidget entries={[]}/> */}
         <MoodInsightWidget dailySummary={dailyMoodSummary} currentWeeklySummary={currentWeeklySummary}/>
-        <MoodTriggersWidget data={dailyMoodSummary}/>
+        <MoodTriggersWidget data={dailyMoodSummary} currentWeeklySummary={currentWeeklySummary}/>
         <DailyAudioEntries entries={recent_entries}/>
       </div>
 

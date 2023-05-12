@@ -5,6 +5,8 @@ import DailyAudioEntries from '../moodWidgets/DailyAudioEntries'
 import MoodActivityWidget from '../moodWidgets/MoodActivityWidget'
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget'
 import { InsightContainer } from '../moodWidgets/MoodInsightWidget'
+import { useRecoilValue } from 'recoil'
+import { SelectedFilterOption } from '../../atoms/atoms'
 
 interface Props { 
   moodTrigger: MoodFrequency | null,

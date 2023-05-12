@@ -20,7 +20,7 @@ function ChatContent() {
     return (
         <>  
             <div className='flex flex-row items-center justify-between'>
-                <BackButton />
+                <BackButton link=''/>
                 <h1 className='font-bold text-sm text-center'>Conversations</h1>
                 <LiveNotification />
             </div>

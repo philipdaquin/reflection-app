@@ -7,14 +7,14 @@ import SwitchView from '../components/SwitchView'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import HomeContents from '../components/pages/HomeContents'
 import AudioVisualizer from '../components/AudioVisualizer'
-import { AudioData, DailySummary, TextClassification, WeeklySummary } from '../typings'
+import { AudioData, DailySummary, MoodFrequency, TextClassification, WeeklySummary } from '../typings'
 import { getMoodSummary } from '../util/analysis/getMoodSummary'
 import SettingsButtons from '../components/SettingsButtons'
 import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, 
   // initialiseAPIKeys 
 } from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey } from '../atoms/atoms'
+import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey, SelectedFilterOption } from '../atoms/atoms'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
@@ -27,6 +27,7 @@ import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
 import { getDailyByDate } from '../util/daily/getDailyByDate'
 import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
 import QRCode from '../components/QRCode'
+import { getCurrentWeek } from '../util/audio/getCurrentWeek'
 
 
 
@@ -34,6 +35,7 @@ import QRCode from '../components/QRCode'
 interface Props { 
   // mood_data: TextClassification[] | null,
   recent_entries: AudioData[] | null,
+  weekly_entries: AudioData[] | null,
   all_mood_data: TextClassification[] | null,
   dailyMoodSummary: DailySummary | null,
   currentWeeklySummary: WeeklySummary | null
@@ -45,7 +47,8 @@ function Home({
   recent_entries, 
   all_mood_data,
   dailyMoodSummary,
-  currentWeeklySummary
+  currentWeeklySummary, 
+  weekly_entries
 }: Props) {
 
   console.log(recent_entries)
@@ -54,15 +57,31 @@ function Home({
   const showModel = useRecoilValue(AddEntryToggle);
 
   // Get the current weeks overall mood average 
-  const [currentWeek, setCurrentWeek] = useRecoilState<WeeklySummary | null>(CurrentWeekSummary)
-
+  const selectedFilter = useRecoilValue(SelectedFilterOption)
+  const [weeklySummary, setWeeklySummary] = useRecoilState<WeeklySummary | null>(CurrentWeekSummary)
+  const [audioEntries, setAudioEntries] = useState<AudioData[] | null>(weekly_entries)
+  
   useEffect(() => {
       if (!currentWeeklySummary) return
-      setCurrentWeek(currentWeeklySummary) 
-      
+      setWeeklySummary(currentWeeklySummary) 
   }, [currentWeeklySummary]);
 
-  console.log(currentWeek)
+  useEffect(() => {
+
+    if (!weekly_entries || !recent_entries) return 
+
+    if (selectedFilter.label === '24H') {
+      setAudioEntries(recent_entries)
+    } else { 
+      setAudioEntries(weekly_entries)
+    }
+  
+  }, [
+    selectedFilter, 
+    weekly_entries, 
+    recent_entries,
+  ])
+  
 
   return (
     <>
@@ -73,10 +92,7 @@ function Home({
         
       {/*  md:px-[104px]  */}
       <div className="md:bg-[#EEEEEE] bg-white flex 
-        md:h-screen flex-col h-screen md:py-14 
-        md:px-4
-        
-        relative">
+        md:h-screen flex-col h-screen md:py-14 md:px-4 relative">
 
         <main className="justify-center flex flex-col items-center space-y-[27px]">
           <div className="flex items-center md:relative md:right-5 h-full">
@@ -91,7 +107,7 @@ function Home({
               /> */}
               <HomeSummaryContent 
                 all_mood_data={all_mood_data}
-                recent_entries={recent_entries}
+                recent_entries={audioEntries}
                 dailyMoodSummary={dailyMoodSummary}
                 currentWeeklySummary={currentWeeklySummary}
               />
@@ -108,7 +124,7 @@ function Home({
           <SettingsButtons />
         </div>
         <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-          <div className='flex items-center  md:hidden justify-center mb-5 '>
+          <div className='flex items-center  md:hidden justify-center mb-10 '>
               <NavigationMobile children={<HomeNav/>} />        
           </div>
         </div>
@@ -130,15 +146,18 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const [
     mood_data, 
     recent_entries, 
+
     all_mood, 
     dailyMoodSummary,
-    currentWeeklySummary
+    currentWeeklySummary,
+    weekly_entries
   ] = await Promise.all([
       ( await getMoodSummary() ),
       ( await getRecentAudioEntries() ),
       ( await getAllAnalysis() ),
       ( await getDailyByDate(new Date()) ),
       ( await getCurrentWeeklySummary() ),
+      ( await getCurrentWeek() ),
   ]) 
 
   return { 
@@ -146,7 +165,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
       recent_entries,
       all_mood_data: all_mood,
       dailyMoodSummary,
-      currentWeeklySummary
+      currentWeeklySummary,
+      weekly_entries
     }
   }
 }

@@ -17,7 +17,7 @@ export function InsightContainer({title, date}: Props) {
     return (
         <div className={`widget_container space-y-2 ${onHover} cursor-pointer`}>
             <h2 className='text-left text-xs font-medium text-[#757575]'>{title}</h2>
-            <h1 className='text-left text-[17px] font-semibold'>
+            <h1 className='text-left text-[17px] md:text-sm font-semibold'>
                 {date}
             </h1>
         </div>

@@ -1,6 +1,8 @@
 import React from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { MoodDataPoint, TextClassification } from '../typings'
+import { FilterOptions, MoodDataPoint, TextClassification } from '../typings'
+import { useRecoilValue } from 'recoil';
+import { SelectedFilterOption } from '../atoms/atoms';
 
 const CustomXAxisTick = (props: any) => {
     const { x, y, payload } = props;
@@ -26,14 +28,22 @@ const CustomXAxisTick = (props: any) => {
     );
 }
 
-const MoodTickFormat  = (value: any) => { 
+const MoodTickFormat  = (value: any, filter: FilterOptions) => { 
   //TypeError: value.toLocaleTimeString is not a function
   const date = new Date(value)
 
-  const timeString = date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
-  const formattedTimeString = `${timeString}`
+  if (filter.label === '24H') { 
+    const timeString = date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
+    const formattedTimeString = `${timeString}`
+    return formattedTimeString
 
-  return formattedTimeString
+  } 
+  return new Intl.DateTimeFormat('en-US', {
+    month: filter.format ? 'long' : undefined,
+    day:  'numeric',
+  }).format(date);
+
+
 }
 
 interface CustomXAxisTickProps {
@@ -80,6 +90,7 @@ function MoodActivityChart({entries}: Props) {
         .getTime()
         .toLocaleString();
     const TICK_VALUES = [MIN_DATE, MIN_DATE + 6 * 3600 * 1000, MIN_DATE + 12 * 3600 * 1000, MIN_DATE + 18 * 3600 * 1000];
+    const selectedFilter = useRecoilValue(SelectedFilterOption)
 
     return (
         <ResponsiveContainer width="100%" height="100%">
@@ -95,7 +106,7 @@ function MoodActivityChart({entries}: Props) {
                 // ticks={TICK_VALUES} 
                 // tickCount={4}
                 domain={['auto', 'auto']} 
-                tickFormatter={(value) => MoodTickFormat(value)}
+                // tickFormatter={(value) => MoodTickFormat(value, selectedFilter)}
 
             />
 

@@ -5,10 +5,12 @@ import {ChevronLeftIcon, ChevronDownIcon,  ChevronRightIcon} from '@heroicons/re
 
 
 interface Props { 
-    setCurrDate: any
+    setCurrDate: any,
+    setShowWeekly: any,
+    showWeekly: any
 }
 
-function WeeklyCalendar({setCurrDate}: Props) {
+function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const prevWeek = () => {
@@ -38,9 +40,10 @@ function WeeklyCalendar({setCurrDate}: Props) {
     const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
     const year = currentDate.getFullYear();
 
-    const [showWeekly, setShowWeekly] = useState(false)
-    const openWeeklySummary = () => { 
-        setShowWeekly(!showWeekly)
+    // Defaulted to Daily 
+    // const [showWeekly, setShowWeekly] = useState('Daily')
+    const openWeeklySummary = (input: string) => { 
+        setShowWeekly(input)
     }
 
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
@@ -53,6 +56,8 @@ function WeeklyCalendar({setCurrDate}: Props) {
 
 
     const onHover = "hover:bg-[#f5f5f5] active:bg-[#E0E0E0] active:rounded-full"
+    const WeeklyColour = showWeekly === 'Weekly' ? 'text-white bg-black' : 'border-2 bg-white text-black border-[#e0e0e0' 
+    const DailyColour = showWeekly === 'Daily' ? 'text-white bg-black' : 'border-2 bg-white text-black border-[#e0e0e0' 
 
     return (
         <div className='w-full bg-white space-y-5'>
@@ -72,12 +77,12 @@ function WeeklyCalendar({setCurrDate}: Props) {
             <div className='space-y-2'>
                 <div className='flex flex-row-reverse'>
                     <div className='flex items-center space-x-1'>
-                        <div  className={`cursor-pointer  text-xs text-white 
-                            rounded-full px-4 py-1 bg-black`}>
+                        <div onClick={() => openWeeklySummary('Daily')}   className={`cursor-pointer  text-xs ${DailyColour}
+                            rounded-full px-4 py-1`}>
                             Today
                         </div>
-                        <div onClick={openWeeklySummary} 
-                            className={`cursor-pointer border-2 text-xs border-[#e0e0e0] rounded-full px-4 py-1 bg-white`} >
+                        <div onClick={() => openWeeklySummary('Weekly')} 
+                            className={`cursor-pointer text-xs rounded-full px-4 py-1 ${WeeklyColour}`} >
                             Weekly
                         </div>
                     </div>

@@ -69,12 +69,13 @@ interface Props {
 }
 
 function DailyAudioEntries({entries}: Props) {
-    
     const data: EntryType[] | undefined = entries?.map((item, i) => new EntryType(item)) || [] 
     // @ts-ignore
     data.sort((a, b) => new Date(b.date.toString()) - new Date(a.date.toString()))
 
     const router = useRouter()  
+
+    // Temporary 
     const currentWeek = useRecoilValue<WeeklySummary | null>(CurrentWeekSummary)
 
     const currentDate = new Date()
@@ -124,7 +125,6 @@ function DailyAudioEntries({entries}: Props) {
                     })
                 }
             </div>
-
         </div>
     )
 }

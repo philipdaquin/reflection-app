@@ -40,7 +40,7 @@ function mood_summary({
           </Head>
           
           <div className="md:bg-[#EEEEEE] bg-white flex 
-        md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px]">
+        md:h-screen flex-col h-screen md:py-14 md:px-4 relative">
             <main className=" justify-center flex flex-col items-center space-y-[27px] ">
               <div className="flex items-center md:relative md:right-5 h-full">
                 
@@ -65,7 +65,7 @@ function mood_summary({
             </main>
             {/* Settings / Footer  */}
             <div className="flex-grow"></div>
-            <div className='relative bottom-10 md:block hidden '>
+            <div className='relative bottom-[170px] lg:block hidden w-full'>
               <SettingsButtons />
             </div>
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>

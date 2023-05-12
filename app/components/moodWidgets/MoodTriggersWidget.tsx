@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
-import { DailySummary, MoodFrequency, MoodTriggerType, TextClassification } from '../../typings'
+import React, { useEffect, useState } from 'react'
+import { DailySummary, MoodFrequency, MoodTriggerType, TextClassification, WeeklySummary } from '../../typings'
 import {ChevronRightIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { useRecoilState } from 'recoil'
-import { MoodTriggerPage } from '../../atoms/atoms'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { MoodTriggerPage, SelectedFilterOption } from '../../atoms/atoms'
 
 
 interface Props { 
-    data: DailySummary | null
+    data: DailySummary | null,
+    currentWeeklySummary: WeeklySummary | null
+
 }
 
 
@@ -47,20 +49,33 @@ function MoodTriggerEntry({entry: {_audio_ids, count, emotion, emotion_emoji, pe
 }
 
 
-function MoodTriggersWidget({data}: Props) {
+function MoodTriggersWidget({data, currentWeeklySummary}: Props) {
 
     const router = useRouter()
     const [showToggle, setShowToggle] = useState(false)
     console.log(data)
-    const dataa: MoodFrequency[] | undefined = data?.mood_frequency
 
-    const filteredData = showToggle ? dataa : dataa?.slice(0, 3)
+    const [selectedData, selectedSetData] = useState<MoodFrequency[] | null | undefined>(data?.mood_frequency)
+
+    const filteredData = showToggle ? selectedData : selectedData?.slice(0, 3)
     const openToggle = () => setShowToggle(true)
+
+    const selectedFilter = useRecoilValue(SelectedFilterOption)
 
 
     // Sets the MoodTriggerType 
     const [showTrigger, setTrigger] = useRecoilState(MoodTriggerPage)
     const selectTrigger = (data: MoodFrequency) => setTrigger(data)
+    
+    useEffect(() => {
+        if (selectedFilter.label === '24H') { 
+            selectedSetData(data?.mood_frequency)
+        } else { 
+            selectedSetData(currentWeeklySummary?.mood_frequency)
+        }
+
+
+    }, [selectedFilter])
     
 
     return (
@@ -75,7 +90,7 @@ function MoodTriggersWidget({data}: Props) {
                     </p>
                 </div>
                 {
-                    !showToggle && dataa && dataa?.length > 3 && (
+                    !showToggle && selectedData && selectedData?.length > 3 && (
                         <h1 onClick={openToggle} hidden={showToggle} className='text-[#2e9dfb] text-[13px] text-left font-regular hover:underline cursor-pointer'>
                             See All
                         </h1>
