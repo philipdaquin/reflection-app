@@ -49,7 +49,7 @@ function record() {
             </div>
             
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-              <div className='flex items-center  md:hidden justify-center mb-10 '>
+              <div className='flex items-center  md:hidden justify-center mb-5 '>
                 <NavigationMobile children={<AudioControls/>} />        
               </div>
             </div>

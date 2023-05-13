@@ -15,6 +15,9 @@ import { CurrentWeekSummary } from '../../atoms/atoms'
 import { useRecoilState } from 'recoil'
 import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget'
 import { getDailyByDate } from '../../util/daily/getDailyByDate'
+import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget'
+import MoodTriggersWidget from '../moodWidgets/MoodTriggersWidget'
+import { SelectedFilterOption } from '../../atoms/atoms'
 
 
 interface WeeklyProps { 
@@ -65,7 +68,7 @@ function DailyContent({selectedDate, selectedEntries, selectedAnalsysis, selecte
   const currDay = selectedDate?.getDay() || 0
   const currDateNum = selectedDate.getDate()
   let day = daysOfWeek[currDay] 
-  
+
   return (
     <>
       
@@ -79,23 +82,23 @@ function DailyContent({selectedDate, selectedEntries, selectedAnalsysis, selecte
       </div>
 
       <div>
-        {/* { */}
-          // selectedEntries && (
+        {
+           selectedEntries && (
             <div className='pt-10  pb-52'>
               <div className=' space-y-6'>
                 <MoodSummaryWidget 
                   dailyMoodSummary={selectedDaily} 
                   currentWeeklySummary={selectedWeekly}/>
-                {/* <MoodAnalysisChange all_mood_data={selectedAnalsysis} /> */}
-                {/* <MoodCompositionWidget data={[]}/>  */}
-                {/* <MoodActivityWidget entries={[]}/> */}
+                <MoodAnalysisChange all_mood_data={selectedAnalsysis} />
+                <MoodCompositionWidget data={[]}/> 
+                <MoodActivityWidget entries={selectedAnalsysis || []}/>
                 <MoodInsightWidget  dailySummary={selectedDaily} currentWeeklySummary={selectedWeekly} />  
-                {/* <MoodTriggersWidget data={[]}/> */}
-                {/* <DailyAudioEntries entries={selectedEntries}/> */}
+                {/* <MoodTriggersWidget data={selectedDaily} currentWeeklySummary={null}/> */}
+                <DailyAudioEntries entries={selectedEntries}/>
               </div>
             </div>
-          {/* ) */}
-        {/* } */}
+          ) 
+        }
       </div>          
     </>
   )
@@ -117,7 +120,7 @@ function WeeklyCalendarContent( {
     const [selectedAnalsysis, setselectedAnalsysis] = useState<TextClassification[] | null>(null)
     
     const [showWeekly, setShowWeekly] = useState('Daily')
-    const [dailySummary, setDailySummary] = useState<DailySummary | null>(null)
+    const [dailySummary, setDailySummary] = useState<DailySummary | null>(dailyMoodSummary)
     const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>(null)
 
     // const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null)
@@ -127,10 +130,10 @@ function WeeklyCalendarContent( {
       const summary = await getDailyByDate(date)
       setDailySummary(summary)
     }
-    // const getDailyEntries = async (date: Date) => { 
-    //     const entries = await getAllByDate(date)
-    //     setSelectedEntries(entries)
-    // }
+    const getDailyEntries = async (date: Date) => { 
+        const entries = await getAllByDate(date)
+        setSelectedEntries(entries)
+    }
 
     const getWeeklyAnalysis = async (date: Date) => { 
       const weeklyAnalysis = await getAnalysisByWeek(date)
@@ -144,13 +147,14 @@ function WeeklyCalendarContent( {
     }
 
     useEffect(() => {
-
-      // if (selectedDate && showWeekly === 'Daily') {
+   
+      if (selectedDate && showWeekly === 'Daily') {
         getDailySummary(selectedDate)
-        // getDailyEntries(selectedDate)
-      // }/
-        // getWeeklyAnalysis(selectedDate)
-        // getWeeklySummary(selectedDate)
+        console.log("DAILY SUMMARY", dailySummary)
+        getDailyEntries(selectedDate)
+      }
+        getWeeklyAnalysis(selectedDate)
+        getWeeklySummary(selectedDate)
     }, [showWeekly, selectedDate])
 
     const handleDateChange = (date: Date) => {
@@ -162,6 +166,16 @@ function WeeklyCalendarContent( {
     //   const textClassification: TextClassification[] | null | undefined  = selectedEntries?.map((item, i) => item.text_classification) || []
     //   setselectedAnalsysis(textClassification)
     // }, [selectedEntries])
+
+
+
+    const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(selectedDate);
+    const year = selectedDate?.getFullYear();
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const currDay = selectedDate?.getDay() || 0
+    const currDateNum = selectedDate.getDate()
+    let day = daysOfWeek[currDay] 
+
 
     return (
 
@@ -176,24 +190,26 @@ function WeeklyCalendarContent( {
             <hr />
           </div>
 
-          {/* <section className='pt-[26px]'>
-            { 
-              showWeekly === 'Daily' ? 
-                <DailyContent 
-                  selectedDate={selectedDate}
-                  selectedAnalsysis={selectedAnalsysis}
-                  selectedEntries={selectedEntries}
-                  selectedDaily={dailySummary}
-                  selectedWeekly={weeklySummary}
-                /> 
-              : 
-                <WeeklyContent 
-                  mood_graph={all_mood_data} 
-                  weekly_summary={weeklySummary}
-                  selectedDate={selectedDate}
-                />
-            }
-          </section> */}
+          <section className='pt-[26px]'>
+
+              {
+                showWeekly === 'Daily' ? (
+                  <DailyContent 
+                    selectedDate={selectedDate}
+                    selectedAnalsysis={selectedAnalsysis}
+                    selectedEntries={selectedEntries}
+                    selectedDaily={dailySummary}
+                    selectedWeekly={weeklySummary}
+                  /> 
+                ) : (
+                  <WeeklyContent 
+                      mood_graph={all_mood_data} 
+                      weekly_summary={weeklySummary}
+                      selectedDate={selectedDate}
+                    />
+                )
+              }
+          </section> 
           
         </div>
     )

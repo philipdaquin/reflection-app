@@ -105,7 +105,9 @@ export class MoodDataPoint {
 export type WeeklySummary = {
     _id: string
     week_number: number | null
-    weekly_avg: number | null
+    weekly_avg: number | null,
+    previous_avg: number | null
+
     total_entries: number | null
     start_week: Date | null
     end_week: Date | null
@@ -123,6 +125,7 @@ export type DailySummary = {
   total_entries: number,
   overall_mood: string | null,
   current_avg: number | null,
+  previous_avg: number | null
   inflection: AudioData | null,
   min: AudioData | null,
   max: AudioData | null,
