@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{collections::HashSet};
 
 use bson::{oid::ObjectId, DateTime};
 use chrono::{Utc, Datelike, NaiveDate, Weekday, TimeZone, Local, Duration};
@@ -29,6 +29,9 @@ pub struct WeeklyAnalysisDTO {
 
     // Weekly average  
     pub weekly_avg: Option<f32>, 
+
+    /// Previous Average ( Previous Week )
+    pub previous_avg: Option<f32>,
 
     // Total number of entries within the week 
     pub total_entries: i32,
@@ -230,6 +233,20 @@ impl WeeklyAnalysisDTO {
         
         // Automatically update both values in the database if new entries are added 
         let val = TextClassification::get_total_entries(bson_start_date, bson_end_date).await?.unwrap();
+        
+        // Previous Week Date
+        // CurrentDate - 6 days
+        let last_week  = Utc::now().date_naive() - chrono::Duration::days(6);
+        let last_week_dt = last_week.and_hms_opt(0, 0, 0).unwrap();
+        let last_date = Utc.from_utc_datetime(&last_week_dt);
+
+        // Get Previous Week Avg 
+        let previous_week_avg = WeeklyAnalysisDB::get_corresponding_week(last_date).await?;
+        
+        if let Some(week) = previous_week_avg { 
+            self.previous_avg = week.weekly_avg;
+        }
+
 
         // 
         // If the value exist, check if we can update the value 

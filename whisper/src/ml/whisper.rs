@@ -38,6 +38,11 @@ pub struct AudioDataDTO {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     pub title: Option<String>,
+
+    // pub image_url: Option<String>,
+    // pub author: Option<String>,
+    // pub despcription: Option<String>,
+
     pub date: Option<DateTime>,
     pub day: Option<String>,
     pub transcription: Option<String>,

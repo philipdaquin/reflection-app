@@ -29,6 +29,9 @@ pub struct DailySummaryDTO {
     /// Daily Average 
     pub current_avg: Option<f32>,
 
+    /// Previous Average ( yesterday )
+    pub previous_avg: Option<f32>,
+
     /// User's change of mood 
     pub inflection: Option<AudioDataDTO>,
     
@@ -148,6 +151,12 @@ impl DailySummaryDTO {
         let average = TextClassification::get_average(&data)
             .await?
             .ok_or(ServerError::DatabaseError(format!("Unable to calculate average")))?;
+
+        let previous = datetime - chrono::Duration::days(1);
+        let previous_entry = DailyAnalysisDb::get_by_date(previous).await?;
+        if let Some(prev) = previous_entry { 
+            self.previous_avg = prev.current_avg
+        }
 
         // If the value exist, update it 
         if let Some(curr_avg) = self.current_avg {  

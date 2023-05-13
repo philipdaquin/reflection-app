@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use actix_web::{ middleware::Logger, App, HttpServer, web};
 use actix_cors::Cors;
-use crate::{persistence::db::MongoDbClient, controllers::{audio_data::configure_audio_services, ws::configure_ws_service, audio_analysis::configure_analysis_service, weekly_controller::configure_weekly_analysis_service, sse::configure_sse_services, daily_data::configure_daily_summary}, broadcast::Broadcaster};
+use crate::{persistence::{db::MongoDbClient}, controllers::{audio_data::configure_audio_services, ws::configure_ws_service, audio_analysis::configure_analysis_service, weekly_controller::configure_weekly_analysis_service, sse::configure_sse_services, daily_data::configure_daily_summary}, broadcast::Broadcaster};
 
 
 pub async fn new_server(port: u32) -> std::io::Result<()> {
