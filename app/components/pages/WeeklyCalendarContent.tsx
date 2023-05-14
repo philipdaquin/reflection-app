@@ -19,7 +19,6 @@ import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget'
 import MoodTriggersWidget from '../moodWidgets/MoodTriggersWidget'
 import { SelectedFilterOption } from '../../atoms/atoms'
 
-
 interface WeeklyProps { 
   mood_graph: TextClassification[] | null,
   weekly_summary: WeeklySummary | null,
@@ -185,7 +184,7 @@ function WeeklyCalendarContent( {
             setShowWeekly={setShowWeekly}
             showWeekly={showWeekly}
           />
-   
+
           <div className='pt-5'>
             <hr />
           </div>

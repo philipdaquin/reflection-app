@@ -128,7 +128,9 @@ function SummaryContent({data}: Props) {
             <div className="pt-3">
                 <div className="flex flex-wrap ">
                     {tags?.map((tag, index) => (
-                    <SuggestedTags name={tag} key={tag} />
+                        <SuggestedTags  key={tag}>
+                            {tag}
+                        </SuggestedTags>
                     ))}
                 </div>
             </div>

@@ -42,6 +42,8 @@ pub struct AudioDataDTO {
     // pub image_url: Option<String>,
     // pub author: Option<String>,
     // pub despcription: Option<String>,
+    // // inSeconds 
+    // pub duration: Option<u64>
 
     pub date: Option<DateTime>,
     pub day: Option<String>,

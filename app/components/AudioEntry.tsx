@@ -11,7 +11,7 @@ interface LinkProps {
   link: string
 }
 
-function LinkButton({link}: LinkProps) { 
+export function LinkButton({link}: LinkProps) { 
   const [openToggle, setOpenToggle] = useState(false)
   const copy_text = () => { 
     setOpenToggle(true);
@@ -29,7 +29,7 @@ function LinkButton({link}: LinkProps) {
   )
 }
 
-function EditButton({link}: LinkProps) { 
+export function EditButton({link}: LinkProps) { 
   return (
     <Link href={`/post_analysis/${link}`}>
       <div className=' flex flex-row items-center space-x-2 '>
@@ -39,6 +39,29 @@ function EditButton({link}: LinkProps) {
         </h1>
       </div>
     </Link>
+  )
+}
+
+interface MenuProps { 
+  id: string
+  children: any,
+  customClass: string
+}
+
+export function MenuItem({id, children, customClass}: MenuProps) { 
+  return (
+    <div className={`cursor-pointer  rounded-full ${customClass} dropdown dropdown-end`}>
+            {/* <EllipsisHorizontalIcon tabIndex={0} height={18} width={18} color='#757575'/> */}
+            
+            <div tabIndex={0}>
+              {children}
+            </div>
+            
+            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
+              <li><LinkButton link={id}/></li>
+              <li><EditButton link={id}/></li>
+            </ul>
+      </div>
   )
 }
 
@@ -129,13 +152,11 @@ function AudioEntry({
             </div>
           </div> 
         </Link> 
-        <div className={`cursor-pointer border-[1px] rounded-full border-[#757575] hover:bg-[#D9D9D9] dropdown dropdown-end`}>
-            <EllipsisHorizontalIcon tabIndex={0} height={18} width={18} color='#757575'/>
-            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
-              <li><LinkButton link={id}/></li>
-              <li><EditButton link={id}/></li>
-            </ul>
-        </div>
+
+        <MenuItem  id={id} customClass='border-[#757575] hover:bg-[#D9D9D9] border-[1px]'>
+          <EllipsisHorizontalIcon tabIndex={0} height={18} width={18} color='#757575'/>
+        </MenuItem>
+       
       </div>
     </>
   )

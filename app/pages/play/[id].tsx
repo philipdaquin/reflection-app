@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React from 'react'
+import React, { useState } from 'react'
 import NavigationButtons from '../../components/navigation/NavigationButtons'
 import PlayerContents from '../../components/pages/PlayerContents'
 import PhoneView from '../../components/PhoneView'
@@ -27,17 +27,17 @@ function play({data}: Props) {
             <link rel="icon" href="/favicon.ico" />
           </Head>
           
-          <div className="md:bg-[#EEEEEE] bg-white  flex 
-            md:min-h-[100vh] flex-col h-screen md:py-14 px-[104px]">
+          <div className="md:bg-[#EEEEEE] bg-white flex 
+          md:h-screen flex-col h-screen md:py-14 md:px-4 relative">
+
             <main className=" justify-center flex flex-col items-center space-y-[27px] ">
-    
               <div className="flex items-center md:relative md:right-5 h-full ">
                 <div className='relative right-10 hidden md:block'>
                   <NavigationButtons />        
                 </div>
 
                 <PhoneView>
-                  <PlayerContents entry={entry}/>
+                  <PlayerContents entry={entry} data={data}/>
                 </PhoneView>
 
               </div>
@@ -45,6 +45,11 @@ function play({data}: Props) {
                 <SwitchView />
               </div>
             </main>
+             {/* Settings / Footer  */}
+            <div className="flex-grow"></div>
+            <div className='relative bottom-[170px] lg:block hidden w-full'>
+              <SettingsButtons />
+            </div>
           </div>
         </>
       )

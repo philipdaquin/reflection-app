@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {ChevronLeftIcon, ChevronDownIcon,  ChevronRightIcon} from '@heroicons/react/24/outline'
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 
 
@@ -59,16 +60,24 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
     const WeeklyColour = showWeekly === 'Weekly' ? 'text-white bg-black' : 'border-2 bg-white text-black border-[#e0e0e0' 
     const DailyColour = showWeekly === 'Daily' ? 'text-white bg-black' : 'border-2 bg-white text-black border-[#e0e0e0' 
 
+    const [showCalendar, setShowCalendar] = useState(false)
+
+    const toggleCalendar = () => { 
+        setShowCalendar(!showCalendar)
+    }
+
     return (
         <div className='w-full bg-white space-y-5'>
              <div className='flex flex-row justify-between py-2 space-x-2 '>
                 <button onClick={prevWeek} className={`${onHover} p-2 rounded-full`}>
                     <ChevronLeftIcon height={20} width={20} color='#757575'/>
                 </button>
-                <div className='flex cursor-pointer flex-row items-center space-x-2 px-4 hover:bg-[#f5f5f5] hover:rounded-full active:bg-[#E0E0E0] active:rounded-full'>
-                    <div className='font-semibold text-base'>{day}, {month} {year}</div>
-                    <ChevronDownIcon height={16} width={16} color='#757575'/>
-                </div>
+
+                    <div onClick={toggleCalendar} className='flex cursor-pointer flex-row items-center space-x-2 px-4 hover:bg-[#f5f5f5] hover:rounded-full active:bg-[#E0E0E0] active:rounded-full'>
+                        <div className='font-semibold text-base'>{day}, {month} {year}</div>
+                        <ChevronDownIcon height={16} width={16} color='#757575'/>
+                    </div>
+          
 
                 <button onClick={nextWeek} className={`${onHover} p-2 rounded-full`}>
                     <ChevronRightIcon height={20} width={20} color='#757575'/>
@@ -97,7 +106,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
                                 w-8 h-8  p-2
                                 items-center text-center 
                                 rounded-full
-                                ${selectedDate && selectedDate.getTime() === day.getTime() ? 
+                                ${selectedDate && selectedDate.getUTCDate() === day.getUTCDate() ? 
                                     'bg-black text-white  ' : 
                                     'bg-white '
                                 }
