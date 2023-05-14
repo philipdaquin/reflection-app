@@ -28,6 +28,8 @@ pub struct DailySummary {
     /// Daily Average 
     pub current_avg: Option<f32>,
 
+    pub previous_avg: Option<f32>,
+
     /// User's change of mood 
     pub inflection: Option<AudioData>,
     
@@ -53,7 +55,9 @@ impl From<DailySummaryDTO> for DailySummary {
             inflection: value.inflection.map(|f| AudioData::from(f)),
             min: value.min.map(|f| AudioData::from(f)),
             max: value.max.map(|f| AudioData::from(f)),
-            mood_frequency: value.mood_frequency
+            mood_frequency: value.mood_frequency,
+            previous_avg: value.previous_avg
+
         }
     }
 }

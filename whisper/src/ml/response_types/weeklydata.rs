@@ -14,6 +14,8 @@ pub struct WeeklyAnalysis {
     pub id: Option<String>, 
     pub week_number: Option<i32>, 
     pub weekly_avg: Option<f32>, 
+    pub previous_avg: Option<f32>,
+
     pub total_entries: i32,
     pub start_week: Option<DateTime<Utc>>,
     pub end_week: Option<DateTime<Utc>>,
@@ -51,6 +53,8 @@ impl From<WeeklyAnalysisDTO> for WeeklyAnalysis {
             important_events: value.important_events.into_iter().collect(),
             
             recommendations: value.recommendations,
+            
+            previous_avg: value.previous_avg
         }
     }
 } 
