@@ -25,7 +25,7 @@ function PhoneView({children}: Props) {
           h-full 
           pt-12 
           py-14
-          px-7
+          px-4
           border-0
           rounded-2xl
           shadow-inherit'
