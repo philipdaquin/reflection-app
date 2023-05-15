@@ -76,12 +76,12 @@ function PlayerContents({entry, data:{
 
     return (
         <section className='flex flex-col h-full  justify-between '>
-            <div className='flex flex-row items-center justify-center pb-5'>
-                {/* <div></div> */}
+            <div className='flex flex-row items-center justify-between pb-5'>
+                <BackButton link='/'/>
                 <h1 className='font-semibold text-[15px] text-end text-[#757575]'>Now Playing</h1>
-                {/* <MenuItem  id={_id} customClass='dropdown-bottom h-[42px] w-[42px] bg-[#212121] items-center flex justify-center'>
+                <MenuItem  id={_id} customClass='dropdown-bottom h-[42px] w-[42px] bg-[#212121] items-center flex justify-center'>
                     <EllipsisHorizontalIcon height={24} width={24} color='#fff'/>
-                </MenuItem> */}
+                </MenuItem>
             </div>
             
             <div className=' w-full pt-20 md:pt-0'>

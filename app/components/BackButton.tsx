@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {ChevronLeftIcon} from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import { useRouter } from 'next/router'

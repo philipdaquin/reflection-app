@@ -8,6 +8,9 @@ import { useRecoilValue } from 'recoil'
 import { getAverageMoodWeek } from '../MoodTrackerIndex'
 import { getWeeklyByDate } from '../../util/weekly/getWeeklyByDate'
 import changeInPercentage from '../../util/changeInPercentage'
+import { fullTimeFormat } from '../../util/fullTimeFormat'
+import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate'
+import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget'
 
 
 interface Props { 
@@ -19,33 +22,17 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
     const most_common_mood = weekly_summary?.mood_frequency || []
     const eventData = weekly_summary?.important_events || []
     const recommendedActivities = weekly_summary?.recommendations || []
-
+    
     const weeklyData: MoodDataPoint[] | null | undefined = mood_graph?.map((i) => new MoodDataPoint(i))
     
     // const weeklyIndex = useRecoilValue(AverageWeeklyIndex);
-    // console.log(weeklyIndex)
     const weeklyIndex = getAverageMoodWeek(mood_graph)
+    const {startDate, endDate } = getWeekStartAndEndDates(new Date()) 
 
+    let start = fullTimeFormat(weekly_summary?.start_week?.toString() || startDate.toString())
+    let end = fullTimeFormat(weekly_summary?.end_week?.toString() || endDate.toString())
     
-
-    // Fetch previous week data 
-    const [previousWeek, setPreviousWeek] = useState<WeeklySummary | null>(null)
-    const oneWeek = async (date: Date) => { 
-        const lastWeek = await getWeeklyByDate(date)
-        setPreviousWeek(lastWeek || null)
-    }
-    
-    useEffect(() => {
-      let currentDate = new Date()
-      let oneWeekAgo = new Date(
-        currentDate.getFullYear(), 
-        currentDate.getMonth(), 
-        currentDate.getDate() - currentDate.getDay() - 7)
-        oneWeek(oneWeekAgo)
-    }, [])
-    
-
-    let changeInPercent = changeInPercentage(weekly_summary?.weekly_avg || 0, previousWeek?.weekly_avg || 0)?.toFixed(2) || 0
+    let changeInPercent = changeInPercentage(weekly_summary?.weekly_avg || 0, weekly_summary?.previous_avg || 0)?.toFixed(2) || 0
     const sign = parseFloat(changeInPercent.toString()) 
     const colour = changeInPercent as number > 0 ? 
         "text-[#41d475] " 
@@ -56,18 +43,26 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
 
     return (
         <section className='pb-52'>
+            
+            <div>
+                <h1 className='items-center flex  font-semibold text-[25px] text-black'>
+                    Weekly Summary
+                </h1>
+                <h2 className='text-[#9e9e9e] text-[15px]'>
+                    {start} - {end}
+                </h2>
+            </div>
 
-            <h1 className='items-center flex justify-center font-bold text-center text-base text-[#212121]'>
-                Weekly Summary
-            </h1>
+            <div className='pt-[20px]'></div>
 
-            <div className='pt-[20px] space-y-1'>
-                <h1 className='text-left font-semibold text-[#757575] text-lg'>
+            <div className=' space-y-1 widget_container'>
+
+                <h1 className='text-left font-semibold text-[#757575] text-[15px]'>
                     Weekly Mood Score
                 </h1>
                 <div className='flex justify-between items-center'>
                     <h1 className='text-[30px] font-bold'>{weeklyIndex || ''}</h1>
-                    <div className='flex items-center space-x-1'>
+                    <div className='flex items-center space-x-1 flex-col'>
                         {/* <ArrowDownCircleIcon height={20} width={20} color="#757575"/>
                         <p className='text-center text-[#757575] text-[12px]'>
                             10% Down from lastweek
@@ -77,23 +72,24 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
                         </h1>
 
                         <p className='pt-[1px]  text-left font-semibold text-xs text-[#757575]'>
-                            from lastweek
+                            from last week
                         </p>   
                     </div>
                 </div>
+
+                {/* Mood trend Graph */}
+                { weeklyData && (
+                
+                <div className='w-full items-center pt-6 h-[310px] space-y-5 pb-10'>
+                    <h1 className='text-left font-semibold text-[#757575] text-[15px]'>
+                        Weekly Data Patterns 
+                    </h1>
+                    <MoodAreaChart data={weeklyData}/>
+                </div>
+                
+                )}
             </div>
 
-            {/* Mood trend Graph */}
-            { weeklyData && (
-            
-            <div className='w-full items-center pt-6 h-[310px] space-y-5 pb-10'>
-                <h1 className='text-left font-semibold text-[#757575] text-lg'>
-                    Weekly Data Patterns 
-                </h1>
-                <MoodAreaChart data={weeklyData}/>
-            </div>
-            
-            )}
 
             {/* Common Mood  */}
             <div className='pt-[24px] space-y-3'>
