@@ -11,7 +11,7 @@ function PhoneView({children}: Props) {
     <div className='md:w-[424px] md:h-[803px] bg-white md:shadow-xl md:rounded-[70px] md:border-[#F5F5F5] md:border-8 border-white shadow-inherit '>
         <div className='
           md:w-full 
-          md:px-4
+          md:px-3
           md:pt-10 
           md:border-[16px] 
           md:shadow-sm 
