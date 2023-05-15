@@ -55,3 +55,13 @@ export const MoodTriggerPage = atom<MoodFrequency | null>({
     key: 'MoodTriggerPage',
     default: null
 })
+
+export const SelectedAudioPlayer = atom<AudioData | null>({ 
+    key: 'SelectedAudioPlayer',
+    default: null
+})
+
+export const ShowAudioPlayer = atom<boolean>({ 
+    key: 'ShowAudioPlayer',
+    default: false
+})

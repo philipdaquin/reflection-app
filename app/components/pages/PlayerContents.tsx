@@ -46,12 +46,11 @@ function ShowTranscript() {
 }
 
 interface PlayerContentProps { 
-    entry: AudioEntryType,
     data: AudioData
 
 }
 
-function PlayerContents({entry, data:{
+function PlayerContents({data:{
     _id, 
     transcription, 
     date,
@@ -76,14 +75,14 @@ function PlayerContents({entry, data:{
 
     return (
         <section className='flex flex-col h-full  justify-between '>
-            <div className='flex flex-row items-center justify-between pb-5'>
+            {/* <div className='flex flex-row items-center justify-between pb-5'>
                 <BackButton link='/'/>
                 <h1 className='font-semibold text-[15px] text-end text-[#757575]'>Now Playing</h1>
                 <MenuItem  id={_id} customClass='dropdown-bottom h-[42px] w-[42px] bg-[#212121] items-center flex justify-center'>
                     <EllipsisHorizontalIcon height={24} width={24} color='#fff'/>
                 </MenuItem>
             </div>
-            
+             */}
             <div className=' w-full pt-20 md:pt-0'>
                 <div className='flex flex-col items-center justify-center space-y-3 '>
                     <div className='flex justify-center'>
@@ -115,7 +114,7 @@ function PlayerContents({entry, data:{
             <div className='pt-44 md:pt-0 flex flex-col justify-center'>
                 <div className="flex-grow"></div>
 
-                <AudioMediaPlayer src={entry.audioUrl} />
+                <AudioMediaPlayer src={"https://www.youtube.com/watch?v=XFkzRNyygfk"} />
                 <div className=' flex flex-col space-y-3 pt-5'>
                     {/* media player */}
                     <div className='w-full' onClick={showTranscript}>

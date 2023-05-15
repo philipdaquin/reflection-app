@@ -42,18 +42,22 @@
 import MuiModal from '@mui/material/Modal'
 import React, { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { AddEntryToggle } from '../atoms/atoms';
+import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms';
 
 interface Props { 
   children: any
 }
 
 function ModalView({children}: Props) {
-  const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
-  const handleClose = () => { 
-    setShowModal(false);
-  }
-    
+    const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
+    const [showPlayer, setshowAudioPlayer] = useRecoilState(ShowAudioPlayer)
+
+    const handleClose = () => { 
+      if (showPlayer || showModal) {
+        setShowModal(false);
+        setshowAudioPlayer(false)
+      }
+    }
       return (
         <MuiModal
           className="
@@ -61,8 +65,9 @@ function ModalView({children}: Props) {
           z-50 mx-auto w-full max-w-5xl 
           overflow-hidden overflow-y-scroll 
           rounded-md scrollbar-hide
+          transition duration-500 ease-in-out
           "
-          open={showModal}
+          open={showModal || showPlayer}
           onClose={handleClose}
         > 
         <>

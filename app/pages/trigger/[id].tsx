@@ -70,7 +70,7 @@ function trigger({data}: Props) {
 
               </div>
 
-              <div className='md:block hidden'>
+              <div className='lg:block hidden'>
                 <SwitchView />
               </div>
 

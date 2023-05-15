@@ -6,6 +6,8 @@ import { OPENAI_KEY } from './SettingsButtons';
 import { BsSoundwave } from 'react-icons/bs';
 import {XMarkIcon} from '@heroicons/react/24/outline'
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
+import { useRecoilState } from 'recoil';
+import { ShowAudioPlayer } from '../atoms/atoms';
 
 
 interface Props { 
@@ -21,6 +23,7 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
     const [progress, setProgress] = useState(0)
 
     const [currentFile, setCurrentFile] = useState<File | null>(null)
+    const [showPlayer, setshowAudioPlayer] = useRecoilState(ShowAudioPlayer)
 
 
     const handleAvatar = () => {    
@@ -56,6 +59,7 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
         if (!selectedFile) return
         setloading(true)
         setCurrentFile(selectedFile)
+        setshowAudioPlayer(false)
         const formData = new FormData();
         formData.append("audio.wav", selectedFile!);
         if (apiKey === null) throw new Error("Failed to get Open AI key")

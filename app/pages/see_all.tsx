@@ -45,7 +45,7 @@ function see_all({entries}: Props) {
                     </PhoneView>
                 
                 </div>
-                <div className='md:block hidden'>
+                <div className='lg:block hidden'>
                     <SwitchView />
                 </div>
             {/* <RecordComponent /> */}

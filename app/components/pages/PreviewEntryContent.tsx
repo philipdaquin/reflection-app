@@ -9,6 +9,8 @@ import { ChevronDownIcon, ChevronRightIcon, EllipsisHorizontalIcon, PlusIcon } f
 import SuggestedTags from '../SuggestedTags'
 import { InsightContainer } from '../moodWidgets/MoodInsightWidget'
 import AudioTranscripts from '../AudioTranscripts'
+import { SelectedAudioPlayer } from '../../atoms/atoms'
+import { useRecoilState } from 'recoil'
 
 
 
@@ -16,18 +18,10 @@ interface Props {
     entry: AudioData 
 }
 
-function PreviewEntryContent({entry: {
-  _id,
-  title,
-  summary,
-  date,
-  text_classification,
-  tags,
-  transcription
-
-
-} }: Props) {
+function PreviewEntryContent({entry}: Props) {
   
+  const { _id, title, summary, date, text_classification, tags, transcription } = entry 
+
   const router = useRouter()
 
   const emotionEmoji = text_classification.emotion_emoji || "NaN" 
@@ -52,6 +46,12 @@ function PreviewEntryContent({entry: {
   const [toggleSummary, setToggleSummary] = useState(false)
   const showSummary = () => setToggleSummary(true)
   const filteredSummary = toggleSummary ? summary : summary?.slice(0, 150) + "..." 
+  const [selectedData, setSelectedData] = useRecoilState(SelectedAudioPlayer)
+
+  const togglePlay = () => { 
+    setSelectedData(entry)
+    // router.push(`/play/${_id}`)
+  }
 
   const [toggleTranscript, setToggleTranscript] = useState(false)
   const showTranscript = () => { 
@@ -101,7 +101,8 @@ function PreviewEntryContent({entry: {
             </div>
 
           </div>
-          <a onClick={() => router.push(`/play/${_id}`)} href={`/play/${_id}`}
+          <a onClick={togglePlay} 
+          // href={`/play/${_id}`}
             className={`items-center flex justify-center bg-[#EDECEC] ${onHover} 
               rounded-full px-24 py-3 w-fit space-x-2`}>
               <PlayIcon height={16} width={16} color="#757575" />  

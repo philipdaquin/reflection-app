@@ -37,11 +37,11 @@ function play({data}: Props) {
                 </div>
 
                 <PhoneView>
-                  <PlayerContents entry={entry} data={data}/>
+                  <PlayerContents data={data}/>
                 </PhoneView>
 
               </div>
-              <div className='md:block hidden'>
+              <div className='lg:block hidden'>
                 <SwitchView />
               </div>
             </main>

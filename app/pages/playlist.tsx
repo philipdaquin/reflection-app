@@ -35,7 +35,7 @@ function playlist() {
                         </PhoneView>
                     </div>
 
-                    <div className='md:block hidden '>
+                    <div className='lg:block hidden '>
                         <SwitchView />
                     </div>
                 </main>

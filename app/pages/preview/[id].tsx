@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React from 'react'
+import React, { useEffect } from 'react'
 import ListeningContent from '../../components/pages/TriggerContent'
 import PhoneView from '../../components/PhoneView'
 import SwitchView from '../../components/SwitchView'
@@ -13,16 +13,25 @@ import NavigationMobile from '../../components/navigation/mobile/NavigationMobil
 import HomeNav from '../../components/navigation/mobile/HomeNav'
 import ModalView from '../../components/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
-import { useRecoilValue } from 'recoil'
-import { AddEntryToggle } from '../../atoms/atoms'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { AddEntryToggle, SelectedAudioPlayer } from '../../atoms/atoms'
+import PlayerModal from '../../components/PlayerModal'
 
 
 interface Props { 
-  data: AudioData 
+  data: AudioData | null
 }
 
 function preview({data}: Props) {
     const showModel = useRecoilValue(AddEntryToggle);
+
+    const [selectedData, setSelectedData] = useRecoilState(SelectedAudioPlayer)
+    // useEffect(() => {
+    //   if (!data) return 
+    //   setSelectedData(data)
+    // }, [data])
+    
+
 
     return (
         <>
@@ -41,11 +50,7 @@ function preview({data}: Props) {
                 </div>
                 
                 <PhoneView>
-                  {/* <HomeContents 
-                    mood_data={mood_data}
-                    recent_entries={recent_entries}  
-                  /> */}
-                <PreviewEntryContent entry={data}/>
+                { data && <PreviewEntryContent entry={data}/>}
               </PhoneView>
               </div>
               <div className='md:block hidden'>
@@ -64,8 +69,7 @@ function preview({data}: Props) {
                   <NavigationMobile children={<HomeNav/>} />        
               </div>
             </div>
-
-              {/* <RecordComponent /> */}
+              {/* <RecordComponent /> */}\
               {showModel && (
                 <ModalView>
                   <AddEntryContent />

@@ -44,7 +44,7 @@ function post_analysis({
                        <SummaryContent data={data}/>
                     </PhoneView>
                 </div>
-                <div className='md:block hidden'>
+                <div className='lg:block hidden'>
                     <SwitchView />
                 </div>
                     {/* <RecordComponent /> */}

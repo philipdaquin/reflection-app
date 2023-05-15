@@ -14,7 +14,7 @@ import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY,
   // initialiseAPIKeys 
 } from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey, SelectedFilterOption } from '../atoms/atoms'
+import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey, SelectedFilterOption, ShowAudioPlayer } from '../atoms/atoms'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
@@ -28,6 +28,7 @@ import { getDailyByDate } from '../util/daily/getDailyByDate'
 import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
 import QRCode from '../components/QRCode'
 import { getCurrentWeek } from '../util/audio/getCurrentWeek'
+import PlayerModal from '../components/PlayerModal'
 
 
 
@@ -55,6 +56,8 @@ function Home({
   // Start API keys 
   const [isOpen, setIsOpen] = useState(false);
   const showModel = useRecoilValue(AddEntryToggle);
+  const showPlayer = useRecoilValue(ShowAudioPlayer);
+
 
   // Get the current weeks overall mood average 
   const selectedFilter = useRecoilValue(SelectedFilterOption)
@@ -114,7 +117,7 @@ function Home({
             </PhoneView>
 
           </div>
-          <div className='sm:block hidden '>
+          <div className='lg:block hidden '>
               <SwitchView />
           </div>
         </main> 
@@ -133,6 +136,11 @@ function Home({
         {showModel && (
           <ModalView>
             <AddEntryContent />
+          </ModalView>
+        )}
+        {showPlayer && (
+          <ModalView>
+            <PlayerModal />
           </ModalView>
         )}
       </div>
