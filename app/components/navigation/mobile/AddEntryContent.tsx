@@ -214,9 +214,8 @@ function AddEntryContent() {
     setCurrentPage(currentPage - 1);
   };
 
-
   return (
-    <div className={`rounded-t-3xl w-full bg-white shadow-2xl absolute bottom-0 h-fit px-7 py-4`}>
+    <div className={`rounded-t-3xl rounded-b-none w-full bg-white shadow-2xl absolute bottom-0 h-fit px-7 py-4`}>
       {currentPage === 1 && (<MenuContent nextPage={nextPage} />)}
       {currentPage === 2 && (<UploadContent prevPage={prevPage}/>)}
       {/* {currentPage === 3 && (<ProgressContent/>) } */}

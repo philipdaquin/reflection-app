@@ -17,6 +17,11 @@ import { GetServerSideProps } from 'next'
 import { AudioData } from '../typings'
 import { getAll } from '../util/audio/getAll'
 import { Toaster } from 'react-hot-toast'
+import { useRecoilValue } from 'recoil'
+import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms'
+import ModalView from '../components/ModalView'
+import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
+import PlayerModal from '../components/PlayerModal'
 
 
 interface Props { 
@@ -24,7 +29,8 @@ interface Props {
 }
 
 function see_all({entries}: Props) {
-   
+    const showModel = useRecoilValue(AddEntryToggle);
+    const showPlayer = useRecoilValue(ShowAudioPlayer);
     return (
       <>
         <Head>
@@ -57,10 +63,22 @@ function see_all({entries}: Props) {
                 <SettingsButtons />
             </div>
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-              <div className='flex items-center  md:hidden justify-center mb-5 '>
-                  <NavigationMobile children={<HomeNav/>} />        
+              <div className='flex items-center  md:hidden justify-center  sm:mb-5 mb-0  '>
+                <NavigationMobile>        
+                  <HomeNav/>
+                </NavigationMobile >        
               </div>
             </div>
+            {showModel && (
+              <ModalView>
+                <AddEntryContent />
+              </ModalView>
+            )}
+            {showPlayer && (
+              <ModalView>
+                <PlayerModal />
+              </ModalView>
+            )}
         </div>
       
       </>

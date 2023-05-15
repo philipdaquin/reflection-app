@@ -103,7 +103,7 @@ function PreviewEntryContent({entry}: Props) {
           </div>
           <a onClick={togglePlay} 
           // href={`/play/${_id}`}
-            className={`items-center flex justify-center bg-[#EDECEC] ${onHover} 
+            className={`cursor-pointer items-center flex justify-center bg-[#EDECEC] ${onHover} 
               rounded-full px-24 py-3 w-fit space-x-2`}>
               <PlayIcon height={16} width={16} color="#757575" />  
               <h1>Play</h1>

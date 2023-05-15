@@ -77,7 +77,7 @@ function MoodSummary({dailyMoodSummary, currentWeeklySummary}: Props) {
 
             <div className='flex flex-col'>
                 <h1 className='text-left font-semibold text-[23px]'>
-                    {currentAvg?.toFixed(2) || "0.00"} <span className='text-[15px]'>%</span>
+                    {((currentAvg || 0) * 100).toFixed(2) || "0.00"} <span className='text-[15px]'>%</span>
                 </h1>
                 <p className='pt-[1px] text-left font-semibold text-xs text-[#757575]'>
                     {

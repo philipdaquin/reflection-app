@@ -25,29 +25,27 @@ function HomeNav() {
       setShowModal(!showModal)
     }
 
-
-
-  return (
-    <div className='flex flex-row space-x-7 px-3 justify-center'>
+    return (
+      <div className='flex flex-row sm:space-x-7 px-3 sm:justify-center justify-between '>
+          <NavButton 
+              routerName=''
+              icon={<HomeIcon height={24} width={24} color="black"/>}/>
         <NavButton 
-            routerName=''
-            icon={<HomeIcon height={24} width={24} color="black"/>}/>
-       <NavButton 
-          routerName='weekly_calendar'
-          icon={<CalendarDaysIcon height={24} width={24} color="black"/>}/>
-        
-        <div onClick={openToggle} className='bg-[#000] rounded-full p-2 cursor-pointer'>
-          <PlusIcon height={24} width={24} color="white"/>
-        </div>
-     
-        <NavButton 
-            routerName='playlist'
-            icon={<HiOutlineClipboardList size={24} color="black"/>}/>
-        <NavButton 
-            routerName='playlist'
-            icon={<MusicalNoteIcon height={24} width={24} color="black"/>}/>
-   </div>
-  )
+            routerName='weekly_calendar'
+            icon={<CalendarDaysIcon height={24} width={24} color="black"/>}/>
+          
+          <div onClick={openToggle} className='bg-[#000] rounded-full p-2 cursor-pointer'>
+            <PlusIcon height={24} width={24} color="white"/>
+          </div>
+      
+          <NavButton 
+              routerName='playlist'
+              icon={<HiOutlineClipboardList size={24} color="black"/>}/>
+          <NavButton 
+              routerName='playlist'
+              icon={<MusicalNoteIcon height={24} width={24} color="black"/>}/>
+    </div>
+    )
 }
 
 export default HomeNav

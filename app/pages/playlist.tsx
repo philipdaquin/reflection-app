@@ -11,10 +11,12 @@ import HomeNav from '../components/navigation/mobile/HomeNav'
 import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { useRecoilValue } from 'recoil'
-import { AddEntryToggle } from '../atoms/atoms'
+import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms'
+import PlayerModal from '../components/PlayerModal'
 
 function playlist() {
     const showModel = useRecoilValue(AddEntryToggle);
+    const showPlayer = useRecoilValue(ShowAudioPlayer);
 
     return (
         <>
@@ -45,14 +47,21 @@ function playlist() {
                     <SettingsButtons />
                 </div>
                 <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-                <div className='flex items-center  md:hidden justify-center mb-5 '>
-                    <NavigationMobile children={<HomeNav/>} />        
+                <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0  '>
+                    <NavigationMobile>        
+                        <HomeNav/>
+                    </NavigationMobile >         
                 </div>
                 </div>
                 {showModel && (
                     <ModalView>
                         <AddEntryContent />
                     </ModalView>
+                )}
+                {showPlayer && (
+                <ModalView>
+                    <PlayerModal />
+                </ModalView>
                 )}
             </div>
             

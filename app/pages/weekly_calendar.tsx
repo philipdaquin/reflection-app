@@ -15,7 +15,7 @@ import WeeklyCalendarContent from '../components/pages/WeeklyCalendarContent'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
-import { AddEntryToggle } from '../atoms/atoms'
+import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms'
 import { useRecoilValue } from 'recoil'
 import { getMoodSummary } from '../util/analysis/getMoodSummary'
 import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
@@ -23,6 +23,7 @@ import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
 import { getDailyByDate } from '../util/daily/getDailyByDate'
 import { GetServerSideProps } from 'next'
 import { AudioData, DailySummary, TextClassification } from '../typings'
+import PlayerModal from '../components/PlayerModal'
 
 
 interface Props { 
@@ -39,6 +40,7 @@ function weekly_record({
   dailyMoodSummary
 }: Props) {
     const showModel = useRecoilValue(AddEntryToggle);
+    const showPlayer = useRecoilValue(ShowAudioPlayer);
 
     return (
       <>
@@ -77,16 +79,23 @@ function weekly_record({
                 <SettingsButtons />
             </div>
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-              <div className='flex items-center  md:hidden justify-center mb-5 '>
-                  <NavigationMobile children={<HomeNav/>} />        
+              <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0'>
+                <NavigationMobile>        
+                  <HomeNav/>
+                </NavigationMobile >         
               </div>
             </div>
 
             {showModel && (
-          <ModalView>
-            <AddEntryContent />
-          </ModalView>
-        )}
+              <ModalView>
+                <AddEntryContent />
+              </ModalView>
+            )}
+            {showPlayer && (
+              <ModalView>
+                <PlayerModal />
+              </ModalView>
+            )}
         </div>
       
       </>

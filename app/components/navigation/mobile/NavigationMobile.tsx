@@ -26,11 +26,10 @@ export function PlayerAttachment(
 
     const fullDate = fullTimeFormat(date.toString())
     
-    
     const onHover = "hover:bg-[#f5f5f5] active:bg-[#E0E0E0] "
 
     return (
-      <div onClick={togglePlayer} className={`${onHover} cursor-pointer rounded-lg px-2 flex flex-row justify-between w-full items-center py-2 mb-2`}>
+      <div onClick={togglePlayer} className={`${onHover} cursor-pointer rounded-xl px-2 flex flex-row justify-between w-full items-center py-2 mb-4`}>
         <div className='flex flex-row items-start space-x-2 w-full'>
           <div className='bg-black w-14 h-14 rounded-lg '>
           </div>
@@ -42,7 +41,6 @@ export function PlayerAttachment(
         <div className='flex flex-row space-x-1 '>
           <PlayIcon height={24} width={24} color='#000' />
           <MdOutlineForward10 size={24} color="#000"/>    
-
         </div>
       </div>
     )
@@ -57,7 +55,8 @@ function NavigationMobile({children} : Props) {
   const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
   return (
-    <div className=' bg-white md:px-8 px-2 py-3 shadow-xl drop-shadow-lg rounded-3xl'>
+    <div className=' bg-white md:px-8 px-2 sm:py-3 py-5 pb-10  shadow-xl sm:drop-shadow-lg drop-shadow-2xl 
+      sm:rounded-3xl w-screen sm:w-full ring-4  ring-[#E0E0E0]/20 backdrop-blur-lg  rounded-t-3xl rounded-b-none '>
       {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}
       {/* <PlayerAttachment audio={null}/> */}
       {children}

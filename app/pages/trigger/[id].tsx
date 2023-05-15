@@ -5,7 +5,7 @@ import PhoneView from '../../components/PhoneView'
 import SwitchView from '../../components/SwitchView'
 import TriggerContent from '../../components/pages/TriggerContent'
 import { useRecoilValue } from 'recoil'
-import { AddEntryToggle, MoodTriggerPage } from '../../atoms/atoms'
+import { AddEntryToggle, MoodTriggerPage, ShowAudioPlayer } from '../../atoms/atoms'
 import { AudioData } from '../../typings'
 import { GetServerSideProps } from 'next'
 import { getRecentAudioEntries } from '../../util/audio/getRecentAudioEntries'
@@ -16,6 +16,7 @@ import ModalView from '../../components/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
 import NavigationButtons from '../../components/navigation/NavigationButtons'
 import { getAll } from '../../util/audio/getAll'
+import PlayerModal from '../../components/PlayerModal'
 
 interface Props { 
   data: AudioData[] | null
@@ -25,6 +26,8 @@ interface Props {
 function trigger({data}: Props) {
 
     const moodTrigger = useRecoilValue(MoodTriggerPage)
+    const showPlayer = useRecoilValue(ShowAudioPlayer);
+
     const [audioData, setData] = useState<AudioData[]>([])
     useEffect(() => {
       if (!data) return 
@@ -78,12 +81,12 @@ function trigger({data}: Props) {
 
              {/* Settings / Footer  */}
             <div className="flex-grow"></div>
-            <div className='relative bottom-10 md:block hidden '>
+            <div className='relative bottom-[170px] lg:block hidden w-full '>
               <SettingsButtons />
             </div>
 
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-              <div className='flex items-center  md:hidden justify-center mb-5 '>
+              <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0 '>
                   <NavigationMobile children={<HomeNav/>} />        
               </div>
             </div>
@@ -92,6 +95,11 @@ function trigger({data}: Props) {
             {showModel && (
               <ModalView>
                 <AddEntryContent />
+              </ModalView>
+            )}
+            {showPlayer && (
+              <ModalView>
+                <PlayerModal />
               </ModalView>
             )}
           </div>

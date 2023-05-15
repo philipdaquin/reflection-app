@@ -14,7 +14,7 @@ import HomeNav from '../../components/navigation/mobile/HomeNav'
 import ModalView from '../../components/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, SelectedAudioPlayer } from '../../atoms/atoms'
+import { AddEntryToggle, SelectedAudioPlayer, ShowAudioPlayer } from '../../atoms/atoms'
 import PlayerModal from '../../components/PlayerModal'
 
 
@@ -24,6 +24,7 @@ interface Props {
 
 function preview({data}: Props) {
     const showModel = useRecoilValue(AddEntryToggle);
+    const showPlayer = useRecoilValue(ShowAudioPlayer);
 
     const [selectedData, setSelectedData] = useRecoilState(SelectedAudioPlayer)
     // useEffect(() => {
@@ -65,17 +66,22 @@ function preview({data}: Props) {
             </div>
 
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
-              <div className='flex items-center  md:hidden justify-center mb-5 '>
+              <div className='flex items-center  md:hidden justify-center  sm:mb-5 mb-0 '>
                   <NavigationMobile children={<HomeNav/>} />        
               </div>
             </div>
-              {/* <RecordComponent /> */}\
+              {/* <RecordComponent /> */}
               {showModel && (
                 <ModalView>
                   <AddEntryContent />
                 </ModalView>
               )}
-              </div>
+               {showPlayer && (
+              <ModalView>
+                <PlayerModal />
+              </ModalView>
+              )}
+            </div>
         </>
     )
 }

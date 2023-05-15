@@ -51,6 +51,14 @@ interface Props {
 function ModalView({children}: Props) {
     const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
     const [showPlayer, setshowAudioPlayer] = useRecoilState(ShowAudioPlayer)
+    const [isOpen, setIsOpen] = useState(false)
+
+
+    useEffect(() => {
+      setIsOpen(showModal || showPlayer)
+      setTranslateY(isOpen ? ' translate-y-0' : '');
+    }, [showModal, showPlayer, isOpen])
+    const [translateY, setTranslateY] = useState(isOpen ? 'translate-y-0' : '');
 
     const handleClose = () => { 
       if (showPlayer || showModal) {
@@ -59,22 +67,23 @@ function ModalView({children}: Props) {
       }
     }
       return (
-        <MuiModal
-          className="
-          fixes !top-10 left-0 right-0 
-          z-50 mx-auto w-full max-w-5xl 
-          overflow-hidden overflow-y-scroll 
-          rounded-md scrollbar-hide
-          transition duration-500 ease-in-out
-          "
-          open={showModal || showPlayer}
-          onClose={handleClose}
-        > 
-        <>
-          {children}
-        </>
+          <MuiModal
+            className={`
+              fixes !top-10 left-0 right-0 
+              z-50 mx-auto w-full max-w-5xl 
+              overflow-hidden overflow-y-scroll 
+              rounded-md rounded-b-none scrollbar-hide
+              duration-700 ease-in-out
+              transition-all
+            `}
+            open={isOpen}
+            onClose={handleClose}
+          > 
+            <>
+              {children}
+            </>
           
-        </MuiModal>
+          </MuiModal>
       );
 }
 
