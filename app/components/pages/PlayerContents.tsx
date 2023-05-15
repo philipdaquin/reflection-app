@@ -76,12 +76,12 @@ function PlayerContents({entry, data:{
 
     return (
         <section className='flex flex-col h-full  justify-between '>
-            <div className='flex flex-row items-center justify-between pb-5'>
-                <BackButton/>
-                <h1 className='font-semibold text-[15px] text-center text-[#757575]'>Now Playing</h1>
-                <MenuItem  id={_id} customClass='dropdown-bottom h-[42px] w-[42px] bg-[#212121] items-center flex justify-center'>
+            <div className='flex flex-row items-center justify-center pb-5'>
+                {/* <div></div> */}
+                <h1 className='font-semibold text-[15px] text-end text-[#757575]'>Now Playing</h1>
+                {/* <MenuItem  id={_id} customClass='dropdown-bottom h-[42px] w-[42px] bg-[#212121] items-center flex justify-center'>
                     <EllipsisHorizontalIcon height={24} width={24} color='#fff'/>
-                </MenuItem>
+                </MenuItem> */}
             </div>
             
             <div className=' w-full pt-20 md:pt-0'>
@@ -91,12 +91,18 @@ function PlayerContents({entry, data:{
                     </div>
                     <div className='flex flex-col justify-center space-y-1 pt-2'>
                         <h1 className='text-[20px] font-bold text-center capitalize'>{title}</h1>
-                        <div className=' flex flex-row  justify-beween text-center items-center  space-x-6 text-[16px] text-[#757575]'>
+                        <div className=' flex flex-row  justify-beween text-center items-center  space-x-3 text-[14px] text-[#757575]'>
                         <p className=''>
-                            {emotionPercent}
+                            {emotion}
+                        </p>
+                        <p>
+                            •
                         </p>
                         <p>
                             {month} {day}
+                        </p>
+                        <p>
+                            •
                         </p>
                         <p>
                             56 mins
