@@ -15,6 +15,10 @@ import MoodSummaryWidget from '../moodWidgets/MoodSummaryWidget';
 import { getCurrentWeeklySummary } from '../../util/weekly/getCurrentWeeklySummary';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import { OPENAI_KEY } from '../SettingsButtons';
+import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate';
+import { fullTimeFormat } from '../../util/fullTimeFormat';
+import { useRecoilValue } from 'recoil';
+import { SelectedFilterOption } from '../../atoms/atoms';
 
 interface Props { 
   all_mood_data: TextClassification[] | null
@@ -29,21 +33,25 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
   const currentDate = new Date()
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const currDay = currentDate.getDay()
-  
   let day = daysOfWeek[currDay]
-
   const d = currentDate.getDate()
-
   const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
   const year = currentDate.getFullYear();
+  const fullday = `${day}, ${d} ${month} ${year}`
 
+  // Weekly Variables 
+  const {startDate, endDate } = getWeekStartAndEndDates(new Date()) 
+  let start = fullTimeFormat(currentWeeklySummary?.start_week?.toString() || startDate.toString())
+  let end = fullTimeFormat(currentWeeklySummary?.end_week?.toString() || endDate.toString())
+  const fullweek = `${start} - ${end}`
 
+  const selectedFilter = useRecoilValue(SelectedFilterOption)
+  const dateRange = selectedFilter.label === '24H' ? fullday : fullweek
   return (
     <section className=''> 
       <div className='flex flex-row items-center justify-between'>
         <div>
-          <h1 className='text-left text-[25px] font-bold  '>Hello, John Apple!</h1>
-          <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{day}, {d} {month} {year}</h2>
+          <h1 className='text-left font-bold text-[25px]'>Hello, John Apple!</h1>
         </div>  
         <Image src={DEFAULT_IMAGE_URL} 
                 className='rounded-full object-fill w-[38px] h-[38px]' 
@@ -56,7 +64,12 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
 
       {/* Widget : Mood Changes */}
       {/* **Designed this way so each widget can be reused again */}
-      <div className='pt-[40px] space-y-6 pb-52'>
+      {/* <h1 className='items-center flex  font-semibold text-[25px] text-black'>
+        Summary
+      </h1> */}
+      <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{dateRange}</h2>
+
+      <div className='pt-[30px] space-y-6 pb-52'>
         <MoodSummaryWidget dailyMoodSummary={dailyMoodSummary} currentWeeklySummary={currentWeeklySummary}/>
         <MoodAnalysisChange all_mood_data={all_mood_data} />
         {/* <MoodCompositionWidget data={[]}/> */}

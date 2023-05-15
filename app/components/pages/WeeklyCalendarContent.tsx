@@ -26,22 +26,8 @@ interface WeeklyProps {
 }
 
 function WeeklyContent({mood_graph, weekly_summary, selectedDate}: WeeklyProps) { 
-  
-  const {startDate, endDate } = getWeekStartAndEndDates(selectedDate) 
-
-  let start = fullTimeFormat(weekly_summary?.start_week?.toString() || startDate.toString())
-  let end = fullTimeFormat(weekly_summary?.end_week?.toString() || endDate.toString())
-  
   return (
     <>
-      <div className=''>
-        <h1 className='text-[25px] font-semibold'>
-          Weekly Summary
-        </h1>
-        <h2 className='text-[#9e9e9e] text-[15px]'>
-          {start} - {end}
-        </h2>
-      </div>
       <MoodSummaryContents 
         mood_graph={mood_graph}
         weekly_summary={weekly_summary}
@@ -88,8 +74,8 @@ function DailyContent({selectedDate, selectedEntries, selectedAnalsysis, selecte
                 <MoodSummaryWidget 
                   dailyMoodSummary={selectedDaily} 
                   currentWeeklySummary={selectedWeekly}/>
-                <MoodAnalysisChange all_mood_data={selectedAnalsysis} />
-                <MoodCompositionWidget data={[]}/> 
+                <MoodAnalysisChange all_mood_data={selectedAnalsysis} hideFilter={true}/>
+                {/* <MoodCompositionWidget data={[]}/>  */}
                 <MoodActivityWidget entries={selectedAnalsysis || []}/>
                 <MoodInsightWidget  dailySummary={selectedDaily} currentWeeklySummary={selectedWeekly} />  
                 {/* <MoodTriggersWidget data={selectedDaily} currentWeeklySummary={null}/> */}
@@ -149,8 +135,8 @@ function WeeklyCalendarContent( {
    
       if (selectedDate && showWeekly === 'Daily') {
         getDailySummary(selectedDate)
-        console.log("DAILY SUMMARY", dailySummary)
         getDailyEntries(selectedDate)
+        
       }
         getWeeklyAnalysis(selectedDate)
         getWeeklySummary(selectedDate)
@@ -165,16 +151,6 @@ function WeeklyCalendarContent( {
     //   const textClassification: TextClassification[] | null | undefined  = selectedEntries?.map((item, i) => item.text_classification) || []
     //   setselectedAnalsysis(textClassification)
     // }, [selectedEntries])
-
-
-
-    const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(selectedDate);
-    const year = selectedDate?.getFullYear();
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const currDay = selectedDate?.getDay() || 0
-    const currDateNum = selectedDate.getDate()
-    let day = daysOfWeek[currDay] 
-
 
     return (
 

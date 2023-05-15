@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import MoodAreaChart from '../MoodAreaChart'
-import {ArrowDownCircleIcon} from '@heroicons/react/24/solid'
 import CommonMoodContainer from '../CommonMoodContainer'
 import { TextClassification, WeeklySummary, MoodDataPoint } from '../../typings'
-import { AverageWeeklyIndex } from '../../atoms/atoms'
-import { useRecoilValue } from 'recoil'
 import { getAverageMoodWeek } from '../MoodTrackerIndex'
-import { getWeeklyByDate } from '../../util/weekly/getWeeklyByDate'
 import changeInPercentage from '../../util/changeInPercentage'
 import { fullTimeFormat } from '../../util/fullTimeFormat'
 import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate'
@@ -26,14 +22,13 @@ function MoodSummaryContents({mood_graph, weekly_summary}: Props) {
     const weeklyData: MoodDataPoint[] | null | undefined = mood_graph?.map((i) => new MoodDataPoint(i))
     
     // const weeklyIndex = useRecoilValue(AverageWeeklyIndex);
-    const weeklyIndex = getAverageMoodWeek(mood_graph)
+    const weeklyIndex = getAverageMoodWeek(weekly_summary?.weekly_avg)
     const {startDate, endDate } = getWeekStartAndEndDates(new Date()) 
 
     let start = fullTimeFormat(weekly_summary?.start_week?.toString() || startDate.toString())
     let end = fullTimeFormat(weekly_summary?.end_week?.toString() || endDate.toString())
     
     let changeInPercent = changeInPercentage(weekly_summary?.weekly_avg || 0, weekly_summary?.previous_avg || 0)?.toFixed(2) || 0
-    const sign = parseFloat(changeInPercent.toString()) 
     const colour = changeInPercent as number > 0 ? 
         "text-[#41d475] " 
     : changeInPercent as number < 0 ? 

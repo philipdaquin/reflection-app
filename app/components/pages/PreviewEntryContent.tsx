@@ -31,6 +31,8 @@ function PreviewEntryContent({entry: {
   const router = useRouter()
 
   const emotionEmoji = text_classification.emotion_emoji || "NaN" 
+  const emotion= text_classification.emotion || "NaN" 
+
   const moodRating = text_classification.average_mood * 100 
   const currDate = new Date(date.toString())
   const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currDate);
@@ -80,16 +82,22 @@ function PreviewEntryContent({entry: {
               {title}
             </h1>
 
-            <div className=' flex flex-row  justify-beween text-center  space-x-6 text-[16px] text-[#757575]'>
-              <p className=' text-black'>
-                {emotionPercent}
-              </p>
-              <p>
+            <div className=' flex flex-row  justify-beween text-center  space-x-3 text-[14px] text-[#757575]'>
+            <p className=''>
+                {emotion}
+            </p>
+            <p>
+                •
+            </p>
+            <p>
                 {month} {day}
-              </p>
-              <p>
+            </p>
+            <p>
+                •
+            </p>
+            <p>
                 56 mins
-              </p>
+            </p>
             </div>
 
           </div>

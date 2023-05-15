@@ -232,3 +232,12 @@ export type MoodTriggerType = {
 
 export const DEFAULT_IMAGE_URL: string = 'https://www.telegraph.co.uk/content/dam/news/2021/06/04/UFO_trans_NvBQzQNjv4BqECnBSB4T3tw7hRvCORLehcLZq-j_VIcNfiYtpwBx7zI.jpg?imwidth=680'
 
+export const ALL_FILTER: FilterOptions[] = [
+        { label: '24H', value: '1d', interval: 'hour' },
+        { label: '1W', value: '1w', interval: 'day', format: 'MMM D' },
+        // { label: '2W', value: '2w', interval: 'day', format: 'MMM D' },
+        // { label: '1M', value: '1m', interval: 'day', format: 'MMM D' },
+        // { label: '1Y', value: '1y', interval: 'month', format: 'MMM YY' },
+        { label: 'All', value: 'all', interval: 'day', format: 'MMM D' }
+    ];
+    

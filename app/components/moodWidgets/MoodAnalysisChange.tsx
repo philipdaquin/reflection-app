@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import MoodSummary from '../MoodSummary'
 import MoodAreaChart from '../MoodAreaChart'
-import { DefaultFilterOption, FilterOptions, TextClassification, MoodDataPoint } from '../../typings'
+import { DefaultFilterOption, FilterOptions, TextClassification, MoodDataPoint, ALL_FILTER } from '../../typings'
 import { ChevronDownIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useRecoilState } from 'recoil'
 import { SelectedFilterOption } from '../../atoms/atoms'
 
 interface Props { 
-    all_mood_data: TextClassification[] | null | undefined
+    all_mood_data: TextClassification[] | null | undefined,
+    hideFilter?: boolean
+}
+
+export function getFilterOption(filter: string): FilterOptions {   
+    return ALL_FILTER.find((item, i) => item.label === filter) || DefaultFilterOption
+
 }
 
 
-
-function MoodAnalysisChange({all_mood_data}: Props) {
+function MoodAnalysisChange({all_mood_data, hideFilter}: Props) {
 
 
     const [, setFilter] = useRecoilState(SelectedFilterOption)
@@ -20,20 +25,11 @@ function MoodAnalysisChange({all_mood_data}: Props) {
     const [chartData, setChartData] = useState<MoodDataPoint[] | null>();
     const [filterOption, setFilterOption] = useState<FilterOptions>(DefaultFilterOption);
 
-    const filter: FilterOptions[] = [
-        { label: '24H', value: '1d', interval: 'hour' },
-        { label: '1W', value: '1w', interval: 'day', format: 'MMM D' },
-        { label: '2W', value: '2w', interval: 'day', format: 'MMM D' },
-        { label: '1M', value: '1m', interval: 'day', format: 'MMM D' },
-        { label: '1Y', value: '1y', interval: 'month', format: 'MMM YY' },
-        { label: 'All', value: 'all', interval: 'day', format: 'MMM D' }
-    ];
-    
-
-    const selectFilter = (idx: number) => { 
-        setFilterOption(filter[idx])
+    const selectFilter = (label: string) => { 
+        const option = getFilterOption(label)
+        setFilterOption(option)
         // Global
-        setFilter(filter[idx])
+        setFilter(option)
     }
 
     // todo!
@@ -55,21 +51,21 @@ function MoodAnalysisChange({all_mood_data}: Props) {
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
             return data.filter((item) => new Date(item.date) >= oneWeekAgo);
           
-        case '2w':
-            const twoWeekAgo = new Date();
-            twoWeekAgo.setDate(twoWeekAgo.getDate() - 14);
+        // case '2w':
+        //     const twoWeekAgo = new Date();
+        //     twoWeekAgo.setDate(twoWeekAgo.getDate() - 14);
 
-            return data.filter((item) => new Date(item.date) >= twoWeekAgo);
+        //     return data.filter((item) => new Date(item.date) >= twoWeekAgo);
         
-        case '1m':
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-            return data.filter((item) => new Date(item.date) >= oneMonthAgo);
+        // case '1m':
+        //     const oneMonthAgo = new Date();
+        //     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        //     return data.filter((item) => new Date(item.date) >= oneMonthAgo);
         
-        case '1y':
-            const oneYearAgo = new Date();
-            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-            return data.filter((item) => new Date(item.date) >= oneYearAgo);
+        // case '1y':
+        //     const oneYearAgo = new Date();
+        //     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        //     return data.filter((item) => new Date(item.date) >= oneYearAgo);
         
         default:
             return data;
@@ -95,22 +91,26 @@ function MoodAnalysisChange({all_mood_data}: Props) {
                 <h1 className='text-left font-medium text-[20px] '>
                     Mood Summary
                 </h1>
-                <div className="dropdown dropdown-end">
-                    <div tabIndex={0} className="capitalize bg-[#f5f5f5] rounded-lg px-5 py-1 text-sm border-2 font-medium cursor-pointer active:scale-90  hover:bg-[#eaeaea]">
-                        {filterOption.label}
+                {
+                    !hideFilter && (
+                    <div className="dropdown dropdown-end">
+                        <div tabIndex={0} className="capitalize bg-[#f5f5f5] rounded-lg px-5 py-1 text-sm border-2 font-medium cursor-pointer active:scale-90  hover:bg-[#eaeaea]">
+                            {filterOption.label}
+                        </div>
+                        <ul tabIndex={0} className="dropdown-content menu p-2 shadow  bg-base-100 rounded-box w-fit">
+                            {
+                                ALL_FILTER.map((item, i ) => { 
+                                    return (
+                                        <li className='text-xs font-medium capitalize items-center' onClick={() => selectFilter(item.label)}>
+                                            <a className='active:bg-black text-center'>{item.label}</a>
+                                        </li>
+                                    )
+                                })
+                            }
+                        </ul>
                     </div>
-                    <ul tabIndex={0} className="dropdown-content menu p-2 shadow  bg-base-100 rounded-box w-fit">
-                        {
-                            filter.map((item, i ) => { 
-                                return (
-                                    <li className='text-xs font-medium capitalize items-center' onClick={() => selectFilter(i)}>
-                                        <a className='active:bg-black text-center'>{item.label}</a>
-                                    </li>
-                                )
-                            })
-                        }
-                    </ul>
-                </div>
+                    )
+                }
             </div>
 
             {/* <div className='widget_container'>

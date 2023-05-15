@@ -112,13 +112,13 @@ function PlayerContents({entry, data:{
                     </div>
                 </div>
             </div>
-            <div className='pt-44 md:pt-0'>
+            <div className='pt-44 md:pt-0 flex flex-col justify-center'>
                 <div className="flex-grow"></div>
 
                 <AudioMediaPlayer src={entry.audioUrl} />
                 <div className=' flex flex-col space-y-3 pt-5'>
                     {/* media player */}
-                    <div className='' onClick={showTranscript}>
+                    <div className='w-full' onClick={showTranscript}>
                         <ShowTranscript />
                     </div>
                     <div>

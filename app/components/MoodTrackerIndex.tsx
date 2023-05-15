@@ -40,19 +40,19 @@ export function Emoji(average: number): string {
 /*
   Calculates the current Average Mood of the Week
 */
-export function getAverageMoodWeek(data: TextClassification[] | null) : string { 
-  let length = data?.length;
+export function getAverageMoodWeek(weeklyAvg: number | null | undefined) : string { 
+  // let length = data?.length;
   const [weeklyAverage, setWeeklyAverage] = useRecoilState(AverageWeeklyIndex)
 
   //@ts-ignore
-  let average: number | null | undefined = data?.reduce((total, item) => total + item.average_mood, 0) / length;
+  // let average: number | null | undefined = data?.reduce((total, item) => total + item.average_mood, 0) / length;
   
-  if (average) { 
-    setWeeklyAverage(average)
+  if (weeklyAvg) { 
+    setWeeklyAverage(weeklyAvg)
   }
   
-  let avgString = (average ? (average * 100.0).toString().slice(0, 5) : '0');
-  let emoji = Emoji(average || 0)
+  let avgString = (weeklyAvg ? (weeklyAvg * 100.0).toString().slice(0, 5) : '0');
+  let emoji = Emoji(weeklyAvg || 0)
 
   let messageToUser = emoji + " " + avgString + "%";
 
@@ -67,7 +67,7 @@ interface Props {
 function MoodTrackerIndex({data}: Props) {
   // console.log(data)
 
-  let messageToUser = getAverageMoodWeek(data)
+  // let messageToUser = getAverageMoodWeek(data)
 // Save global variable 
 // const [showAverageWeeklyIndex, setAverageWeeklyIndex] = useRecoilState(AverageWeeklyIndex)
 // useEffect(() => {
@@ -84,7 +84,7 @@ const dataPoint: DataPoint[] | null | undefined = data?.map((i) => new DataPoint
     <div className='flex justify-between items-start'>
         <div className='flex flex-col space-y-2 '>
             <div className='text-4xl font-bold text-left relative right-2 text-[#424242] '>
-                {messageToUser}
+                {/* {messageToUser} */}
             </div>
             
             <div className='font-bold text-[14px] text-[#757575]'>

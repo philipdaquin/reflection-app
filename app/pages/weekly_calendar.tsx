@@ -26,13 +26,14 @@ import { AudioData, DailySummary, TextClassification } from '../typings'
 
 
 interface Props { 
+  mood_data: TextClassification[] | null,
   recent_entries: AudioData[] | null,
   all_mood_data: TextClassification[] | null,
   dailyMoodSummary: DailySummary | null
 }
 
 function weekly_record({
-  // mood_data, 
+  mood_data, 
   recent_entries, 
   all_mood_data,
   dailyMoodSummary
@@ -57,7 +58,7 @@ function weekly_record({
 
                     <PhoneView>
                         <WeeklyCalendarContent 
-                          all_mood_data={all_mood_data}
+                          all_mood_data={mood_data}
                           recent_entries={recent_entries}
                           dailyMoodSummary={dailyMoodSummary}
                         />
@@ -105,6 +106,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 
   return { 
     props: { 
+      mood_data,
       recent_entries,
       all_mood_data: all_mood,
       dailyMoodSummary
