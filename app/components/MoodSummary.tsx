@@ -47,7 +47,7 @@ function MoodSummary({dailyMoodSummary, currentWeeklySummary}: Props) {
             setCurrentAvg(currentWeeklySummary?.weekly_avg);
             setCurrentMood(currentWeeklySummary?.mood_frequency[0].emotion);
 
-            const emoji = Emoji(currentAvg || 0 )
+            const emoji = Emoji(currentWeeklySummary?.weekly_avg || 0 )
 
             setEmotionEmoji(emoji);
             setPreviousAvg(currentWeeklySummary?.previous_avg)
