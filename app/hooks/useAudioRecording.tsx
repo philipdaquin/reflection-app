@@ -4,14 +4,14 @@ import { setInterval } from 'timers/promises';
 
 interface AudioInterface { 
     is_recording: boolean;
-    audioBlob: Blob;
-    audioUrl: string;
+    audioBlob: Blob | null;
+    audioUrl: string | null;
     startRecording: () => void;
     stopRecording: () => void;
 
 }
 
-function useAudioRecording() {
+function useAudioRecording(): AudioInterface {
     const [is_recording, setRecording] = useState(false);
     const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
