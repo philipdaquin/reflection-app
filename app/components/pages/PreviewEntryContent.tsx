@@ -59,7 +59,7 @@ function PreviewEntryContent({entry}: Props) {
   }
 
   return (
-    <section className='flex flex-col h-full'>
+    <section className='flex flex-col h-full w-full'>
       <div className='flex flex-row items-center justify-between pb-5'>
         <BackButton/>
         <h1 className='font-semibold text-[15px] text-center  text-[#757575]'>Preview</h1>
@@ -82,7 +82,7 @@ function PreviewEntryContent({entry}: Props) {
               {title}
             </h1>
 
-            <div className=' flex flex-row  justify-beween text-center  space-x-3 text-[14px] text-[#757575]'>
+            <div className=' flex flex-row  justify-center text-center  space-x-3 text-[14px] text-[#757575]'>
             <p className=''>
                 {emotion}
             </p>
@@ -148,11 +148,11 @@ function PreviewEntryContent({entry}: Props) {
                 </div>
             </div>
       </div>
-      
-      <div>
-        <h1 className="text-md font-semibold pt-5">Insights</h1>
+                      
+      <div className='space-y-3 pt-4'>
+        <h1 className="text-md font-semibold">Insights</h1>
 
-         <div className='flex space-x-4 pt-3'>
+         <div className='flex space-x-4'>
             <InsightContainer date={`${text_classification.emotion}`} title='Overall Emotion'/>
             <InsightContainer date={`${emotionPercent}`} title='Mood Rating'/>
           </div>
