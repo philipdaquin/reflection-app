@@ -1,5 +1,5 @@
 import { PlayIcon, StopIcon } from '@heroicons/react/24/solid';
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactPlayer from 'react-player';
 import {MdOutlineForward10 ,  MdOutlineReplay10} from 'react-icons/md'
 import { HeartIcon } from '@heroicons/react/24/outline';
@@ -18,7 +18,6 @@ function AudioMediaPlayer({src}: Props) {
     const handlePlayClick = () => {
       setIsPlaying(!isPlaying);
     };
-  
     const handleProgress = (state: { played: number; playedSeconds: number }) => {
       setCurrentTime(state.playedSeconds);
     };
@@ -26,17 +25,20 @@ function AudioMediaPlayer({src}: Props) {
     const handleDuration = (duration: number) => {
       setDuration(duration);
     };
-  
+    
+    const audioPlayer = useRef<ReactPlayer | null>(null)
+    
+
     const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCurrentTime(parseFloat(event.target.value));
+      audioPlayer?.current?.seekTo(parseFloat(event.target.value))
     };
 
     const handleFastForward = () => {
-        setCurrentTime(currentTime + 10);
+      audioPlayer?.current?.seekTo(audioPlayer?.current?.getCurrentTime() + 10)
     };
 
     const handleRewindBack = () => {
-      setCurrentTime(currentTime - 10);
+      audioPlayer?.current?.seekTo(audioPlayer?.current?.getCurrentTime() - 10)
     };
     const formatTime = (time: number) => {
       const minutes = Math.floor(time / 60);
@@ -45,7 +47,7 @@ function AudioMediaPlayer({src}: Props) {
         .padStart(2, "0");
       return `${minutes}:${seconds}`;
     };
-    
+
     return (
         <> 
             <div className='w-full'>
@@ -58,11 +60,13 @@ function AudioMediaPlayer({src}: Props) {
                     className="w-full "
                 />
                 <ReactPlayer
+                    ref={audioPlayer}
                     url={src}
                     playing={isPlaying}
                     onSeek={setCurrentTime}
                     onProgress={handleProgress}
                     onDuration={handleDuration}
+
                     style={{ 
                     display: "none", 
                     width: "100%" 
@@ -79,7 +83,7 @@ function AudioMediaPlayer({src}: Props) {
 
             <HeartIcon height={25} width={25} color="#424242" strokeWidth={2} />
             
-            <div onClick={() => handleRewindBack} className={"cursor-pointer"}>
+            <div onClick={handleRewindBack} className={"cursor-pointer"}>
                 <MdOutlineReplay10 size={30} color="#424242"/>    
             </div>
             
@@ -90,7 +94,7 @@ function AudioMediaPlayer({src}: Props) {
                 <StopIcon height={25} width={25} color="#fff"/>}
             </button>
             
-            <div onClick={() => handleFastForward} className={"cursor-pointer"}>
+            <div onClick={handleFastForward} className={"cursor-pointer"}>
                 <MdOutlineForward10 size={30} color="#424242"/>    
             </div>
             

@@ -25,14 +25,16 @@ export function PlayerAttachment(
     }
 
     const fullDate = fullTimeFormat(date.toString())
+    const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full"
+
     
-    const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] hover:rounded-b-none"
+
 
     return (
-      <div onClick={togglePlayer} className={`${onHover} 
-        cursor-pointer rounded-xl pb-5 px-5 sm:px-4 flex flex-row 
+      <div className={`hover:bg-[#F5F5F5]
+        cursor-pointer rounded-xl pb-5 px-5 sm:px-4 flex flex-row pr-4
         justify-between w-full items-center py-4 sm:py-2 mb-4`}>
-        <div className='flex flex-row items-start space-x-2 w-full'>
+        <div  onClick={togglePlayer} className='flex flex-row items-start space-x-2 w-full'>
           <div className='bg-black w-14 h-14 rounded-lg '>
           </div>
           <div className=''>
@@ -40,10 +42,13 @@ export function PlayerAttachment(
             <p className='text-[#757575] text-xs'>{fullDate}</p>
           </div>
         </div>
-        <div className='flex flex-row space-x-3 sm:space-x-1'>
-
-          <PlayIcon height={24} width={24} color='#000' />
-          <MdOutlineForward10 size={24} color="#000"/>    
+        <div className='flex flex-row space-x-3 sm:space-x-1 z-50'>
+          <div className={`${onHover} p-2`}>
+            <PlayIcon height={24} width={24} color='#000' />
+          </div>
+          <div className={`${onHover} p-2`}>
+            <MdOutlineForward10 size={24} color="#000"/>    
+          </div>
         </div>
       </div>
     )

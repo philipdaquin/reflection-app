@@ -90,7 +90,7 @@ function PlayerContents({data:{
                     </div>
                     <div className='flex flex-col justify-center space-y-1 pt-2'>
                         <h1 className='text-[20px] font-bold text-center capitalize'>{title}</h1>
-                        <div className=' flex flex-row  justify-beween text-center items-center  space-x-3 text-[14px] text-[#757575]'>
+                        <div className=' flex flex-row  justify-center text-center items-center  space-x-3 text-[14px] text-[#757575]'>
                         <p className=''>
                             {emotion}
                         </p>

@@ -28,7 +28,7 @@ function AudioPlayer({src} : Props) {
     const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setCurrentTime(parseFloat(event.target.value));
     };
-  
+    
     const formatTime = (time: number) => {
       const minutes = Math.floor(time / 60);
       const seconds = Math.floor(time % 60)

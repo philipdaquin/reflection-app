@@ -26,11 +26,11 @@ function HomeNav() {
     }
 
     return (
-      <div className='flex flex-row sm:space-x-7 px-2 sm:justify-center justify-between '>
+      <div className='flex flex-row sm:space-x-7 px-4 sm:justify-center justify-between '>
           <NavButton 
               routerName=''
               icon={<HomeIcon height={24} width={24} color="black"/>}/>
-        <NavButton 
+          <NavButton 
             routerName='weekly_calendar'
             icon={<CalendarDaysIcon height={24} width={24} color="black"/>}/>
           
