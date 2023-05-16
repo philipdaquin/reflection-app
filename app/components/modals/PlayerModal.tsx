@@ -1,8 +1,8 @@
 import React from 'react'
-import PreviewEntryContent from './pages/PreviewEntryContent'
+import PreviewEntryContent from '../pages/PreviewEntryContent'
 import { useRecoilValue } from 'recoil'
-import { SelectedAudioPlayer } from '../atoms/atoms'
-import PlayerContents from './pages/PlayerContents'
+import { SelectedAudioPlayer } from '../../atoms/atoms'
+import PlayerContents from '../pages/PlayerContents'
 
 function PlayerModal() {
 

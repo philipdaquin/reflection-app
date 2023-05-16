@@ -11,11 +11,11 @@ import NavigationButtons from '../../components/navigation/NavigationButtons'
 import SettingsButtons from '../../components/SettingsButtons'
 import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../../components/navigation/mobile/HomeNav'
-import ModalView from '../../components/ModalView'
+import ModalView from '../../components/modals/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { AddEntryToggle, SelectedAudioPlayer, ShowAudioPlayer } from '../../atoms/atoms'
-import PlayerModal from '../../components/PlayerModal'
+import PlayerModal from '../../components/modals/PlayerModal'
 
 
 interface Props { 

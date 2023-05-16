@@ -19,9 +19,9 @@ import { getAll } from '../util/audio/getAll'
 import { Toaster } from 'react-hot-toast'
 import { useRecoilValue } from 'recoil'
 import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms'
-import ModalView from '../components/ModalView'
+import ModalView from '../components/modals/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
-import PlayerModal from '../components/PlayerModal'
+import PlayerModal from '../components/modals/PlayerModal'
 
 
 interface Props { 

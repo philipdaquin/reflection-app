@@ -12,11 +12,11 @@ import { getRecentAudioEntries } from '../../util/audio/getRecentAudioEntries'
 import SettingsButtons from '../../components/SettingsButtons'
 import HomeNav from '../../components/navigation/mobile/HomeNav'
 import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
-import ModalView from '../../components/ModalView'
+import ModalView from '../../components/modals/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
 import NavigationButtons from '../../components/navigation/NavigationButtons'
 import { getAll } from '../../util/audio/getAll'
-import PlayerModal from '../../components/PlayerModal'
+import PlayerModal from '../../components/modals/PlayerModal'
 
 interface Props { 
   data: AudioData[] | null

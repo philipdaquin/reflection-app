@@ -42,7 +42,7 @@
 import MuiModal from '@mui/material/Modal'
 import React, { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms';
+import { AddEntryToggle, ShowAudioPlayer } from '../../atoms/atoms';
 
 interface Props { 
   children: any

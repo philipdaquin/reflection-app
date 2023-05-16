@@ -14,9 +14,9 @@ import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { useRecoilValue } from 'recoil'
 import { AddEntryToggle } from '../atoms/atoms'
-import ModalView from '../components/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
+import ModalView from '../components/modals/ModalView'
 
 
 

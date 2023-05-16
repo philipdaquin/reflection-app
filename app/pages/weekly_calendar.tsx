@@ -13,7 +13,7 @@ import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import WeeklyCalendarContent from '../components/pages/WeeklyCalendarContent'
 import HomeNav from '../components/navigation/mobile/HomeNav'
-import ModalView from '../components/ModalView'
+import ModalView from '../components/modals/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms'
 import { useRecoilValue } from 'recoil'
@@ -23,7 +23,7 @@ import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
 import { getDailyByDate } from '../util/daily/getDailyByDate'
 import { GetServerSideProps } from 'next'
 import { AudioData, DailySummary, TextClassification } from '../typings'
-import PlayerModal from '../components/PlayerModal'
+import PlayerModal from '../components/modals/PlayerModal'
 
 
 interface Props { 

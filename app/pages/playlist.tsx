@@ -8,11 +8,11 @@ import SwitchView from '../components/SwitchView'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import SettingsButtons from '../components/SettingsButtons'
 import HomeNav from '../components/navigation/mobile/HomeNav'
-import ModalView from '../components/ModalView'
+import ModalView from '../components/modals/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { useRecoilValue } from 'recoil'
 import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms'
-import PlayerModal from '../components/PlayerModal'
+import PlayerModal from '../components/modals/PlayerModal'
 
 function playlist() {
     const showModel = useRecoilValue(AddEntryToggle);
