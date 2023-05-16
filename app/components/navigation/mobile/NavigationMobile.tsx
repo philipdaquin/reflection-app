@@ -29,7 +29,9 @@ export function PlayerAttachment(
     const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] hover:rounded-b-none"
 
     return (
-      <div onClick={togglePlayer} className={`${onHover} cursor-pointer rounded-xl px-5 sm:px-2 flex flex-row justify-between w-full items-center py-4 sm:py-2 mb-4`}>
+      <div onClick={togglePlayer} className={`${onHover} 
+        cursor-pointer rounded-xl pb-5 px-5 sm:px-4 flex flex-row 
+        justify-between w-full items-center py-4 sm:py-2 mb-4`}>
         <div className='flex flex-row items-start space-x-2 w-full'>
           <div className='bg-black w-14 h-14 rounded-lg '>
           </div>
@@ -56,8 +58,13 @@ function NavigationMobile({children} : Props) {
   const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
   return (
-    <div className=' bg-white md:px-8 px-2 sm:py-3 pb-10  shadow-xl sm:drop-shadow-lg drop-shadow-2xl 
-      sm:rounded-3xl w-screen sm:w-full ring-4  ring-[#E0E0E0]/20 backdrop-blur-lg  rounded-t-3xl rounded-b-none '>
+    <div className={` bg-white md:px-8  sm:py-3 pb-10  
+      shadow-xl sm:drop-shadow-lg drop-shadow-2xl  
+      sm:rounded-3xl w-screen 
+      sm:w-full ring-4 ring-[#E0E0E0]/20 backdrop-blur-lg  
+      rounded-t-3xl rounded-b-none
+      ${selectedAudio ? 'py-0 ' : 'py-5'}
+      `}>
       {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}
       {/* <PlayerAttachment audio={null}/> */}
       {children}

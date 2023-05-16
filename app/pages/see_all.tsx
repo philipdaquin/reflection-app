@@ -39,8 +39,8 @@ function see_all({entries}: Props) {
         </Head>
 
         <div className="md:bg-[#EEEEEE] bg-white flex 
-        md:h-screen flex-col h-screen md:py-14 md:px-4 relative">
-            <main className="justify-center flex flex-col items-center space-y-[27px] ">
+            md:h-screen flex-col h-screen md:py-5 lg:py-14 md:px-4 relative">
+            <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
                 <div className="flex items-center md:relative md:right-5 h-full">
                   <div className='relative right-10 hidden md:block'>
                     <NavigationButtons />        
@@ -58,10 +58,11 @@ function see_all({entries}: Props) {
             </main>
 
             {/* Settings / Footer  */}
-            <div className="flex-grow"></div>
-            <div className='relative bottom-[170px] lg:block hidden w-full'>
-                <SettingsButtons />
+            <div className="flex-grow hidden lg:block"></div>
+            <div className='relative bottom-[140px]  lg:block hidden w-full'>
+              <SettingsButtons />
             </div>
+            
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center  sm:mb-5 mb-0  '>
                 <NavigationMobile>        

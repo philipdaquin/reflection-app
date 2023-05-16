@@ -53,9 +53,9 @@ function trigger({data}: Props) {
           </Head>
           
           <div className="md:bg-[#EEEEEE] bg-white flex 
-           md:min-h-[100vh] flex-col h-screen md:py-14 md:px-[104px] relative">
+            md:h-screen flex-col h-screen md:py-5 lg:py-14 md:px-4 relative">
 
-            <main className="justify-center flex flex-col items-center space-y-[27px]">
+            <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
               <div className="flex items-center md:relative md:right-5 h-full">
               
                 <div className='relative right-10 hidden md:block'>
@@ -80,8 +80,8 @@ function trigger({data}: Props) {
             </main>
 
              {/* Settings / Footer  */}
-            <div className="flex-grow"></div>
-            <div className='relative bottom-[170px] lg:block hidden w-full '>
+            <div className="flex-grow hidden lg:block"></div>
+            <div className='relative bottom-[140px]  lg:block hidden w-full'>
               <SettingsButtons />
             </div>
 
