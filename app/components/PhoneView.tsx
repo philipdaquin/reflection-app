@@ -24,7 +24,7 @@ function PhoneView({children}: Props) {
           md:overflow-scroll 
           md:scrollbar-hide 
           md:py-4 
-          w-full
+          w-screen
           h-full 
           pt-12 
           py-14
