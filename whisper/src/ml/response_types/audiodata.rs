@@ -11,6 +11,11 @@ pub struct AudioData {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     pub title: Option<String>,
+    pub image_url: Option<String>,
+    pub author: Option<String>,
+    pub description: Option<String>,
+    pub duration: Option<u64>,
+    pub favourite: bool, 
     pub date: Option<DateTime<Utc>>,
     pub day: Option<String>,
     pub transcription: Option<String>,
@@ -33,6 +38,13 @@ impl From<AudioDataDTO> for AudioData {
             title: value.title,
 
             date: back_to_chrono,
+
+            image_url: value.image_url, 
+
+            author: value.author,
+            description: value.description,
+            duration: value.duration,
+            favourite: value.favourite,
 
             day: value.day,
 
@@ -61,6 +73,11 @@ impl From<AudioData> for AudioDataDTO {
             summary: value.summary,
             text_classification: value.text_classification.map(|f| TextClassification::from(f)),
             tags: value.tags,
+            image_url: value.image_url, 
+            author: value.author,
+            description: value.description,
+            duration: value.duration,
+            favourite: value.favourite,
         }
     }
 }

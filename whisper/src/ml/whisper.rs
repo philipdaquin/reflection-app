@@ -35,17 +35,17 @@ const NUM_WORKERS: usize = 5;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AudioDataDTO { 
+    // User Inputs 
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     pub title: Option<String>,
-
-    // pub image_url: Option<String>,
-    // pub author: Option<String>,
-    // pub description: Option<String>,
-    // // inSeconds 
-    // pub duration: Option<u64>,
-    // pub favourite: bool, 
-
+    pub image_url: Option<String>,
+    pub author: Option<String>,
+    pub description: Option<String>,
+    pub duration: Option<u64>,
+    pub favourite: bool, 
+    
+    // Server Generated 
     pub date: Option<DateTime>,
     pub day: Option<String>,
     pub transcription: Option<String>,

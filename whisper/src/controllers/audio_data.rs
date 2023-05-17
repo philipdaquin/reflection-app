@@ -37,11 +37,22 @@ pub fn configure_audio_services(cfg: &mut web::ServiceConfig) {
     .service(update_entry)
     .service(delete_all_audio_entries)
     .service(delete_audio_entry)
+    .service(updated_new_fields)
     ;
 }
 #[route("/api/audio/get-all", method = "GET")]
 pub async fn get_all_entries() -> Result<HttpResponse> { 
     let res = AudioDB::get_all_entries()
+        .await?
+        .into_iter()
+        .map(AudioData::from)
+        .collect::<Vec<AudioData>>();
+
+    Ok(HttpResponse::Ok().json(res))
+}
+#[route("/api/audio/update-fields", method = "PUT")]
+pub async fn updated_new_fields() -> Result<HttpResponse> { 
+    let res = AudioDB::update_fields()
         .await?
         .into_iter()
         .map(AudioData::from)

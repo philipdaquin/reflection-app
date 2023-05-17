@@ -1,5 +1,6 @@
 
 use async_trait::async_trait;
+use bson::Bson;
 use chrono::{Utc, Duration, TimeZone, NaiveTime, NaiveDate, DateTime, Datelike, Weekday};
 use futures::TryStreamExt;
 use uuid::Uuid;
@@ -26,6 +27,7 @@ pub trait AudioInterface {
     async fn get_all_by_week(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>>; 
     async fn get_current_week() -> Result<Vec<AudioDataDTO>>; 
     
+    async fn update_fields() -> Result<Vec<AudioDataDTO>>;
     fn get_collection() -> Collection<AudioDataDTO>;
 }
 
@@ -285,6 +287,38 @@ impl AudioInterface for AudioDB {
         }
         Ok(result)
     }
+
+    /// 
+    /// 
+    /// Update the current fields in the object and then return all the new updated items 
+    async fn update_fields() -> Result<Vec<AudioDataDTO>> { 
+        let collection = AudioDB::get_collection();
+        let query = doc! {};
+
+        // New fields 
+        let update = doc!{
+            "$set": {
+                "image_url": Bson::Null,
+                "author": Bson::Null,
+                "description": Bson::Null,
+                "duration": Bson::Null,
+                "favourite": bson::Bson::Boolean(false)
+            }
+        };  
+
+        let _ = collection.update_many(query, update, None).await?;
+        let filter = doc! {};
+
+        let mut results = vec![];
+        let mut doc = collection.find(filter, None).await?;
+
+        while let Some(item) = doc.try_next().await? { 
+            results.push(item);
+        }
+        Ok(results)
+    }
+
+    
 
     ///
     /// Access collection from database
