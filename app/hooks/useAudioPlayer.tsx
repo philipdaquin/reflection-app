@@ -1,11 +1,13 @@
 import React, { MutableRefObject, useContext, createContext,
-    useEffect, useMemo, useRef, useState, Children } from "react";
+    useEffect, useMemo, useRef, useState, Children, useCallback } from "react";
 import ReactPlayer from "react-player";
 import { useRecoilState } from "recoil";
 import { AudioPlayerSource } from "../atoms/atoms";
 
 
 interface PlayerInterface { 
+    source: string | null, 
+    setSource: (src: string) => void;
     isPlaying: boolean; 
     currentTime: number; 
     isLoop: boolean;
@@ -23,7 +25,9 @@ interface PlayerInterface {
 }
   
 const AudioContext = createContext<PlayerInterface>({
-    isPlaying: false, 
+    source: null, 
+    setSource: () => {},
+    isPlaying: true, 
     currentTime: 0,
     isLoop: false,
     duration: 0,
@@ -44,6 +48,7 @@ interface Props {
 }
 
 export const AudioProvider = ({ children} : Props) => { 
+    const [source, setSource] = useRecoilState(AudioPlayerSource)
     const audioPlayer = useRef<ReactPlayer | null>(null)
     const [isPlaying, setIsPlaying] = useState(true);
     const [currentTime, setCurrentTime] = useState(0);
@@ -51,36 +56,41 @@ export const AudioProvider = ({ children} : Props) => {
 
     const [isLoop, setLoop] = useState(false)
 
+    const handleSetSource = () => { 
+      if (!source) return 
+      setSource(source)
+    }
+
     const handlePlayerLoop = () => { 
         setLoop(!isLoop)
     }
 
-    const setCurrent = (newCurrent: number) => { 
+    const setCurrent = useCallback((newCurrent: number) => { 
         setCurrentTime(newCurrent)
-    }
+    }, [])
 
     const handlePlayClick = () => {
       setIsPlaying(!isPlaying);
     };
-    const handleProgress = (state: { played: number; playedSeconds: number }) => {
+    const handleProgress = useCallback((state: { played: number; playedSeconds: number }) => {
       setCurrentTime(state.playedSeconds);
-    };
+    }, []);
 
-    const handleDuration = (duration: number) => {
+    const handleDuration = useCallback((duration: number) => {
       setDuration(duration);
-    };
+    }, []);
     
-    const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSliderChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
       audioPlayer?.current?.seekTo(parseFloat(event.target.value))
-    };
+    }, []);
 
-    const handleFastForward = () => {
+    const handleFastForward = useCallback(() => {
       audioPlayer?.current?.seekTo(audioPlayer?.current?.getCurrentTime() + 10)
-    };
+    }, []);
 
-    const handleRewindBack = () => {
+    const handleRewindBack = useCallback(() => {
       audioPlayer?.current?.seekTo(audioPlayer?.current?.getCurrentTime() - 10)
-    };
+    }, []);
 
     const formatTime = (time: number) => {
         const minutes = Math.floor(time / 60);
@@ -106,7 +116,15 @@ export const AudioProvider = ({ children} : Props) => {
       handleFastForward,
       handleRewindBack,
       formatTime,
-    }), [audioPlayer])
+      setSource: handleSetSource, 
+      source
+    }), [
+      isPlaying, currentTime, setCurrentTime, isLoop, duration, 
+      audioPlayer, handleProgress, handlePlayClick, handleSliderChange, 
+      handleDuration, handlePlayerLoop, handleFastForward, 
+      handleRewindBack, formatTime, handleSetSource, source
+    ]
+    )
 
   
     return <AudioContext.Provider value={memoValue}>
