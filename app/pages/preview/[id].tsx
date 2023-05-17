@@ -9,13 +9,15 @@ import { getEntry } from '../../util/audio/getEntry'
 import PreviewEntryContent from '../../components/pages/PreviewEntryContent'
 import NavigationButtons from '../../components/navigation/NavigationButtons'
 import SettingsButtons from '../../components/SettingsButtons'
-import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
+import NavigationMobile, { PlayerAttachment } from '../../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../../components/navigation/mobile/HomeNav'
 import ModalView from '../../components/modals/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, SelectedAudioPlayer, ShowAudioPlayer } from '../../atoms/atoms'
+import { AddEntryToggle, AudioPlayerSource, SelectedAudioPlayer, ShowAudioPlayer } from '../../atoms/atoms'
 import PlayerModal from '../../components/modals/PlayerModal'
+import useAudioPlayer from '../../hooks/useAudioPlayer'
+import { Player } from '../../components/AudioMediaPlayer'
 
 
 interface Props { 
@@ -26,13 +28,7 @@ function preview({data}: Props) {
     const showModel = useRecoilValue(AddEntryToggle);
     const showPlayer = useRecoilValue(ShowAudioPlayer);
 
-    const [selectedData, setSelectedData] = useRecoilState(SelectedAudioPlayer)
-    // useEffect(() => {
-    //   if (!data) return 
-    //   setSelectedData(data)
-    // }, [data])
-    
-
+    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
     return (
         <>
@@ -67,7 +63,9 @@ function preview({data}: Props) {
 
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center  sm:mb-5 mb-0'>
-                <NavigationMobile>        
+                <Player/>
+                <NavigationMobile selectedAudio={selectedAudio}>        
+                  {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}
                   <HomeNav/>
                 </NavigationMobile >                 
               </div>

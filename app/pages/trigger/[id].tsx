@@ -5,18 +5,19 @@ import PhoneView from '../../components/PhoneView'
 import SwitchView from '../../components/SwitchView'
 import TriggerContent from '../../components/pages/TriggerContent'
 import { useRecoilValue } from 'recoil'
-import { AddEntryToggle, MoodTriggerPage, ShowAudioPlayer } from '../../atoms/atoms'
+import { AddEntryToggle, MoodTriggerPage, SelectedAudioPlayer, ShowAudioPlayer } from '../../atoms/atoms'
 import { AudioData } from '../../typings'
 import { GetServerSideProps } from 'next'
 import { getRecentAudioEntries } from '../../util/audio/getRecentAudioEntries'
 import SettingsButtons from '../../components/SettingsButtons'
 import HomeNav from '../../components/navigation/mobile/HomeNav'
-import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
+import NavigationMobile, { PlayerAttachment } from '../../components/navigation/mobile/NavigationMobile'
 import ModalView from '../../components/modals/ModalView'
 import AddEntryContent from '../../components/navigation/mobile/AddEntryContent'
 import NavigationButtons from '../../components/navigation/NavigationButtons'
 import { getAll } from '../../util/audio/getAll'
 import PlayerModal from '../../components/modals/PlayerModal'
+import { Player } from '../../components/AudioMediaPlayer'
 
 interface Props { 
   data: AudioData[] | null
@@ -43,6 +44,7 @@ function trigger({data}: Props) {
     }, [data])
     
     const showModel = useRecoilValue(AddEntryToggle);
+    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
 
     return (  
@@ -63,12 +65,10 @@ function trigger({data}: Props) {
                 </div>
             
                 <PhoneView>
-                  
                   <TriggerContent 
                     moodTrigger={moodTrigger} 
                     entries={audioData}
                   />
-                
                 </PhoneView>
 
               </div>
@@ -87,7 +87,11 @@ function trigger({data}: Props) {
 
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0 '>
-                  <NavigationMobile children={<HomeNav/>} />        
+                <Player/>
+                <NavigationMobile selectedAudio={selectedAudio}>        
+                  {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}
+                  <HomeNav/>
+                </NavigationMobile >       
               </div>
             </div>
 

@@ -12,6 +12,7 @@ import NavigationMobile from '../../components/navigation/mobile/NavigationMobil
 import SettingsButtons from '../../components/SettingsButtons'
 import { getEntry } from '../../util/audio/getEntry'
 import { Long, ObjectId } from 'bson'
+import AudioMediaPlayer from '../../components/AudioMediaPlayer'
 
 interface Props { 
   data: AudioData
@@ -37,7 +38,9 @@ function play({data}: Props) {
                 </div>
 
                 <PhoneView>
-                  <PlayerContents data={data}/>
+                  <PlayerContents data={data}>
+                    <AudioMediaPlayer/>
+                  </PlayerContents>
                 </PhoneView>
 
               </div>

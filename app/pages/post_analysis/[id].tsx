@@ -10,20 +10,18 @@ import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
 import { getEntry } from '../../util/audio/getEntry'
 import { AudioData } from '../../typings'
 import SettingsButtons from '../../components/SettingsButtons'
-import NavigationMobile from '../../components/navigation/mobile/NavigationMobile'
-import AudioControls from '../../components/AudioControls'
+import NavigationMobile, { PlayerAttachment } from '../../components/navigation/mobile/NavigationMobile'
+import { useRecoilValue } from 'recoil'
+import { SelectedAudioPlayer } from '../../atoms/atoms'
 
 
 interface Props { 
     data: AudioData 
 }
 
-function post_analysis({
-   data
-}: Props) {
-
+function post_analysis({data}: Props) {
     const router = useRouter()
-    // const data = router.query
+    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
     return (
         <>
@@ -57,11 +55,12 @@ function post_analysis({
 
                 <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
                     <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0 '>
-                        <NavigationMobile children={<PostSummaryControls/>} />        
+                        <NavigationMobile selectedAudio={selectedAudio}>       
+                            {/* {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}, */}
+                            <PostSummaryControls/> 
+                        </NavigationMobile >        
                     </div>
                 </div>
-
-
             </div>
         </>
     )
