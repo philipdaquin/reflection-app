@@ -9,8 +9,9 @@ import { ChevronDownIcon, ChevronRightIcon, EllipsisHorizontalIcon, PlusIcon } f
 import SuggestedTags from '../SuggestedTags'
 import { InsightContainer } from '../moodWidgets/MoodInsightWidget'
 import AudioTranscripts from '../AudioTranscripts'
-import { SelectedAudioPlayer } from '../../atoms/atoms'
+import { AudioPlayerSource, SelectedAudioPlayer } from '../../atoms/atoms'
 import { useRecoilState } from 'recoil'
+import useAudioPlayer from '../../hooks/useAudioPlayer'
 
 
 
@@ -47,15 +48,19 @@ function PreviewEntryContent({entry}: Props) {
   const showSummary = () => setToggleSummary(true)
   const filteredSummary = toggleSummary ? summary : summary?.slice(0, 150) + "..." 
   const [selectedData, setSelectedData] = useRecoilState(SelectedAudioPlayer)
+  const [source, setAudioSource] = useRecoilState(AudioPlayerSource)
+  const [toggleTranscript, setToggleTranscript] = useState(false)
 
   const togglePlay = () => { 
     setSelectedData(entry)
     // router.push(`/play/${_id}`)
   }
 
-  const [toggleTranscript, setToggleTranscript] = useState(false)
+  const src ="https://www.youtube.com/watch?v=XFkzRNyygfk"
+  
   const showTranscript = () => { 
     setToggleTranscript(!toggleTranscript)
+    setAudioSource(src)
   }
 
   return (

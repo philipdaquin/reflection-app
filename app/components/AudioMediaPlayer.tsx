@@ -4,31 +4,59 @@ import ReactPlayer from 'react-player';
 import {MdOutlineForward10 ,  MdOutlineReplay10} from 'react-icons/md'
 import { HeartIcon } from '@heroicons/react/24/outline';
 import {BsRepeat, BsRepeat1} from 'react-icons/bs'
-import { useAudioPlayer } from '../hooks/useAudioPlayer';
+import useAudioPlayer from '../hooks/useAudioPlayer';
+import { useRecoilValue } from 'recoil';
+import { AudioPlayerSource } from '../atoms/atoms';
 
-interface Props { 
-    src: string
+
+
+
+
+export function Player() {
+  const src = useRecoilValue(AudioPlayerSource)
+  // const { handleDuration, 
+  //     handleProgress, 
+  //     isLoop, 
+  //     isPlaying, 
+  //     playerRef, 
+  //     setCurrent, 
+  //   } = useAudioPlayer() 
+
+  return (
+    <>
+      <ReactPlayer
+        ref={(ref) => (playerRef.current = ref)}
+        url={src || ""}
+        playing={isPlaying}
+        onSeek={setCurrent}
+        onProgress={handleProgress}
+        onDuration={handleDuration}
+        loop={isLoop}
+        style={{ 
+        display: "none", 
+        width: "100%" 
+        }}
+      />
+    </>
+  )
 }
-function AudioMediaPlayer({src}: Props) {
-    const {
-      isPlaying,
-        currentTime,
-        setCurrent,
-        isLoop,
-        handlePlayerLoop,
-        duration,
-        playerRef,
-        handleProgress,
-        handlePlayClick,
-        handleSliderChange,
-        handleDuration,
-        handleFastForward,
-        handleRewindBack,
-        formatTime,
-    } = useAudioPlayer(src)
+
+function AudioMediaPlayer() {
+    
     
     const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full p-2"
-
+    const {
+      currentTime, 
+      duration, 
+      formatTime, 
+      handleFastForward, 
+      handlePlayClick, 
+      handlePlayerLoop, 
+      handleRewindBack, 
+      handleSliderChange, 
+      isLoop, 
+      isPlaying, 
+    } = useAudioPlayer()
     return (
         <> 
             <div className='w-full'>
@@ -37,22 +65,8 @@ function AudioMediaPlayer({src}: Props) {
                     min={0}
                     max={duration}
                     value={currentTime}
-
                     onChange={handleSliderChange}
                     className="w-full "
-                />
-                <ReactPlayer
-                    ref={playerRef}
-                    url={src}
-                    playing={isPlaying}
-                    onSeek={setCurrent}
-                    onProgress={handleProgress}
-                    onDuration={handleDuration}
-                    loop={isLoop}
-                    style={{ 
-                    display: "none", 
-                    width: "100%" 
-                    }}
                 />
             </div>
             <div className='space-y-2'>
@@ -76,7 +90,7 @@ function AudioMediaPlayer({src}: Props) {
             
             <button onClick={handlePlayClick} 
               className="items-center flex justify-center bg-[#5d5fef] rounded-full p-[22px] ">
-                {!isPlaying ? 
+                {isPlaying ? 
                 <PlayIcon height={25} width={25} color="#fff" /> : 
                 <StopIcon height={25} width={25} color="#fff"/>}
             </button>

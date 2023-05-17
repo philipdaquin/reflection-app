@@ -1,6 +1,8 @@
 import { atom } from "recoil";
 import { AudioData, DefaultFilterOption, MoodFrequency, MoodTriggerType, WeeklySummary } from "../typings";
 import { ELEVEN_LABS_KEY, OPENAI_KEY } from "../components/SettingsButtons";
+import { MutableRefObject } from "react";
+import ReactPlayer from "react-player";
 
 export const TimerState = atom({
     key: 'TimerState',
@@ -64,4 +66,8 @@ export const SelectedAudioPlayer = atom<AudioData | null>({
 export const ShowAudioPlayer = atom<boolean>({ 
     key: 'ShowAudioPlayer',
     default: false
+})
+export const AudioPlayerSource = atom<string | null>({ 
+    key: 'AudioPlayerSource',
+    default: null
 })

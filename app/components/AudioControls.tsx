@@ -163,7 +163,7 @@ function StartStopRecording() {
           flex items-center 
           justify-center' 
             onClick={stop}>
-            <StopIcon height={24} width={24} color="white"/>
+            <StopIcon height={  24} width={24} color="white"/>
           </div>
         )
       }

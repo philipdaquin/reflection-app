@@ -48,11 +48,11 @@ function ShowTranscript() {
 }
 
 interface PlayerContentProps { 
-    data: AudioData
-
+    data: AudioData,
+    children: any
 }
 
-function PlayerContents({data:{
+function PlayerContents({children, data:{
     _id, 
     transcription, 
     date,
@@ -116,7 +116,8 @@ function PlayerContents({data:{
             <div className='pt-44 md:pt-0 flex flex-col justify-center'>
                 <div className="flex-grow"></div>
 
-                <AudioMediaPlayer src={"https://www.youtube.com/watch?v=XFkzRNyygfk"} />
+                {/* <AudioMediaPlayer src={"https://www.youtube.com/watch?v=XFkzRNyygfk"} /> */}
+                {children}
                 <div className=' flex flex-col space-y-3 pt-5'>
                     {/* media player */}
                     <div className='w-full items-center flex flex-row justify-center' 
