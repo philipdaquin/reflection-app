@@ -16,6 +16,28 @@ export function getFilterOption(filter: string): FilterOptions {
 
 }
 
+// todo!
+export const getFilteredData = (data: TextClassification[], filter: FilterOptions) => {
+    const currentDate = new Date();
+
+    switch (filter.value) {
+    
+    case '1d':
+        return data.filter(
+            (item) =>
+              new Date(item.date).getDate() === currentDate.getDate() &&
+              new Date(item.date).getMonth() === currentDate.getMonth() &&
+              new Date(item.date).getFullYear() === currentDate.getFullYear()
+          );
+
+    case '1w':
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        return data.filter((item) => new Date(item.date) >= oneWeekAgo);
+    default:
+        return data;
+    }
+};
 
 function MoodAnalysisChange({all_mood_data, hideFilter}: Props) {
 
@@ -32,51 +54,10 @@ function MoodAnalysisChange({all_mood_data, hideFilter}: Props) {
         setFilter(option)
     }
 
-    // todo!
-    const getFilteredData = (data: TextClassification[], filter: FilterOptions) => {
-        const currentDate = new Date();
-
-        switch (filter.value) {
-        
-        case '1d':
-            return data.filter(
-                (item) =>
-                  new Date(item.date).getDate() === currentDate.getDate() &&
-                  new Date(item.date).getMonth() === currentDate.getMonth() &&
-                  new Date(item.date).getFullYear() === currentDate.getFullYear()
-              );
-
-        case '1w':
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            return data.filter((item) => new Date(item.date) >= oneWeekAgo);
-          
-        // case '2w':
-        //     const twoWeekAgo = new Date();
-        //     twoWeekAgo.setDate(twoWeekAgo.getDate() - 14);
-
-        //     return data.filter((item) => new Date(item.date) >= twoWeekAgo);
-        
-        // case '1m':
-        //     const oneMonthAgo = new Date();
-        //     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-        //     return data.filter((item) => new Date(item.date) >= oneMonthAgo);
-        
-        // case '1y':
-        //     const oneYearAgo = new Date();
-        //     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        //     return data.filter((item) => new Date(item.date) >= oneYearAgo);
-        
-        default:
-            return data;
-        }
-      };
-
 
     // Filter data based on the filter 
     useEffect(() => {
         if (!all_mood_data) return 
-
         let data = getFilteredData(all_mood_data, filterOption)
             .map((i) => new MoodDataPoint(i))
         
@@ -125,26 +106,7 @@ function MoodAnalysisChange({all_mood_data, hideFilter}: Props) {
                     }
 
                 </div>
-
-                {/* <div className='pt-6'>
-                    <div className=' flex flex-row w-full items-center bg-[#f5f5f5] rounded-xl  px-2 py-2 md:px-1 md:py-1 justify-between'>
-                        {
-                            filter.map((item, i) => { 
-                                return (
-                                    <div className={`text-xs cursor-pointer 
-                                        ${filterOption === item ? 'bg-[#212121] text-white' : 'font-semibold'} 
-                                    text-[#757575]  rounded-lg px-5 py-2 md:px-2 md:py-1`}
-                                        onClick={() => selectFilter(i)}
-                                    >
-                                        {item}
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div> */}
             </div>
-
         </div>
     )
 }

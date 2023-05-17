@@ -19,6 +19,7 @@ import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate';
 import { fullTimeFormat } from '../../util/fullTimeFormat';
 import { useRecoilValue } from 'recoil';
 import { SelectedFilterOption } from '../../atoms/atoms';
+import MoodFilter from '../MoodFilter';
 
 interface Props { 
   all_mood_data: TextClassification[] | null
@@ -70,8 +71,9 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
       <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{dateRange}</h2>
 
       <div className='pt-[30px] space-y-6 pb-52'>
+        <MoodFilter />
         <MoodSummaryWidget dailyMoodSummary={dailyMoodSummary} currentWeeklySummary={currentWeeklySummary}/>
-        <MoodAnalysisChange all_mood_data={all_mood_data} />
+        <MoodAnalysisChange all_mood_data={all_mood_data} hideFilter/>
         {/* <MoodCompositionWidget data={[]}/> */}
         {/* <MoodActivityWidget entries={[]}/> */}
         <MoodInsightWidget dailySummary={dailyMoodSummary} currentWeeklySummary={currentWeeklySummary}/>

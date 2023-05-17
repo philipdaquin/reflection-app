@@ -22,7 +22,7 @@ function TriggerContent({moodTrigger, entries}: Props) {
 
   const analysis = entries?.map((item, i) => item.text_classification) || []
   return (
-    <>
+    <section className='pb-52'>
       <div className='flex flex-row items-center justify-between'>
         <BackButton/>
         <h1 className='font-bold text-[15px] text-center '>{emotion}</h1>
@@ -38,7 +38,7 @@ function TriggerContent({moodTrigger, entries}: Props) {
         <MoodActivityWidget entries={analysis}/>
         <DailyAudioEntries entries={entries}/>
       </div>
-    </>
+    </section>
   )
 }
 
