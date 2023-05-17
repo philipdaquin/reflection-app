@@ -3,7 +3,7 @@ import { AudioData, DEFAULT_IMAGE_URL } from '../../typings'
 import BackButton from '../BackButton'
 import { ThumbnailPlayer } from './PlayerContents'
 import { useRouter } from 'next/router'
-import { PlayIcon } from '@heroicons/react/20/solid'
+import { PauseIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
 import { EditButton, LinkButton, MenuItem } from '../AudioEntry'
 import { ChevronDownIcon, ChevronRightIcon, EllipsisHorizontalIcon, PlusIcon } from '@heroicons/react/24/outline'
 import SuggestedTags from '../SuggestedTags'
@@ -50,18 +50,46 @@ function PreviewEntryContent({entry}: Props) {
   const [selectedData, setSelectedData] = useRecoilState(SelectedAudioPlayer)
   const [source, setAudioSource] = useRecoilState(AudioPlayerSource)
   const [toggleTranscript, setToggleTranscript] = useState(false)
+  const src ="https://www.youtube.com/watch?v=XFkzRNyygfk"
+
+  const [isStarted, setIsStarted] = useState(false)
+
+  const { 
+    isPlaying, 
+    handlePlayClick
+  } = useAudioPlayer() 
 
   const togglePlay = () => { 
+    handlePlayClick()
+    setIsStarted(true)
     setSelectedData(entry)
+    setAudioSource(src)
     // router.push(`/play/${_id}`)
   }
 
-  const src ="https://www.youtube.com/watch?v=XFkzRNyygfk"
-  
   const showTranscript = () => { 
     setToggleTranscript(!toggleTranscript)
-    setAudioSource(src)
   }
+
+  const IconList = [
+    {
+      title: 'Resume', 
+      icon: <PlayIcon height={16} width={16} color="#757575" />  
+    },
+    {
+      title: 'Pause', 
+      icon: <PauseIcon height={16} width={16} color="#757575" />  
+    },
+    {
+      title: 'Play', 
+      icon: <PlayIcon height={16} width={16} color="#757575" />  
+    },
+  ]
+
+  const pauseOrResume = !isPlaying  ? IconList[0] : IconList[1]
+  const playOrpause = isStarted  ? pauseOrResume : IconList[2]
+
+
 
   return (
     <section className='flex flex-col h-full w-full'>
@@ -106,13 +134,18 @@ function PreviewEntryContent({entry}: Props) {
             </div>
 
           </div>
-          <a onClick={togglePlay} 
-          // href={`/play/${_id}`}
-            className={`cursor-pointer items-center flex justify-center bg-[#EDECEC] ${onHover} 
-              rounded-full px-24 py-3 w-fit space-x-2`}>
-              <PlayIcon height={16} width={16} color="#757575" />  
-              <h1>Play</h1>
-          </a>
+          <button onClick={togglePlay} 
+            className={`cursor-pointer items-center text-[#757575] 
+              text-sm font-regular -px-10
+              flex justify-center bg-[#EDECEC] ${onHover} 
+              rounded-full  py-4 w-full space-x-2`}>
+                {
+                  playOrpause.icon
+                }
+                <h1>
+                  {playOrpause.title}
+                </h1>
+          </button>
         </div>
 
         <div className=' pt-[25px]'>

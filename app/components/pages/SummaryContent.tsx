@@ -94,7 +94,7 @@ function SummaryContent({data}: Props) {
     }
 
     return (
-        <section>
+        <section className='pb-52'>
             <div className='flex flex-row items-center justify-between pb-5'>
                 <BackButton />
                 <h1 className='font-bold text-[15px] text-center '>Journal Entry Summary</h1>

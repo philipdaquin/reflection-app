@@ -10,6 +10,7 @@ import ReactPlayer from 'react-player'
 function PlayerModal() {
 
     const selectedAudio = useRecoilValue(SelectedAudioPlayer)
+
     return (
         <div className={`rounded-t-3xl w-full bg-white shadow-2xl scrollbar-hide
             absolute max-h-full overflow-scroll bottom-0 px-7 py-4 rounded-b-none`}>

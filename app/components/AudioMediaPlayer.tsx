@@ -2,7 +2,7 @@ import { PlayIcon, StopIcon } from '@heroicons/react/24/solid';
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
 import ReactPlayer from 'react-player';
 import {MdOutlineForward10 ,  MdOutlineReplay10} from 'react-icons/md'
-import { HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon, PauseIcon } from '@heroicons/react/24/outline';
 import {BsRepeat, BsRepeat1} from 'react-icons/bs'
 import useAudioPlayer from '../hooks/useAudioPlayer';
 import { useRecoilValue } from 'recoil';
@@ -10,23 +10,39 @@ import { AudioPlayerSource } from '../atoms/atoms';
 
 
 
+interface PlayerProps { 
+  source: string;
+  isPlaying: boolean; 
+  isLoop: boolean;
+  duration: number;
+  playerRef: MutableRefObject<ReactPlayer | null>;
+  setCurrent: (newcurrent: number) => void;
+  handleProgress: (state: { played: number; playedSeconds: number }) => void;
+  handleDuration: (duration: number) => void;
 
+}
 
 export function Player() {
-  const src = useRecoilValue(AudioPlayerSource)
-  // const { handleDuration, 
-  //     handleProgress, 
-  //     isLoop, 
-  //     isPlaying, 
-  //     playerRef, 
-  //     setCurrent, 
-  //   } = useAudioPlayer() 
+  const [src, setSource] = useState<string>()
+  const { handleDuration, 
+      handleProgress, 
+      isLoop, 
+      isPlaying, 
+      playerRef, 
+      setCurrent, 
+      source
+    } = useAudioPlayer() 
+
+  useEffect(() => { 
+    if (!source) return 
+    setSource(source)
+  }, [source])
 
   return (
     <>
       <ReactPlayer
         ref={(ref) => (playerRef.current = ref)}
-        url={src || ""}
+        url={src}
         playing={isPlaying}
         onSeek={setCurrent}
         onProgress={handleProgress}
@@ -41,22 +57,41 @@ export function Player() {
   )
 }
 
+
+interface AudioProps { 
+    isPlaying: boolean; 
+    currentTime: number; 
+    isLoop: boolean;
+    duration: number;
+    playerRef: MutableRefObject<ReactPlayer | null>;
+    setCurrent: (newcurrent: number) => void;
+    handleProgress: (state: { played: number; playedSeconds: number }) => void;
+    handlePlayClick: () => void; 
+    handleSliderChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleDuration: (duration: number) => void;
+    handleFastForward: () => void;
+    handleRewindBack: () => void;
+    handlePlayerLoop: () => void;
+    formatTime: (time: number) => string
+}
 function AudioMediaPlayer() {
     
     
     const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full p-2"
+    
     const {
-      currentTime, 
       duration, 
-      formatTime, 
-      handleFastForward, 
-      handlePlayClick, 
-      handlePlayerLoop, 
-      handleRewindBack, 
-      handleSliderChange, 
-      isLoop, 
-      isPlaying, 
+      currentTime, 
+      formatTime,
+      handleFastForward,
+      handlePlayClick,
+      handlePlayerLoop,
+      handleRewindBack,
+      handleSliderChange,
+      isLoop,
+      isPlaying,
     } = useAudioPlayer()
+
     return (
         <> 
             <div className='w-full'>
@@ -90,9 +125,9 @@ function AudioMediaPlayer() {
             
             <button onClick={handlePlayClick} 
               className="items-center flex justify-center bg-[#5d5fef] rounded-full p-[22px] ">
-                {isPlaying ? 
+                {!isPlaying ? 
                 <PlayIcon height={25} width={25} color="#fff" /> : 
-                <StopIcon height={25} width={25} color="#fff"/>}
+                <PauseIcon height={25} width={25} color="#fff" strokeWidth={4}/>}
             </button>
             
             <div onClick={handleFastForward} 

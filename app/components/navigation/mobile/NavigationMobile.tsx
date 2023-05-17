@@ -1,4 +1,4 @@
-import { PlayIcon, StopIcon } from '@heroicons/react/20/solid'
+import { PauseIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
 import React from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { AudioPlayerSource, SelectedAudioPlayer, ShowAudioPlayer } from '../../../atoms/atoms'
@@ -13,19 +13,8 @@ import useAudioPlayer from '../../../hooks/useAudioPlayer'
 
 interface PlayerProps { 
   audio: AudioData,
-  isPlaying: boolean, 
-  handlePlayClick: () => void; 
-  handleFastForward: () => void;
-
 }
-export function PlayerAttachment(
-  {
-    audio: {title, _id, date},
-    isPlaying,
-    handlePlayClick,
-    handleFastForward,
-
-}: PlayerProps
+export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
   ) { 
     // let date = '2023-05-15T01:25:21.879Z'
     // const title = 'Podcast4 fsdfs dfsdsddsdf'
@@ -38,6 +27,11 @@ export function PlayerAttachment(
     const fullDate = fullTimeFormat(date.toString())
     const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full"
     // const src ="https://www.youtube.com/watch?v=XFkzRNyygfk"
+    const { 
+      isPlaying, 
+      handlePlayClick,
+      handleFastForward
+    } = useAudioPlayer() 
     return (
       <>
       <div className={`hover:bg-[#F5F5F5] border-t-2 
@@ -58,7 +52,7 @@ export function PlayerAttachment(
               !isPlaying ? (
                   <PlayIcon height={24} width={24} color='#000' />
                 ) : (
-                  <StopIcon height={25} width={25} color="#000"/>
+                  <PauseIcon height={25} width={25} color="#000" strokeWidth={4}/>
               )
             }
           </div>
@@ -81,12 +75,12 @@ interface Props {
 function NavigationMobile({children, selectedAudio} : Props) {
 
   return (
-    <div className={` bg-[#FCFCFC] md:px-8 sm:py-5 sm:pt-0 pb-10   
+    <div className={` bg-[#FCFCFC] md:px-8 sm:py-5 pb-10  
       shadow-xl sm:drop-shadow-lg drop-shadow-2xl  
       sm:rounded-3xl w-screen  border-t-2 border-[#F0F0F0] sm:border-none
       sm:w-full ring-4 ring-[#E0E0E0]/20 backdrop-blur-lg  
       rounded-t-3xl rounded-b-none
-      ${selectedAudio ? 'py-0 ' : 'py-5'}
+      ${selectedAudio ? 'py-0 sm:pt-0' : 'py-5'}
       `}>
       {children}
     </div>

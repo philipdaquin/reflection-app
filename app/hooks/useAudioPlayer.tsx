@@ -1,13 +1,12 @@
 import React, { MutableRefObject, useContext, createContext,
     useEffect, useMemo, useRef, useState, Children, useCallback } from "react";
 import ReactPlayer from "react-player";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { AudioPlayerSource } from "../atoms/atoms";
 
 
 interface PlayerInterface { 
     source: string | null, 
-    setSource: (src: string) => void;
     isPlaying: boolean; 
     currentTime: number; 
     isLoop: boolean;
@@ -26,8 +25,7 @@ interface PlayerInterface {
   
 const AudioContext = createContext<PlayerInterface>({
     source: null, 
-    setSource: () => {},
-    isPlaying: true, 
+    isPlaying: false, 
     currentTime: 0,
     isLoop: false,
     duration: 0,
@@ -48,7 +46,6 @@ interface Props {
 }
 
 export const AudioProvider = ({ children} : Props) => { 
-    const [source, setSource] = useRecoilState(AudioPlayerSource)
     const audioPlayer = useRef<ReactPlayer | null>(null)
     const [isPlaying, setIsPlaying] = useState(true);
     const [currentTime, setCurrentTime] = useState(0);
@@ -56,14 +53,9 @@ export const AudioProvider = ({ children} : Props) => {
 
     const [isLoop, setLoop] = useState(false)
 
-    const handleSetSource = () => { 
-      if (!source) return 
-      setSource(source)
-    }
-
-    const handlePlayerLoop = () => { 
-        setLoop(!isLoop)
-    }
+    const handlePlayerLoop = useCallback(() => { 
+      setLoop((prevIsLoop) => !prevIsLoop);
+    }, [])
 
     const setCurrent = useCallback((newCurrent: number) => { 
         setCurrentTime(newCurrent)
@@ -101,6 +93,7 @@ export const AudioProvider = ({ children} : Props) => {
         return `${minutes}:${seconds}`;
     };
 
+    const source = useRecoilValue(AudioPlayerSource)
     const memoValue = useMemo(() => ({ 
       isPlaying,
       currentTime,
@@ -116,13 +109,12 @@ export const AudioProvider = ({ children} : Props) => {
       handleFastForward,
       handleRewindBack,
       formatTime,
-      setSource: handleSetSource, 
       source
     }), [
       isPlaying, currentTime, setCurrentTime, isLoop, duration, 
       audioPlayer, handleProgress, handlePlayClick, handleSliderChange, 
       handleDuration, handlePlayerLoop, handleFastForward, 
-      handleRewindBack, formatTime, handleSetSource, source
+      handleRewindBack, formatTime, source
     ]
     )
 
