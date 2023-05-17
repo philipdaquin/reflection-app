@@ -70,9 +70,9 @@ function PlayerContents({children, data:{
     const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currDate);
     const day = currDate.getDate()
   
-    const emotionEmoji = text_classification.emotion_emoji || "NaN" 
-    const emotion = text_classification.emotion 
-    const moodRating = text_classification.average_mood * 100 
+    const emotionEmoji = text_classification?.emotion_emoji || "NaN" 
+    const emotion = text_classification?.emotion 
+    const moodRating = text_classification?.average_mood || 0 * 100  
     const emotionPercent = `${emotionEmoji} ${moodRating.toFixed(1) + "%"}`
 
     return (
@@ -126,7 +126,7 @@ function PlayerContents({children, data:{
                     </div>
                     <div>
                     { 
-                        toggleTranscript && (
+                        toggleTranscript && transcription && (
                             <div className=''>
                                 <hr className='mt-4 pb-2' />
                                 <p className='text-sm text-[#757575] pt-4'>

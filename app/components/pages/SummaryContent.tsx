@@ -8,7 +8,7 @@ import {CgTranscript} from 'react-icons/cg'
 import PostSummaryControls from '../PostSummaryControls'
 import { useRecoilState } from 'recoil'
 import { AudioSummaryAtom } from '../../atoms/atoms'
-import {AudioData}  from '../../typings'
+import {AudioData, AudioDataBuilder}  from '../../typings'
 
 interface DownloadProps { 
     transcript : String 
@@ -49,7 +49,13 @@ function SummaryContent({data}: Props) {
             tags, 
             text_classification, 
             date, 
-            day 
+            day, 
+            author, 
+            description,
+            duration, 
+            favourite, 
+            image_url,
+            audio_url
           } = data
     const [editedSummary, setEditedSummary] = useState(summary)
     const [editedTags, setEditedTags] = useState(tags)
@@ -58,17 +64,21 @@ function SummaryContent({data}: Props) {
 
     const [updatedAudioData, setUpdatedAudioData] = useState<AudioData | null>(null)
     useEffect(() => {
-        const updatedAudioData = new AudioData(
-            _id,
-            editedTitle,
-            date, 
-            day,
-            transcription, 
-            editedSummary, 
-            text_classification, 
-            editedTags,
-        );
-        setUpdatedAudioData(updatedAudioData);
+        const builder = new AudioDataBuilder(_id, date)
+        .setTranscript(transcription)
+        .setTitle(editedTitle)
+        .setImageUrl(image_url)
+        .setAudioUrl(audio_url)
+        .setAuthor(author)
+        .setDescription(description)
+        .setDuration(duration)
+        .setFavourite(favourite)
+        .setDay(day)
+        .setSummary(editedSummary)
+        .setTextClassification(text_classification)
+        .setTags(tags)
+        .build()
+        setUpdatedAudioData(builder);
       }, [
         _id,
         editedTitle,
@@ -77,7 +87,13 @@ function SummaryContent({data}: Props) {
         text_classification, 
         editedTags, 
         date, 
-        day
+        day,
+        author, 
+        description,
+        duration, 
+        favourite, 
+        image_url,
+        audio_url
     ]);
     const [, setAudioDataAtom] = useRecoilState(AudioSummaryAtom);
     

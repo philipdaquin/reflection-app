@@ -33,9 +33,9 @@ function DateWithEntry({date, entries}: EntryProps) {
                                 title= {title}
                                 duration={10} 
                                 date={date.toString()} 
-                                emotion={text_classification.emotion}
-                                emoji={text_classification.emotion_emoji} 
-                                average_mood={text_classification.average_mood}   
+                                emotion={text_classification?.emotion || "NaN"}
+                                emoji={text_classification?.emotion_emoji || "NaN"} 
+                                average_mood={text_classification?.average_mood || 0}   
                                 thumbnailUrl={""}
                             />
                         </li>

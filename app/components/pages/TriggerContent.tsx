@@ -20,7 +20,7 @@ function TriggerContent({moodTrigger, entries}: Props) {
   let count = (moodTrigger?.count || 0).toString()
   let percentage = parseInt(moodTrigger?.percentage || "").toFixed(2) || "0" 
 
-  const analysis = entries?.map((item, i) => item.text_classification) || []
+  const analysis = entries?.map((item, i) => item.text_classification!  ) || []
   return (
     <section className='pb-52'>
       <div className='flex flex-row items-center justify-between'>

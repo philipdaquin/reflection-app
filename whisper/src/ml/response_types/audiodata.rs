@@ -12,6 +12,8 @@ pub struct AudioData {
     pub id: Option<String>,
     pub title: Option<String>,
     pub image_url: Option<String>,
+    pub audio_url: Option<String>,
+    
     pub author: Option<String>,
     pub description: Option<String>,
     pub duration: Option<u64>,
@@ -40,7 +42,7 @@ impl From<AudioDataDTO> for AudioData {
             date: back_to_chrono,
 
             image_url: value.image_url, 
-
+            audio_url: value.audio_url,
             author: value.author,
             description: value.description,
             duration: value.duration,
@@ -74,6 +76,7 @@ impl From<AudioData> for AudioDataDTO {
             text_classification: value.text_classification.map(|f| TextClassification::from(f)),
             tags: value.tags,
             image_url: value.image_url, 
+            audio_url: value.audio_url,
             author: value.author,
             description: value.description,
             duration: value.duration,

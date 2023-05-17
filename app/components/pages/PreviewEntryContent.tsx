@@ -25,10 +25,10 @@ function PreviewEntryContent({entry}: Props) {
 
   const router = useRouter()
 
-  const emotionEmoji = text_classification.emotion_emoji || "NaN" 
-  const emotion= text_classification.emotion || "NaN" 
+  const emotionEmoji = text_classification?.emotion_emoji || "NaN" 
+  const emotion= text_classification?.emotion || "NaN" 
 
-  const moodRating = text_classification.average_mood * 100 
+  const moodRating = text_classification?.average_mood || 0 * 100 
   const currDate = new Date(date.toString())
   const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currDate);
   const day = currDate.getDate()
@@ -191,7 +191,7 @@ function PreviewEntryContent({entry}: Props) {
         <h1 className="text-md font-semibold">Insights</h1>
 
          <div className='flex space-x-4'>
-            <InsightContainer date={`${text_classification.emotion}`} title='Overall Emotion'/>
+            <InsightContainer date={`${text_classification?.emotion}`} title='Overall Emotion'/>
             <InsightContainer date={`${emotionPercent}`} title='Mood Rating'/>
           </div>
       </div>
@@ -209,7 +209,7 @@ function PreviewEntryContent({entry}: Props) {
 
         </div>
       </div>
-       { toggleTranscript && (
+       { toggleTranscript && transcription &&  (
           <div>
             {/* <h1 className="text-md text-center font-semibold pt-5">Transcription</h1> */}
             <hr className='mt-4 pb-2' />

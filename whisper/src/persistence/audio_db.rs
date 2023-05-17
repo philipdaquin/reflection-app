@@ -298,11 +298,7 @@ impl AudioInterface for AudioDB {
         // New fields 
         let update = doc!{
             "$set": {
-                "image_url": Bson::Null,
-                "author": Bson::Null,
-                "description": Bson::Null,
-                "duration": Bson::Null,
-                "favourite": bson::Bson::Boolean(false)
+                "audio_url": Bson::Null
             }
         };  
 

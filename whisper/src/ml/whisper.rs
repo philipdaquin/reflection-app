@@ -40,6 +40,7 @@ pub struct AudioDataDTO {
     pub id: Option<String>,
     pub title: Option<String>,
     pub image_url: Option<String>,
+    pub audio_url: Option<String>,
     pub author: Option<String>,
     pub description: Option<String>,
     pub duration: Option<u64>,

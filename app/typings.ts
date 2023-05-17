@@ -13,36 +13,113 @@ export type TextClassification = {
     average_mood: number 
   }
 
-export class AudioData { 
+
+export interface AudioData { 
     _id: string;
     title: string | null;
+    image_url: string | null; 
+    audio_url: string | null; 
+    author: string | null;
+    description: string | null;
+    duration: number | null;
+    favourite: boolean;
     date: Date ;
     day: string | null;
-    transcription: string;
+    transcription: string | null;
     summary: string | null;
-    text_classification: TextClassification;
+    text_classification: TextClassification | null;
     tags: string[] | null;
-  
-  constructor(
-      _id: string,
-      title: string | null,
-      date: Date ,
-      day: string | null,
-      transcription: string,
-      summary: string | null,
-      text_classification: TextClassification,
-      tags: string[] | null,
-    ) {
-      this._id = _id;
-      this.title = title;
-      this.date = date;
-      this.day = day;
-      this.transcription = transcription;
-      this.summary = summary;
-      this.text_classification = text_classification;
-      this.tags = tags;
-    }
+}
+
+export class AudioDataBuilder {
+  private audioData: AudioData;
+
+  constructor(_id: string, date: Date) {
+    this.audioData = {
+      _id,
+      title: null,
+      image_url: null,
+      audio_url: null,
+      author: null,
+      description: null,
+      duration: null,
+      favourite: false,
+      date,
+      day: null,
+      transcription: null, 
+      summary: null,
+      text_classification: null,
+      tags: null
+    };
   }
+
+  public setTranscript(transcript: string | null) : AudioDataBuilder { 
+    this.audioData.transcription = transcript;
+    return this;
+  }
+  
+  public setTitle(title: string | null): AudioDataBuilder {
+    this.audioData.title = title;
+    return this;
+  }
+
+  public setImageUrl(image_url: string | null): AudioDataBuilder {
+    this.audioData.image_url = image_url;
+    return this;
+  }
+
+  public setAudioUrl(audio_url: string | null): AudioDataBuilder {
+    this.audioData.audio_url = audio_url;
+    return this;
+  }
+
+  public setAuthor(author: string | null): AudioDataBuilder {
+    this.audioData.author = author;
+    return this;
+  }
+
+  public setDescription(description: string | null): AudioDataBuilder {
+    this.audioData.description = description;
+    return this;
+  }
+
+  public setDuration(duration: number | null): AudioDataBuilder {
+    this.audioData.duration = duration;
+    return this;
+  }
+
+  public setFavourite(favourite: boolean): AudioDataBuilder {
+    this.audioData.favourite = favourite;
+    return this;
+  }
+
+  public setDay(day: string | null): AudioDataBuilder {
+    this.audioData.day = day;
+    return this;
+  }
+
+  public setSummary(summary: string | null): AudioDataBuilder {
+    this.audioData.summary = summary;
+    return this;
+  }
+
+  public setTextClassification(
+    text_classification: TextClassification  | null
+  ): AudioDataBuilder {
+    this.audioData.text_classification = text_classification;
+    return this;
+  }
+
+  public setTags(tags: string[] | null): AudioDataBuilder {
+    this.audioData.tags = tags;
+    return this;
+  }
+
+  public build(): AudioData {
+    return this.audioData;
+  }
+}
+
 export class AudioEntryType { 
     id: string;
     title: string | null;
@@ -220,8 +297,8 @@ export class EntryType {
       this.id = data._id
       this.date = data.date.toString()
       this.title = data.title || ""
-      this.emoji = data.text_classification.emotion_emoji || ""
-      this.avgMood = data.text_classification.average_mood
+      this.emoji = data.text_classification?.emotion_emoji || ""
+      this.avgMood = data.text_classification?.average_mood || 0
   }
 }
 export type MoodTriggerType = { 
