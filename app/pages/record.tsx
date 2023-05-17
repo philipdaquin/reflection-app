@@ -11,9 +11,12 @@ import RecordComponent from '../components/RecordComponent'
 import SwitchView from '../components/SwitchView'
 import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
+import { useRecoilValue } from 'recoil'
+import { SelectedAudioPlayer } from '../atoms/atoms'
 
 function record() {
-   
+    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
+
     return (
       <>
         <Head>
@@ -51,7 +54,7 @@ function record() {
             
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0 '>
-                  <NavigationMobile>        
+                  <NavigationMobile selectedAudio={selectedAudio}>        
                     <AudioControls/>
                   </NavigationMobile >
               </div>

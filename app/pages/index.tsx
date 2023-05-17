@@ -10,8 +10,8 @@ import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY,
   // initialiseAPIKeys 
 } from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey, SelectedFilterOption, ShowAudioPlayer } from '../atoms/atoms'
-import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
+import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey, SelectedAudioPlayer, SelectedFilterOption, ShowAudioPlayer } from '../atoms/atoms'
+import NavigationMobile, { PlayerAttachment } from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
 import { useEffect, useState } from 'react'
@@ -25,6 +25,8 @@ import QRCode from '../components/QRCode'
 import { getCurrentWeek } from '../util/audio/getCurrentWeek'
 import PlayerModal from '../components/modals/PlayerModal'
 import ModalView from '../components/modals/ModalView'
+import useAudioPlayer from '../hooks/useAudioPlayer'
+import { Player } from '../components/AudioMediaPlayer'
 
 
 
@@ -80,8 +82,7 @@ function Home({
     weekly_entries, 
     recent_entries,
   ])
-  
-
+  const selectedAudio = useRecoilValue(SelectedAudioPlayer)
   return (
     <>
       <Head>
@@ -98,12 +99,8 @@ function Home({
             <div className='relative right-10 hidden md:block'>
               <NavigationButtons />        
             </div>
-            
+
             <PhoneView>
-              {/* <HomeContents 
-                mood_data={mood_data}
-                recent_entries={recent_entries}  
-              /> */}
               <HomeSummaryContent 
                 all_mood_data={all_mood_data}
                 recent_entries={audioEntries}
@@ -124,7 +121,9 @@ function Home({
         </div>
         <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
           <div className='flex items-center md:hidden justify-center sm:mb-5 mb-0 '>
-              <NavigationMobile>        
+              <Player/>
+              <NavigationMobile selectedAudio={selectedAudio}>      
+                {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}
                 <HomeNav/>
               </NavigationMobile >        
           </div>

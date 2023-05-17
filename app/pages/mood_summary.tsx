@@ -13,7 +13,7 @@ import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { useRecoilValue } from 'recoil'
-import { AddEntryToggle } from '../atoms/atoms'
+import { AddEntryToggle, SelectedAudioPlayer } from '../atoms/atoms'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
 import ModalView from '../components/modals/ModalView'
@@ -31,6 +31,7 @@ function mood_summary({
 }: Props) {
 
     const showModel = useRecoilValue(AddEntryToggle);
+    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
     return (
         <>
@@ -70,7 +71,10 @@ function mood_summary({
             </div>
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0  '>
-                  <NavigationMobile children={<HomeNav/>} />        
+                <NavigationMobile selectedAudio={selectedAudio}>       
+                  {/* {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}, */}
+                  <HomeNav/>
+                </NavigationMobile >   
               </div>
             </div>
 

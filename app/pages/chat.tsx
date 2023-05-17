@@ -9,8 +9,12 @@ import ChatControls from '../components/ChatControls'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
 import SettingsButtons from '../components/SettingsButtons'
 import HomeNav from '../components/navigation/mobile/HomeNav'
+import { useRecoilValue } from 'recoil'
+import { SelectedAudioPlayer } from '../atoms/atoms'
 
 function chat() {
+    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
+
     return (
         <>
         <Head>
@@ -45,7 +49,7 @@ function chat() {
             
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
                 <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0  '>
-                    <NavigationMobile>        
+                    <NavigationMobile selectedAudio={selectedAudio}>        
                         <ChatControls/>
                     </NavigationMobile >
                 </div>

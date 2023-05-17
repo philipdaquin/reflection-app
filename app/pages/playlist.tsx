@@ -5,18 +5,20 @@ import ChatContent from '../components/pages/ChatContent'
 import LibraryContent from '../components/pages/LibraryContent'
 import PhoneView from '../components/PhoneView'
 import SwitchView from '../components/SwitchView'
-import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
+import NavigationMobile, { PlayerAttachment } from '../components/navigation/mobile/NavigationMobile'
 import SettingsButtons from '../components/SettingsButtons'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import ModalView from '../components/modals/ModalView'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { useRecoilValue } from 'recoil'
-import { AddEntryToggle, ShowAudioPlayer } from '../atoms/atoms'
+import { AddEntryToggle, SelectedAudioPlayer, ShowAudioPlayer } from '../atoms/atoms'
 import PlayerModal from '../components/modals/PlayerModal'
+import { Player } from '../components/AudioMediaPlayer'
 
 function playlist() {
     const showModel = useRecoilValue(AddEntryToggle);
     const showPlayer = useRecoilValue(ShowAudioPlayer);
+    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
     return (
         <>
@@ -49,7 +51,10 @@ function playlist() {
 
                 <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
                     <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0  '>
-                        <NavigationMobile>        
+                        <Player/>
+                        <NavigationMobile selectedAudio={selectedAudio}>        
+                            {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}
+
                             <HomeNav/>
                         </NavigationMobile >         
                     </div>

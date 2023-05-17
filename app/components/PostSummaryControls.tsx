@@ -68,7 +68,7 @@ function PostSummaryControls() {
                 
                 items-center 
                 flex justify-center cursor-pointer 
-                rounded-full'
+                rounded-3xl'
             onClick={updateData}>
                 <CheckIcon height={24} width={24} strokeWidth={2} color="white"/>
             </div>
@@ -77,10 +77,10 @@ function PostSummaryControls() {
 
     const SEND_TO_AI = () => { 
         return (
-            <div className='cursor-pointer flex flex-row items-center px-5 h-fit py-3 space-x-2 rounded-full bg-[#424242]'
+            <div className='cursor-pointer flex flex-row items-center px-3 h-fit py-3 space-x-2 rounded-3xl bg-[#424242]'
                 onClick={() => router.push('/chat')}
             >
-                <TbMessageChatbot size={27} color="white"/>
+                <TbMessageChatbot size={24} color="white"/>
                 {/* <h1 className='text-white font-bold text-[15px]'>Send to AI</h1> */}
             </div>
         )
@@ -88,10 +88,10 @@ function PostSummaryControls() {
 
     const DELETE_ENTRY = () => { 
         return (
-            <div className='cursor-pointer flex flex-row items-center px-5 h-fit py-3 space-x-2 rounded-full bg-[#E84040]'
+            <div className='cursor-pointer flex flex-row items-center px-3 h-fit py-3 space-x-2 rounded-3xl bg-[#E84040]'
                 onClick={delete_Entry}
             >
-                <TbTrash size={27} color="#fff"/>
+                <TbTrash size={24} color="#fff"/>
                 {/* <h1 className='text-white font-bold text-[15px]'>Send to AI</h1> */}
             </div>
         )
@@ -100,8 +100,8 @@ function PostSummaryControls() {
     
     
     return (
-        <div className='flex items-center space-x-2 md:space-x-0 md:flex-col md:space-y-2
-            md:relative md:right-10
+        <div className='flex items-center space-x-2 sm:space-x-5 md:space-x-0 md:flex-col md:space-y-2 justify-between
+        md:relative md:right-10 px-3 sm:pb-0  sm:px-4 relative bottom-1 sm:relative sm:bottom-0
         '>
             <CONTINUE />
             <div className='flex items-center space-x-2 md:flex-col  md:space-x-0 md:space-y-2'>
