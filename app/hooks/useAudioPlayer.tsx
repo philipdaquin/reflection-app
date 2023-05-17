@@ -1,14 +1,17 @@
-import { MutableRefObject, useRef, useState } from "react";
+import React, { MutableRefObject, useContext, createContext,
+    useEffect, useMemo, useRef, useState, Children } from "react";
 import ReactPlayer from "react-player";
+import { useRecoilState } from "recoil";
+import { AudioPlayerSource } from "../atoms/atoms";
 
 
 interface PlayerInterface { 
     isPlaying: boolean; 
     currentTime: number; 
     isLoop: boolean;
-    setCurrent: (newcurrent: number) => void;
     duration: number;
     playerRef: MutableRefObject<ReactPlayer | null>;
+    setCurrent: (newcurrent: number) => void;
     handleProgress: (state: { played: number; playedSeconds: number }) => void;
     handlePlayClick: () => void; 
     handleSliderChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -18,10 +21,31 @@ interface PlayerInterface {
     handlePlayerLoop: () => void;
     formatTime: (time: number) => string
 }
+  
+const AudioContext = createContext<PlayerInterface>({
+    isPlaying: false, 
+    currentTime: 0,
+    isLoop: false,
+    duration: 0,
+    playerRef: { current: null},
+    setCurrent: () => {},
+    handleProgress: () => {},
+    handlePlayClick: () => {},
+    handleSliderChange: () => {},
+    handleDuration: () => {},
+    handleFastForward: () => {},
+    handleRewindBack: () => {},
+    handlePlayerLoop: () => {},
+    formatTime: () => ""
+}) 
 
-export function useAudioPlayer(url: string): PlayerInterface { 
+interface Props { 
+  children: React.ReactNode
+}
+
+export const AudioProvider = ({ children} : Props) => { 
     const audioPlayer = useRef<ReactPlayer | null>(null)
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(true);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
 
@@ -67,21 +91,30 @@ export function useAudioPlayer(url: string): PlayerInterface {
         return `${minutes}:${seconds}`;
     };
 
-    return  { 
-        isPlaying,
-        currentTime,
-        setCurrent,
-        isLoop,
-        duration,
-        playerRef: audioPlayer,
-        handleProgress,
-        handlePlayClick,
-        handleSliderChange,
-        handleDuration,
-        handlePlayerLoop,
-        handleFastForward,
-        handleRewindBack,
-        formatTime,
-    };
+    const memoValue = useMemo(() => ({ 
+      isPlaying,
+      currentTime,
+      setCurrent,
+      isLoop,
+      duration,
+      playerRef: audioPlayer,
+      handleProgress,
+      handlePlayClick,
+      handleSliderChange,
+      handleDuration,
+      handlePlayerLoop,
+      handleFastForward,
+      handleRewindBack,
+      formatTime,
+    }), [audioPlayer])
 
+  
+    return <AudioContext.Provider value={memoValue}>
+      {children}
+    </AudioContext.Provider>
+  
+}
+
+export default function useAudioPlayer() { 
+  return useContext(AudioContext)
 }
