@@ -34,9 +34,9 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
     } = useAudioPlayer() 
     return (
       <>
-      <div className={`hover:bg-[#F5F5F5] border-t-2 
+      <div className={`hover:bg-[#F5F5F5] border-t-2 mb-5 border-b-2 sm:mb-2
         border-[#F0F0F0] sm:border-none rounded-t-3xl h-full
-        cursor-pointer  pb-5 px-5 sm:px-4 flex flex-row pr-4
+        cursor-pointer pb-5 px-5 sm:px-4 flex flex-row pr-4
         justify-between w-full items-center py-4 sm:py-4`}>
         <div  onClick={togglePlayer} className='flex flex-row items-start space-x-2 w-full'>
           <div className='bg-black w-14 h-14 rounded-lg '>
@@ -80,7 +80,7 @@ function NavigationMobile({children, selectedAudio} : Props) {
       sm:rounded-3xl w-screen  border-t-2 border-[#F0F0F0] sm:border-none
       sm:w-full ring-4 ring-[#E0E0E0]/20 backdrop-blur-lg  
       rounded-t-3xl rounded-b-none
-      ${selectedAudio ? 'py-0 sm:pt-0' : 'py-5'}
+      ${selectedAudio ? 'sm:pt-0' : 'py-5'}
       `}>
       {children}
     </div>

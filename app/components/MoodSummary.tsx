@@ -24,9 +24,13 @@ function MoodSummary({dailyMoodSummary, currentWeeklySummary}: Props) {
     // const [currentAvg, setCurrentAvg] = useState<number | null | undefined>(currentWeeklySummary?.weekly_avg)
     // const [currentMood, setCurrentMood] = useState<string | null | undefined>(currentWeeklySummary?.mood_frequency[0]?.emotion)
     // const [emotion_emoji, setEmotionEmoji] = useState<string | null | undefined>(currentWeeklySummary?.mood_frequency[0]?.emotion_emoji)
-    const [currentAvg, setCurrentAvg] = useState<number | null | undefined>(dailyMoodSummary?.current_avg)
-    const [currentMood, setCurrentMood] = useState<string | null | undefined>(dailyMoodSummary?.overall_mood)
-    const [emotion_emoji, setEmotionEmoji] = useState<string | null | undefined>(dailyMoodSummary?.mood_frequency[0]?.emotion_emoji)
+    const [currentAvg, setCurrentAvg] = useState<number | null | undefined>(dailyMoodSummary?.current_avg || 0)
+    const [currentMood, setCurrentMood] = useState<string | null | undefined>(dailyMoodSummary?.overall_mood || "NaN")
+    const [emotion_emoji, setEmotionEmoji] = useState<string | null | undefined>(
+        dailyMoodSummary?.mood_frequency && dailyMoodSummary.mood_frequency.length > 0
+          ? dailyMoodSummary.mood_frequency[0]?.emotion_emoji
+          : "NaN"
+      );
     
     const [previousAvg, setPreviousAvg] = useState<number | null | undefined>(null)
 
@@ -34,8 +38,8 @@ function MoodSummary({dailyMoodSummary, currentWeeklySummary}: Props) {
 
         // Show current day's data 
         if (selectedFilter.label === '24H') {
-            setCurrentAvg(dailyMoodSummary?.current_avg);
-            setCurrentMood(dailyMoodSummary?.overall_mood);
+            setCurrentAvg(dailyMoodSummary?.current_avg || 0);
+            setCurrentMood(dailyMoodSummary?.overall_mood || "NaN");
 
             const emoji = Emoji(currentAvg || 0 )
 
@@ -45,12 +49,16 @@ function MoodSummary({dailyMoodSummary, currentWeeklySummary}: Props) {
         } else { 
             // Show current week's data 
             setCurrentAvg(currentWeeklySummary?.weekly_avg);
-            setCurrentMood(currentWeeklySummary?.mood_frequency[0].emotion);
+
+            const mood =  currentWeeklySummary?.mood_frequency && currentWeeklySummary.mood_frequency.length > 0
+                        ? currentWeeklySummary.mood_frequency[0]?.emotion : "NaN"
+
+            setCurrentMood(mood);
 
             const emoji = Emoji(currentWeeklySummary?.weekly_avg || 0 )
 
             setEmotionEmoji(emoji);
-            setPreviousAvg(currentWeeklySummary?.previous_avg)
+            setPreviousAvg(currentWeeklySummary?.previous_avg || 0)
            
         }
     
