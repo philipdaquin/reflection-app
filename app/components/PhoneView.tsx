@@ -9,6 +9,7 @@ interface Props {
 function PhoneView({children}: Props) {
   return (
     <div className='md:w-[424px] md:h-[803px]
+      md:relative
       bg-white md:shadow-xl md:rounded-[70px] 
       md:border-[#F5F5F5] md:border-8 
       border-white shadow-inherit '>
@@ -23,6 +24,7 @@ function PhoneView({children}: Props) {
           md:bg-white 
           md:overflow-scroll 
           md:scrollbar-hide 
+          static
           md:py-4 
           w-screen
           h-full 

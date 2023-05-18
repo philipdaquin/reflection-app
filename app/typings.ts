@@ -206,7 +206,7 @@ export type DailySummary = {
   inflection: AudioData | null,
   min: AudioData | null,
   max: AudioData | null,
-  mood_frequency: MoodFrequency[] | null
+  mood_frequency: MoodFrequency[] 
 }
 
 

@@ -46,7 +46,7 @@ pub async fn get_all_by_week(date: web::Json<InputDate>) -> Result<HttpResponse>
         .map(AudioAnalysis::from)
         .collect::<Vec<AudioAnalysis>>();
 
-    log::info!("{res:#?}");
+    // log::info!("{res:#?}");
 
     Ok(HttpResponse::Ok().json(res))
 }

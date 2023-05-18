@@ -32,6 +32,11 @@ pub async fn get_all() -> Result<HttpResponse> {
 /// Get the Daily Summary by Date 
 #[route("/api/daily/get-by-date", method = "POST")]
 pub async fn get_by_date(date: web::Json<InputDate>) -> Result<HttpResponse> { 
+
+
+    log::warn!("{date:?}");
+
+
     let summary = DailyAnalysisDb::get_by_date(date.date)
         .await?
         .map(|f| DailySummary::from(f));

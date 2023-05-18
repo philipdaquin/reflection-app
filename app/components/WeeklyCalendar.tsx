@@ -66,7 +66,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
     }
 
     return (
-        <div className='w-full bg-white space-y-5'>
+        <div className='w-full bg-[#FEFEFE] space-y-5 relative md:rounded-t-[70px] md:px-3'>
              <div className='flex flex-row justify-between py-2 space-x-2 '>
                 <button onClick={prevWeek} className={`${onHover} p-2 rounded-full`}>
                     <ChevronLeftIcon height={20} width={20} color='#757575'/>
@@ -76,12 +76,12 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
                         <div className='font-semibold text-base'>{day}, {month} {year}</div>
                         <ChevronDownIcon height={16} width={16} color='#757575'/>
                     </div>
-          
-
                 <button onClick={nextWeek} className={`${onHover} p-2 rounded-full`}>
                     <ChevronRightIcon height={20} width={20} color='#757575'/>
                 </button>
             </div>
+
+          
             <div className='space-y-2'>
                 <div className='flex flex-row-reverse'>
                     <div className='flex items-center space-x-1'>
