@@ -6,7 +6,7 @@ import { HeartIcon, PauseIcon } from '@heroicons/react/24/outline';
 import {BsRepeat, BsRepeat1} from 'react-icons/bs'
 import useAudioPlayer from '../hooks/useAudioPlayer';
 import { useRecoilValue } from 'recoil';
-import { AudioPlayerSource } from '../atoms/atoms';
+import { AudioPlayerSource, PlayResumePauseIcons } from '../atoms/atoms';
 
 
 
@@ -30,7 +30,8 @@ export function Player() {
       isPlaying, 
       playerRef, 
       setCurrent, 
-      source
+      source,
+      handleEnded
     } = useAudioPlayer() 
 
   useEffect(() => { 
@@ -52,6 +53,7 @@ export function Player() {
         display: "none", 
         width: "100%" 
         }}
+        onEnded={handleEnded}
       />
     </>
   )
@@ -91,6 +93,7 @@ function AudioMediaPlayer() {
       isLoop,
       isPlaying,
     } = useAudioPlayer()
+    const iconTitle = useRecoilValue(PlayResumePauseIcons)
 
     return (
         <> 
@@ -125,7 +128,8 @@ function AudioMediaPlayer() {
             
             <button onClick={handlePlayClick} 
               className="items-center flex justify-center bg-[#5d5fef] rounded-full p-[22px] ">
-                {!isPlaying ? 
+                {iconTitle && 
+                iconTitle === 'Play' || iconTitle === 'Resume' ? 
                 <PlayIcon height={25} width={25} color="#fff" /> : 
                 <PauseIcon height={25} width={25} color="#fff" strokeWidth={4}/>}
             </button>

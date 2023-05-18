@@ -1,13 +1,14 @@
 import { PauseIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AudioPlayerSource, SelectedAudioPlayer, ShowAudioPlayer } from '../../../atoms/atoms'
+import { AudioPlayerSource, PlayResumePauseIcons, SelectedAudioPlayer, ShowAudioPlayer } from '../../../atoms/atoms'
 import { AudioData } from '../../../typings'
 import { fullTimeFormat } from '../../../util/fullTimeFormat'
 import { EllipsisHorizontalCircleIcon } from '@heroicons/react/24/outline'
 import { MdOutlineForward10 } from 'react-icons/md'
 import ReactPlayer from 'react-player'
 import useAudioPlayer from '../../../hooks/useAudioPlayer'
+import { IconTitle, PlayIconList } from '../../pages/PreviewEntryContent'
 
 
 
@@ -30,8 +31,11 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
     const { 
       isPlaying, 
       handlePlayClick,
-      handleFastForward
+      handleFastForward,
     } = useAudioPlayer() 
+
+    const iconTitle = useRecoilValue(PlayResumePauseIcons)
+
     return (
       <>
       <div className={`hover:bg-[#F5F5F5] border-t-2 mb-5 border-b-2 sm:mb-2
@@ -48,8 +52,8 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
         </div>
         <div className='flex flex-row space-x-3 sm:space-x-1 z-50'>
           <div className={`${onHover} p-2`} onClick={handlePlayClick} >
-            {
-              !isPlaying ? (
+            { iconTitle && 
+              iconTitle === 'Play' || iconTitle === 'Resume' ? (
                   <PlayIcon height={24} width={24} color='#000' />
                 ) : (
                   <PauseIcon height={25} width={25} color="#000" strokeWidth={4}/>

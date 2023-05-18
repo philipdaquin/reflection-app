@@ -11,10 +11,12 @@ interface PlayerInterface {
     currentTime: number; 
     isLoop: boolean;
     duration: number;
+    isEnded: boolean;
     playerRef: MutableRefObject<ReactPlayer | null>;
     setCurrent: (newcurrent: number) => void;
     handleProgress: (state: { played: number; playedSeconds: number }) => void;
     handlePlayClick: () => void; 
+    handleEnded: () => void; 
     handleSliderChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     handleDuration: (duration: number) => void;
     handleFastForward: () => void;
@@ -29,10 +31,13 @@ const AudioContext = createContext<PlayerInterface>({
     currentTime: 0,
     isLoop: false,
     duration: 0,
+    isEnded: false,
     playerRef: { current: null},
     setCurrent: () => {},
     handleProgress: () => {},
     handlePlayClick: () => {},
+    handleEnded: () => {},
+    
     handleSliderChange: () => {},
     handleDuration: () => {},
     handleFastForward: () => {},
@@ -51,7 +56,11 @@ export const AudioProvider = ({ children} : Props) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
 
+    const [isEnded, setIsEnded] = useState(false)
+
     const [isLoop, setLoop] = useState(false)
+
+    const handleEnded = () => setIsEnded(true)
 
     const handlePlayerLoop = useCallback(() => { 
       setLoop((prevIsLoop) => !prevIsLoop);
@@ -109,12 +118,14 @@ export const AudioProvider = ({ children} : Props) => {
       handleFastForward,
       handleRewindBack,
       formatTime,
-      source
+      source,
+      handleEnded,
+      isEnded
     }), [
       isPlaying, currentTime, setCurrentTime, isLoop, duration, 
       audioPlayer, handleProgress, handlePlayClick, handleSliderChange, 
       handleDuration, handlePlayerLoop, handleFastForward, 
-      handleRewindBack, formatTime, source
+      handleRewindBack, formatTime, source, handleEnded, isEnded
     ]
     )
 

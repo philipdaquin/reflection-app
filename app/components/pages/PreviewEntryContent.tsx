@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AudioData, DEFAULT_IMAGE_URL } from '../../typings'
 import BackButton from '../BackButton'
 import { ThumbnailPlayer } from './PlayerContents'
@@ -9,14 +9,33 @@ import { ChevronDownIcon, ChevronRightIcon, EllipsisHorizontalIcon, PlusIcon } f
 import SuggestedTags from '../SuggestedTags'
 import { InsightContainer } from '../moodWidgets/MoodInsightWidget'
 import AudioTranscripts from '../AudioTranscripts'
-import { AudioPlayerSource, SelectedAudioPlayer } from '../../atoms/atoms'
+import { AudioPlayerSource, PlayResumePauseIcons, SelectedAudioPlayer } from '../../atoms/atoms'
 import { useRecoilState } from 'recoil'
 import useAudioPlayer from '../../hooks/useAudioPlayer'
 
 
+export const PlayIconList = [
+  {
+    title: 'Resume', 
+    icon: <PlayIcon height={16} width={16} color="#757575" />  
+  },
+  {
+    title: 'Pause', 
+    icon: <PauseIcon height={16} width={16} color="#757575" />  
+  },
+  {
+    title: 'Play', 
+    icon: <PlayIcon height={16} width={16} color="#757575" />  
+  },
+]
 
 interface Props { 
     entry: AudioData 
+}
+
+export type IconTitle = { 
+  title: string, 
+  icon: any
 }
 
 function PreviewEntryContent({entry}: Props) {
@@ -52,11 +71,13 @@ function PreviewEntryContent({entry}: Props) {
   const [toggleTranscript, setToggleTranscript] = useState(false)
   const src ="https://www.youtube.com/watch?v=XFkzRNyygfk"
 
-  const [isStarted, setIsStarted] = useState(false)
 
   const { 
     isPlaying, 
-    handlePlayClick
+    handlePlayClick,
+    currentTime, 
+    duration,
+    isEnded
   } = useAudioPlayer() 
 
   const togglePlay = () => { 
@@ -71,26 +92,26 @@ function PreviewEntryContent({entry}: Props) {
     setToggleTranscript(!toggleTranscript)
   }
 
-  const IconList = [
-    {
-      title: 'Resume', 
-      icon: <PlayIcon height={16} width={16} color="#757575" />  
-    },
-    {
-      title: 'Pause', 
-      icon: <PauseIcon height={16} width={16} color="#757575" />  
-    },
-    {
-      title: 'Play', 
-      icon: <PlayIcon height={16} width={16} color="#757575" />  
-    },
-  ]
 
-  const pauseOrResume = !isPlaying  ? IconList[0] : IconList[1]
-  const playOrpause = isStarted  ? pauseOrResume : IconList[2]
+  const [Icon, setIcon] = useRecoilState<string | null>(PlayResumePauseIcons)
+  // const [Icon, setIcon] = useState<IconTitle>()
+  const [isStarted, setIsStarted] = useState(false)
 
-
-
+  // 
+  useEffect(() => {
+    if (currentTime === 0 && !isStarted) {
+      setIcon('Play'); // Show "Play" when not started
+    }else if (isEnded) {
+        setIcon('Play'); // Show "Play" when current time equals duration
+    } else if (isPlaying) {
+      setIcon('Pause'); // Show "Pause" when currently playing
+    } else if (currentTime > 0 && !isPlaying) {
+      setIcon('Resume'); // Show "Resume" when current time > 0 and not playing
+    } 
+  }, [isPlaying, isStarted, currentTime, duration, isEnded]);
+  
+  
+  console.log(duration, currentTime, isPlaying, isEnded)
   return (
     <section className='flex flex-col h-full w-full'>
       <div className='flex flex-row items-center justify-between pb-5'>
@@ -139,11 +160,15 @@ function PreviewEntryContent({entry}: Props) {
               text-sm font-regular -px-10
               flex justify-center bg-[#EDECEC] ${onHover} 
               rounded-full  py-4 w-full space-x-2`}>
-                {
-                  playOrpause.icon
+                {Icon && 
+                  Icon === 'Play' || Icon === 'Resume' ? (
+                      <PlayIcon height={16} width={16} color='#757575' />
+                    ) : (
+                      <PauseIcon height={16} width={16} color="#757575" strokeWidth={4}/>
+                  )
                 }
                 <h1>
-                  {playOrpause.title}
+                  {Icon}
                 </h1>
           </button>
         </div>

@@ -3,6 +3,7 @@ import { AudioData, DefaultFilterOption, MoodFrequency, MoodTriggerType, WeeklyS
 import { ELEVEN_LABS_KEY, OPENAI_KEY } from "../components/SettingsButtons";
 import { MutableRefObject } from "react";
 import ReactPlayer from "react-player";
+import { IconTitle, PlayIconList } from "../components/pages/PreviewEntryContent";
 
 export const TimerState = atom({
     key: 'TimerState',
@@ -69,5 +70,10 @@ export const ShowAudioPlayer = atom<boolean>({
 })
 export const AudioPlayerSource = atom<string | null>({ 
     key: 'AudioPlayerSource',
+    default: null
+})
+
+export const PlayResumePauseIcons = atom<string | null>({
+    key: 'PlayResumePauseIcons',
     default: null
 })
