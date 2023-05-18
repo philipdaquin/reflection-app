@@ -100,8 +100,21 @@ function PostSummaryControls() {
     
     
     return (
-        <div className='flex items-center space-x-2 sm:space-x-5 md:space-x-0 md:flex-col md:space-y-2 justify-between
-        md:relative md:right-10 px-3 sm:pb-0  sm:px-4 relative bottom-1 sm:relative sm:bottom-0
+        <div className='flex items-center space-x-2 
+        relative 
+        sm:pt-0
+        justify-between
+        px-3
+        sm:space-x-5 
+        sm:pb-0 
+        sm:px-4 
+        sm:relative 
+        sm:bottom-0
+        md:space-x-0 
+        md:flex-col 
+        md:space-y-2 
+        md:relative 
+        md:right-10 
         '>
             <CONTINUE />
             <div className='flex items-center space-x-2 md:flex-col  md:space-x-0 md:space-y-2'>

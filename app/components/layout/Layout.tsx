@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion';
+import { Player } from '../AudioMediaPlayer';
 
 interface Props { 
   children: React.ReactNode
@@ -12,6 +13,7 @@ function Layout({children}: Props) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      <Player />
       {children}
     </motion.div>
   )

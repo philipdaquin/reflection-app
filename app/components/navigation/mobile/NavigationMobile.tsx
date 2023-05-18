@@ -7,8 +7,9 @@ import { fullTimeFormat } from '../../../util/fullTimeFormat'
 import { EllipsisHorizontalCircleIcon } from '@heroicons/react/24/outline'
 import { MdOutlineForward10 } from 'react-icons/md'
 import ReactPlayer from 'react-player'
-import useAudioPlayer from '../../../hooks/useAudioPlayer'
+import useAudioPlayer, { PlayerState } from '../../../hooks/useAudioPlayer'
 import { IconTitle, PlayIconList } from '../../pages/PreviewEntryContent'
+import { useRouter } from 'next/router'
 
 
 
@@ -27,15 +28,13 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
     }
     const fullDate = fullTimeFormat(date.toString())
     const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full"
-    // const src ="https://www.youtube.com/watch?v=XFkzRNyygfk"
+    
     const { 
-      isPlaying, 
       handlePlayClick,
       handleFastForward,
+      currentState
     } = useAudioPlayer() 
-
-    const iconTitle = useRecoilValue(PlayResumePauseIcons)
-
+    
     return (
       <>
       <div className={`hover:bg-[#F5F5F5] border-t-2 mb-5 border-b-2 sm:mb-2
@@ -52,8 +51,7 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
         </div>
         <div className='flex flex-row space-x-3 sm:space-x-1 z-50'>
           <div className={`${onHover} p-2`} onClick={handlePlayClick} >
-            { iconTitle && 
-              iconTitle === 'Play' || iconTitle === 'Resume' ? (
+            { currentState &&  (currentState === PlayerState.PLAY || currentState === PlayerState.RESUME) ? (
                   <PlayIcon height={24} width={24} color='#000' />
                 ) : (
                   <PauseIcon height={25} width={25} color="#000" strokeWidth={4}/>
@@ -77,17 +75,37 @@ interface Props {
 }
 
 function NavigationMobile({children, selectedAudio} : Props) {
+  const router = useRouter()
+
+  // Prevent playing audio + rendering ui on specific links
+  const isAudioPlayingPage =
+    router.pathname === '/chat' ||
+    router.pathname === '/record' ||
+    router.pathname === '/mood_summary' ||
+    router.pathname.startsWith('/post_analysis/');
+
+  const navContainer = `
+    bg-[#FCFCFC] md:px-8 sm:py-5 pb-10  
+    shadow-xl sm:drop-shadow-lg drop-shadow-2xl  
+    sm:rounded-3xl w-screen  border-t-2 border-[#F0F0F0] sm:border-none
+    sm:w-full ring-4 ring-[#E0E0E0]/20 backdrop-blur-lg  
+    rounded-t-3xl rounded-b-none
+  `
 
   return (
-    <div className={` bg-[#FCFCFC] md:px-8 sm:py-5 pb-10  
-      shadow-xl sm:drop-shadow-lg drop-shadow-2xl  
-      sm:rounded-3xl w-screen  border-t-2 border-[#F0F0F0] sm:border-none
-      sm:w-full ring-4 ring-[#E0E0E0]/20 backdrop-blur-lg  
-      rounded-t-3xl rounded-b-none
-      ${selectedAudio ? 'sm:pt-0' : 'py-5'}
-      `}>
-      {children}
-    </div>
+    <>
+      {
+        !isAudioPlayingPage  ? (
+          <div className={` ${navContainer} ${selectedAudio ? 'sm:pt-0' : 'py-5'}`}>
+            {children}
+          </div>
+        ) : (
+          <div className={` ${navContainer} py-5`}>
+            {children}
+          </div>
+        )
+      }
+    </>
   )
 }
 

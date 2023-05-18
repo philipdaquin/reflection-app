@@ -4,9 +4,10 @@ import ReactPlayer from 'react-player';
 import {MdOutlineForward10 ,  MdOutlineReplay10} from 'react-icons/md'
 import { HeartIcon, PauseIcon } from '@heroicons/react/24/outline';
 import {BsRepeat, BsRepeat1} from 'react-icons/bs'
-import useAudioPlayer from '../hooks/useAudioPlayer';
+import useAudioPlayer, { PlayerState } from '../hooks/useAudioPlayer';
 import { useRecoilValue } from 'recoil';
 import { AudioPlayerSource, PlayResumePauseIcons } from '../atoms/atoms';
+import { useRouter } from 'next/router';
 
 
 
@@ -23,6 +24,9 @@ interface PlayerProps {
 }
 
 export function Player() {
+
+  const router = useRouter()
+
   const [src, setSource] = useState<string>()
   const { handleDuration, 
       handleProgress, 
@@ -39,22 +43,37 @@ export function Player() {
     setSource(source)
   }, [source])
 
+  const isAudioPlayingPage =
+    router.pathname === '/chat' ||
+    router.pathname === '/record' ||
+    router.pathname === '/mood_summary' ||
+    router.pathname.startsWith('/post_analysis/');
+
   return (
     <>
-      <ReactPlayer
-        ref={(ref) => (playerRef.current = ref)}
-        url={src}
-        playing={isPlaying}
-        onSeek={setCurrent}
-        onProgress={handleProgress}
-        onDuration={handleDuration}
-        loop={isLoop}
-        style={{ 
-        display: "none", 
-        width: "100%" 
-        }}
-        onEnded={handleEnded}
-      />
+    {
+      !isAudioPlayingPage && (
+
+        <ReactPlayer
+          ref={(ref) => (playerRef.current = ref)}
+          url={src}
+          stopOnUnmount={false}
+          progressInterval={1000}
+          playing={isPlaying}
+          onSeek={setCurrent}
+          onProgress={handleProgress}
+          onDuration={handleDuration}
+          loop={isLoop}
+          playbackRate={1} // Adjust the playbackRate as needed
+          config={{ file: { forceAudio: true } }} // Force the player to use audio
+          style={{ 
+          display: "none", 
+          width: "100%" 
+          }}
+          onEnded={handleEnded}
+        />
+      )
+    }
     </>
   )
 }
@@ -92,8 +111,8 @@ function AudioMediaPlayer() {
       handleSliderChange,
       isLoop,
       isPlaying,
+      currentState
     } = useAudioPlayer()
-    const iconTitle = useRecoilValue(PlayResumePauseIcons)
 
     return (
         <> 
@@ -128,8 +147,8 @@ function AudioMediaPlayer() {
             
             <button onClick={handlePlayClick} 
               className="items-center flex justify-center bg-[#5d5fef] rounded-full p-[22px] ">
-                {iconTitle && 
-                iconTitle === 'Play' || iconTitle === 'Resume' ? 
+                {
+                currentState &&  (currentState === PlayerState.PLAY || currentState === PlayerState.RESUME) ? 
                 <PlayIcon height={25} width={25} color="#fff" /> : 
                 <PauseIcon height={25} width={25} color="#fff" strokeWidth={4}/>}
             </button>

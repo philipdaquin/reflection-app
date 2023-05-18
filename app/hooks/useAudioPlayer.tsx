@@ -1,9 +1,14 @@
 import React, { MutableRefObject, useContext, createContext,
     useEffect, useMemo, useRef, useState, Children, useCallback } from "react";
 import ReactPlayer from "react-player";
-import { useRecoilState, useRecoilValue } from "recoil";
 import { AudioPlayerSource } from "../atoms/atoms";
+import { useRecoilValue } from "recoil";
 
+export enum PlayerState { 
+  PLAY = 'play',
+  PAUSE = 'pause', 
+  RESUME = 'resume'
+}
 
 interface PlayerInterface { 
     source: string | null, 
@@ -12,6 +17,7 @@ interface PlayerInterface {
     isLoop: boolean;
     duration: number;
     isEnded: boolean;
+    currentState: PlayerState | null;
     playerRef: MutableRefObject<ReactPlayer | null>;
     setCurrent: (newcurrent: number) => void;
     handleProgress: (state: { played: number; playedSeconds: number }) => void;
@@ -32,6 +38,7 @@ const AudioContext = createContext<PlayerInterface>({
     isLoop: false,
     duration: 0,
     isEnded: false,
+    currentState: null, 
     playerRef: { current: null},
     setCurrent: () => {},
     handleProgress: () => {},
@@ -55,10 +62,26 @@ export const AudioProvider = ({ children} : Props) => {
     const [isPlaying, setIsPlaying] = useState(true);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
-
     const [isEnded, setIsEnded] = useState(false)
-
     const [isLoop, setLoop] = useState(false)
+
+
+
+
+    const [currentState, setCurrentState] = useState<PlayerState | null>(null)
+    const [isStarted, setIsStarted] = useState(false)
+    // 
+    useEffect(() => {
+      if (currentTime === 0 && !isStarted) {
+        setCurrentState(PlayerState.PLAY); // Show "Play" when not started
+      }else if (isEnded) {
+        setCurrentState(PlayerState.PLAY); // Show "Play" when current time equals duration
+      } else if (isPlaying) {
+        setCurrentState(PlayerState.PAUSE); // Show "Pause" when currently playing
+      } else if (currentTime > 0 && !isPlaying) {
+        setCurrentState(PlayerState.RESUME); // Show "Resume" when current time > 0 and not playing
+      } 
+    }, [isPlaying, isStarted, currentTime, duration, isEnded]);
 
     const handleEnded = () => setIsEnded(true)
 
@@ -72,6 +95,7 @@ export const AudioProvider = ({ children} : Props) => {
 
     const handlePlayClick = () => {
       setIsPlaying(!isPlaying);
+      setIsStarted(true)
     };
     const handleProgress = useCallback((state: { played: number; playedSeconds: number }) => {
       setCurrentTime(state.playedSeconds);
@@ -120,12 +144,13 @@ export const AudioProvider = ({ children} : Props) => {
       formatTime,
       source,
       handleEnded,
-      isEnded
+      isEnded,
+      currentState
     }), [
       isPlaying, currentTime, setCurrentTime, isLoop, duration, 
       audioPlayer, handleProgress, handlePlayClick, handleSliderChange, 
       handleDuration, handlePlayerLoop, handleFastForward, 
-      handleRewindBack, formatTime, source, handleEnded, isEnded
+      handleRewindBack, formatTime, source, handleEnded, isEnded, currentState
     ]
     )
 

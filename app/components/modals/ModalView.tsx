@@ -55,6 +55,7 @@ function ModalView({children}: Props) {
                opacity: 0,
                transition: { duration: 0.3, ease: [0.36, 0.66, 0.04, 1] },
              }}
+             
             />
               {children}
           </>

@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import React from 'react'
 import { useAudioRecorder } from 'react-audio-voice-recorder'
-import AudioControls from '../components/AudioControls'
+import AudioControls from '../components/controls/AudioControls'
 import AudioVisualizer from '../components/AudioVisualizer'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import ChatContent from '../components/pages/ChatContent'

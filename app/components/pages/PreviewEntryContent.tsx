@@ -11,7 +11,7 @@ import { InsightContainer } from '../moodWidgets/MoodInsightWidget'
 import AudioTranscripts from '../AudioTranscripts'
 import { AudioPlayerSource, PlayResumePauseIcons, SelectedAudioPlayer } from '../../atoms/atoms'
 import { useRecoilState } from 'recoil'
-import useAudioPlayer from '../../hooks/useAudioPlayer'
+import useAudioPlayer, { PlayerState } from '../../hooks/useAudioPlayer'
 
 
 export const PlayIconList = [
@@ -69,20 +69,16 @@ function PreviewEntryContent({entry}: Props) {
   const [selectedData, setSelectedData] = useRecoilState(SelectedAudioPlayer)
   const [source, setAudioSource] = useRecoilState(AudioPlayerSource)
   const [toggleTranscript, setToggleTranscript] = useState(false)
-  const src ="https://www.youtube.com/watch?v=XFkzRNyygfk"
+  const src ="https://www.youtube.com/watch?v=wsCJB8TW2Ck"
 
 
   const { 
-    isPlaying, 
     handlePlayClick,
-    currentTime, 
-    duration,
-    isEnded
+    currentState
   } = useAudioPlayer() 
 
   const togglePlay = () => { 
     handlePlayClick()
-    setIsStarted(true)
     setSelectedData(entry)
     setAudioSource(src)
     // router.push(`/play/${_id}`)
@@ -93,25 +89,6 @@ function PreviewEntryContent({entry}: Props) {
   }
 
 
-  const [Icon, setIcon] = useRecoilState<string | null>(PlayResumePauseIcons)
-  // const [Icon, setIcon] = useState<IconTitle>()
-  const [isStarted, setIsStarted] = useState(false)
-
-  // 
-  useEffect(() => {
-    if (currentTime === 0 && !isStarted) {
-      setIcon('Play'); // Show "Play" when not started
-    }else if (isEnded) {
-        setIcon('Play'); // Show "Play" when current time equals duration
-    } else if (isPlaying) {
-      setIcon('Pause'); // Show "Pause" when currently playing
-    } else if (currentTime > 0 && !isPlaying) {
-      setIcon('Resume'); // Show "Resume" when current time > 0 and not playing
-    } 
-  }, [isPlaying, isStarted, currentTime, duration, isEnded]);
-  
-  
-  console.log(duration, currentTime, isPlaying, isEnded)
   return (
     <section className='flex flex-col h-full w-full'>
       <div className='flex flex-row items-center justify-between pb-5'>
@@ -160,15 +137,14 @@ function PreviewEntryContent({entry}: Props) {
               text-sm font-regular -px-10
               flex justify-center bg-[#EDECEC] ${onHover} 
               rounded-full  py-4 w-full space-x-2`}>
-                {Icon && 
-                  Icon === 'Play' || Icon === 'Resume' ? (
+                {currentState &&  (currentState === PlayerState.PLAY || currentState === PlayerState.RESUME) ? (
                       <PlayIcon height={16} width={16} color='#757575' />
                     ) : (
                       <PauseIcon height={16} width={16} color="#757575" strokeWidth={4}/>
                   )
                 }
-                <h1>
-                  {Icon}
+                <h1 className='capitalize'>
+                  {currentState?.toString()}
                 </h1>
           </button>
         </div>

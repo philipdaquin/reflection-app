@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import React from 'react'
 import { useAudioRecorder } from 'react-audio-voice-recorder'
-import AudioControls from '../components/AudioControls'
+import AudioControls from '../components/controls/AudioControls'
 import AudioVisualizer from '../components/AudioVisualizer'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import ChatContent from '../components/pages/ChatContent'
@@ -68,7 +68,6 @@ function see_all({entries}: Props) {
             
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center  sm:mb-5 mb-0  '>
-                <Player/>
                 <NavigationMobile selectedAudio={selectedAudio}>      
                   {selectedAudio && <PlayerAttachment audio={selectedAudio}/>}
 
