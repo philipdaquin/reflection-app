@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import WeeklyCalendar from '../WeeklyCalendar'
 import { getAllByDate } from '../../util/audio/getAllByDate'
-import { AudioData, DailySummary, TextClassification, WeeklySummary } from '../../typings'
+import { AudioData, DailySummary, DefaultFilterOption, FilterOptions, TextClassification, WeeklySummary } from '../../typings'
 import DailyAudioEntries from '../moodWidgets/DailyAudioEntries'
 import MoodInsightWidget from '../moodWidgets/MoodInsightWidget'
 import MoodAnalysisChange from '../moodWidgets/MoodAnalysisChange'
@@ -18,6 +18,8 @@ import { getDailyByDate } from '../../util/daily/getDailyByDate'
 import MoodCompositionWidget from '../moodWidgets/MoodCompositionWidget'
 import MoodTriggersWidget from '../moodWidgets/MoodTriggersWidget'
 import { SelectedFilterOption } from '../../atoms/atoms'
+import MoodFilter from '../MoodFilter'
+import { getFilterOption } from '../moodWidgets/MoodAnalysisChange'
 
 interface WeeklyProps { 
   mood_graph: TextClassification[] | null,
@@ -46,13 +48,11 @@ interface DailyProps {
 }
 
 function DailyContent({selectedDate, selectedEntries, selectedAnalsysis, selectedDaily, selectedWeekly}: DailyProps) { 
+  const [, setFilter] = useRecoilState(SelectedFilterOption)
+  const date = fullTimeFormat(selectedDate.toString(), true)
 
-  const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(selectedDate);
-  const year = selectedDate?.getFullYear();
-  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const currDay = selectedDate?.getDay() || 0
-  const currDateNum = selectedDate.getDate()
-  let day = daysOfWeek[currDay] 
+  // **Prevent unneccessary calls to the server 
+  const analysis = selectedEntries?.map((item, i) => item.text_classification!  ) || []
 
   return (
     <>
@@ -62,10 +62,9 @@ function DailyContent({selectedDate, selectedEntries, selectedAnalsysis, selecte
           Daily Summary
         </h1>
         <h2 className='text-[#9e9e9e] text-[15px]'>
-          {day}, {currDateNum} {month} {year} 
+          {date}
         </h2>
       </div>
-
       <div>
         {
            selectedEntries && (
@@ -74,9 +73,9 @@ function DailyContent({selectedDate, selectedEntries, selectedAnalsysis, selecte
                 <MoodSummaryWidget 
                   dailyMoodSummary={selectedDaily} 
                   currentWeeklySummary={selectedWeekly}/>
-                <MoodAnalysisChange all_mood_data={selectedAnalsysis} hideFilter={true}/>
+                <MoodAnalysisChange all_mood_data={selectedAnalsysis}/>
                 {/* <MoodCompositionWidget data={[]}/>  */}
-                <MoodActivityWidget entries={selectedAnalsysis || []}/>
+                <MoodActivityWidget entries={analysis || []}/>
                 <MoodInsightWidget  dailySummary={selectedDaily} currentWeeklySummary={selectedWeekly} />  
                 {/* <MoodTriggersWidget data={selectedDaily} currentWeeklySummary={null}/> */}
                 <DailyAudioEntries entries={selectedEntries}/>
@@ -106,7 +105,7 @@ function WeeklyCalendarContent( {
     
     const [showWeekly, setShowWeekly] = useState('Daily')
     const [dailySummary, setDailySummary] = useState<DailySummary | null>(dailyMoodSummary)
-    const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>(null)
+    const [selectedEntries, setSelectedEntries] = useState<AudioData[] | null>(recent_entries)
 
     // const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null)
     const [weeklySummary, setWeeklySummary] = useRecoilState<WeeklySummary | null>(CurrentWeekSummary)
@@ -115,6 +114,7 @@ function WeeklyCalendarContent( {
       const summary = await getDailyByDate(date)
       setDailySummary(summary)
     }
+    
     const getDailyEntries = async (date: Date) => { 
         const entries = await getAllByDate(date)
         setSelectedEntries(entries)
@@ -131,16 +131,39 @@ function WeeklyCalendarContent( {
       setWeeklySummary(summary)
     }
 
+    // Track previous dates selected to prevent frequent server calls 
+    const [lastSelectedDate, setLastSelectedDate] = useState<Date | null>(null);
+
+
+    const [, setFilter] = useRecoilState(SelectedFilterOption)
+    const selectFilter = (label: string) => { 
+        const option = getFilterOption(label)
+        setFilter(option)
+    }
+    
+    
     useEffect(() => {
-   
-      if (selectedDate && showWeekly === 'Daily') {
-        getDailySummary(selectedDate)
-        getDailyEntries(selectedDate)
-        
+      const fetchAll = async() => { 
+        if (selectedDate && selectedDate !== lastSelectedDate && showWeekly === 'Daily') {
+          
+          selectFilter('24H')
+          
+          await Promise.all([
+            getDailySummary(selectedDate),
+            getDailyEntries(selectedDate)
+          ])
+          setLastSelectedDate(selectedDate);
+
+        }
+        if (selectedDate && selectedDate !== lastSelectedDate)
+          await Promise.all([
+            getWeeklyAnalysis(selectedDate),
+            getWeeklySummary(selectedDate)
+          ])
+          setLastSelectedDate(selectedDate);
       }
-        getWeeklyAnalysis(selectedDate)
-        getWeeklySummary(selectedDate)
-    }, [showWeekly, selectedDate])
+      fetchAll()
+    }, [showWeekly, selectedDate, lastSelectedDate])
 
     const handleDateChange = (date: Date) => {
       setCurrDate(date)
@@ -153,18 +176,36 @@ function WeeklyCalendarContent( {
     // }, [selectedEntries])
 
     return (
+      <section className='static'>
+        <div className='fixed top-0 w-full left-0 right-0
+            drop-shadow-sm py-5  shadow-sm  
+            border-[#e0e0e0] 
+            border-t-0 border-r-0 border-l-0 border-b-[1px] 
+            
+            bg-[#FEFEFE]
+            z-10 
+            sm:fixed 
+            sm:top-0  
+            md:absolute
+            md:border-[16px] 
+            md:border-[#FCFCFC] 
+            
+            md:rounded-t-[60px]
+            md:border-b-0
+            md:drop-shadow-none
+            md:shadow-none
+            ' >
 
-        <div className='w-full relative'>
           <WeeklyCalendar 
             setCurrDate={handleDateChange } 
             setShowWeekly={setShowWeekly}
             showWeekly={showWeekly}
           />
-
-          <div className='pt-5'>
-            <hr />
-          </div>
-
+          <div className='hidden md:block z-10  border-[#e0e0e0] border-t-0 border-r-0 border-l-0 border-b-[1px] pt-3 relative top-5 
+            shadow-sm drop-shadow-sm'></div>
+        </div>
+        <div className='w-full relative mt-40 '>
+          
           <section className='pt-[26px]'>
 
               {
@@ -187,6 +228,7 @@ function WeeklyCalendarContent( {
           </section> 
           
         </div>
+      </section>
     )
 }
 
