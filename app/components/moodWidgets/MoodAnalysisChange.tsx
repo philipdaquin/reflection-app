@@ -42,7 +42,7 @@ export const getFilteredData = (data: TextClassification[], filter: FilterOption
 function MoodAnalysisChange({all_mood_data, hideFilter}: Props) {
 
 
-    const [, setFilter] = useRecoilState(SelectedFilterOption)
+    const [filter, setFilter] = useRecoilState(SelectedFilterOption)
 
     const [chartData, setChartData] = useState<MoodDataPoint[] | null>();
     const [filterOption, setFilterOption] = useState<FilterOptions>(DefaultFilterOption);
@@ -76,7 +76,7 @@ function MoodAnalysisChange({all_mood_data, hideFilter}: Props) {
                     !hideFilter && (
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} className="capitalize bg-[#f5f5f5] rounded-lg px-5 py-1 text-sm border-2 font-medium cursor-pointer active:scale-90  hover:bg-[#eaeaea]">
-                            {filterOption.label}
+                            {filter.label}
                         </div>
                         <ul tabIndex={0} className="dropdown-content menu p-2 shadow  bg-base-100 rounded-box w-fit">
                             {

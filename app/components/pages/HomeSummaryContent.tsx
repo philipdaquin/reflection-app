@@ -32,13 +32,7 @@ interface Props {
 function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, currentWeeklySummary} : Props) {
 
   const currentDate = new Date()
-  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const currDay = currentDate.getDay()
-  let day = daysOfWeek[currDay]
-  const d = currentDate.getDate()
-  const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
-  const year = currentDate.getFullYear();
-  const fullday = `${day}, ${d} ${month} ${year}`
+  const fullday = fullTimeFormat(currentDate.toString(), true)
 
   // Weekly Variables 
   const {startDate, endDate } = getWeekStartAndEndDates(new Date()) 

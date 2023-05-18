@@ -8,7 +8,7 @@ import { SelectedFilterOption } from '../../atoms/atoms'
 
 interface Props {
     title: string 
-    date: string 
+    date: string | null
 }
 
 export function InsightContainer({title, date}: Props) { 
@@ -18,7 +18,7 @@ export function InsightContainer({title, date}: Props) {
         <div className={`widget_container space-y-2 ${onHover} cursor-pointer`}>
             <h2 className='text-left text-xs font-medium text-[#757575]'>{title}</h2>
             <h1 className='text-left text-[17px] md:text-sm font-semibold'>
-                {date}
+                {date || "NaN"}
             </h1>
         </div>
     )
@@ -71,11 +71,11 @@ function MoodInsightWidget({dailySummary, currentWeeklySummary}: MoodProps) {
     return (
         <div className='flex flex-col space-y-4 '>
             <div className='flex space-x-4'>
-                <InsightContainer date={`${best ? bestTime: 'NaN' }`} title='🏆 Best Day'/>
-                <InsightContainer date={`${worst ? worstTime : 'NaN'}`} title='😖 Worst Day'/>
+                <InsightContainer date={bestTime} title='🏆 Best Day'/>
+                <InsightContainer date={worstTime} title='😖 Worst Day'/>
             </div>
             <div className='flex space-x-4'>
-                <InsightContainer date={`${inflection ? inflectionTime : 'NaN'}`} title='😐 Change in Mood'/>
+                <InsightContainer date={inflectionTime } title='😐 Change in Mood'/>
                 <InsightContainer date={fullPercentage} title='💪 Dominant Mood'/>
             </div>
         </div>
