@@ -26,7 +26,6 @@ pub trait AudioInterface {
     async fn get_all_by_date(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>>;
     async fn get_all_by_week(date: DateTime<Utc>) -> Result<Vec<AudioDataDTO>>; 
     async fn get_current_week() -> Result<Vec<AudioDataDTO>>; 
-    
     async fn update_fields() -> Result<Vec<AudioDataDTO>>;
     fn get_collection() -> Collection<AudioDataDTO>;
 }

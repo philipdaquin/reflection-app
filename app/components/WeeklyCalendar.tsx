@@ -65,8 +65,18 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
         setShowCalendar(!showCalendar)
     }
 
+    const handleOpenWeekly = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => { 
+        e.stopPropagation()
+        openWeeklySummary('Daily')
+    }
+    const handleOpenDaily = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => { 
+        e.stopPropagation()
+        openWeeklySummary('Weekly')
+    }
+
+
     return (
-        <div className='w-full bg-[#FEFEFE] space-y-5 relative md:rounded-t-[70px] md:px-3'>
+        <div className='w-full bg-[#FEFEFE] space-y-5 relative md:rounded-t-[70px] md:px-3 px'>
              <div className='flex flex-row justify-between py-2 space-x-2 '>
                 <button onClick={prevWeek} className={`${onHover} p-2 rounded-full`}>
                     <ChevronLeftIcon height={20} width={20} color='#757575'/>
@@ -85,11 +95,11 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
             <div className='space-y-2'>
                 <div className='flex flex-row-reverse'>
                     <div className='flex items-center space-x-1'>
-                        <div onClick={() => openWeeklySummary('Daily')}   className={`cursor-pointer  text-xs ${DailyColour}
+                        <div onClick={(e) => handleOpenWeekly(e)}   className={`cursor-pointer  text-xs ${DailyColour}
                             rounded-full px-4 py-1`}>
                             Today
                         </div>
-                        <div onClick={() => openWeeklySummary('Weekly')} 
+                        <div onClick={(e) => handleOpenDaily(e)} 
                             className={`cursor-pointer text-xs rounded-full px-4 py-1 ${WeeklyColour}`} >
                             Weekly
                         </div>

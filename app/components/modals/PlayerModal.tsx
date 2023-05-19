@@ -23,7 +23,7 @@ function PlayerModal() {
             absolute max-h-full overflow-scroll bottom-0 px-7 py-4 rounded-b-none`}>
            { selectedAudio && ( 
             <PlayerContents data={selectedAudio}>
-                <AudioMediaPlayer/>
+                <AudioMediaPlayer data={selectedAudio}/>
             </PlayerContents>
            ) }
         </motion.div>

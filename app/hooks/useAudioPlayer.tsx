@@ -67,7 +67,6 @@ export const AudioProvider = ({ children} : Props) => {
 
 
 
-
     const [currentState, setCurrentState] = useState<PlayerState | null>(null)
     const [isStarted, setIsStarted] = useState(false)
     // 
@@ -75,15 +74,26 @@ export const AudioProvider = ({ children} : Props) => {
       if (currentTime === 0 && !isStarted) {
         setCurrentState(PlayerState.PLAY); // Show "Play" when not started
       }else if (isEnded) {
+        // If the audio has ended, reset all states
         setCurrentState(PlayerState.PLAY); // Show "Play" when current time equals duration
+        setIsStarted(false)
+        setIsEnded(false)
+
       } else if (isPlaying) {
+
         setCurrentState(PlayerState.PAUSE); // Show "Pause" when currently playing
       } else if (currentTime > 0 && !isPlaying) {
+
         setCurrentState(PlayerState.RESUME); // Show "Resume" when current time > 0 and not playing
       } 
     }, [isPlaying, isStarted, currentTime, duration, isEnded]);
 
-    const handleEnded = () => setIsEnded(true)
+    const handleEnded = useCallback(() =>{
+      setIsEnded(true)
+      setCurrentTime(0)
+    }, [])
+
+    console.log(duration, currentTime, isEnded)
 
     const handlePlayerLoop = useCallback(() => { 
       setLoop((prevIsLoop) => !prevIsLoop);

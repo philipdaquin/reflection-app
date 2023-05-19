@@ -8,7 +8,9 @@ import useAudioPlayer, { PlayerState } from '../hooks/useAudioPlayer';
 import { useRecoilValue } from 'recoil';
 import { AudioPlayerSource, PlayResumePauseIcons } from '../atoms/atoms';
 import { useRouter } from 'next/router';
+import { AudioData } from '../typings';
 
+import { updateEntry } from '../util/audio/updateEntry'
 
 
 interface PlayerProps { 
@@ -57,7 +59,7 @@ export function Player() {
         <ReactPlayer
           ref={(ref) => (playerRef.current = ref)}
           url={src}
-          stopOnUnmount={false}
+          // stopOnUnmount={false}
           progressInterval={1000}
           playing={isPlaying}
           onSeek={setCurrent}
@@ -80,26 +82,24 @@ export function Player() {
 
 
 interface AudioProps { 
-    isPlaying: boolean; 
-    currentTime: number; 
-    isLoop: boolean;
-    duration: number;
-    playerRef: MutableRefObject<ReactPlayer | null>;
-    setCurrent: (newcurrent: number) => void;
-    handleProgress: (state: { played: number; playedSeconds: number }) => void;
-    handlePlayClick: () => void; 
-    handleSliderChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    handleDuration: (duration: number) => void;
-    handleFastForward: () => void;
-    handleRewindBack: () => void;
-    handlePlayerLoop: () => void;
-    formatTime: (time: number) => string
+    data: AudioData | null
 }
-function AudioMediaPlayer() {
+function AudioMediaPlayer({data}: AudioProps) {
     
     
     const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full p-2"
-    
+    const [isFavourite, setIsFavourite] = useState<boolean>(data?.favourite!)
+
+    const updateData = async (updatedData: AudioData) => {
+        await updateEntry(updatedData)
+    }
+    const handleAddtoFavourites = async () => { 
+      if (!data) return 
+      const update = !data.favourite
+      setIsFavourite(update)
+      const newData = { ...data, favourite: update }
+      await updateData(newData)
+    }
     const {
       duration, 
       currentTime, 
@@ -113,6 +113,9 @@ function AudioMediaPlayer() {
       isPlaying,
       currentState
     } = useAudioPlayer()
+  
+
+    console.log(data?.favourite, isFavourite)
 
     return (
         <> 
@@ -135,8 +138,14 @@ function AudioMediaPlayer() {
 
           <div className='flex flex-row items-center justify-between w-full pt-[20px] '>
             
-            <div className={`cursor-pointer ${onHover}`}>
-              <HeartIcon height={25} width={25} color="#424242" strokeWidth={2} />
+            <div className={`cursor-pointer ${onHover}`} onClick={handleAddtoFavourites}>
+              <HeartIcon 
+                height={25} 
+                width={25} 
+                color="#424242" 
+                strokeWidth={2} 
+                fill={`${isFavourite ? '#424242' : '#fff'}`}
+              />
             </div>
             
             <div onClick={handleRewindBack} 
