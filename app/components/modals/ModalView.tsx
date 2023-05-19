@@ -37,6 +37,7 @@ function ModalView({children}: Props) {
             className={`
               fixed !top-10 left-0 right-0 
               z-50 mx-auto w-full max-w-5xl 
+              h-screen
               overflow-hidden overflow-y-scroll 
               rounded-md rounded-b-none scrollbar-hide
               duration-700 ease-out transition-all
