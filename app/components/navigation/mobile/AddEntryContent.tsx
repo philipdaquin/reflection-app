@@ -226,7 +226,9 @@ function AddEntryContent() {
       y: "100%",
       transition: { duration: 0.3, ease: [0.36, 0.66, 0.04, 1] },
     }}
-    className={`rounded-t-3xl  rounded-b-none w-full bg-white shadow-2xl absolute bottom-0 h-fit px-7 py-4`}
+    className={`rounded-t-3xl  rounded-b-none w-full bg-white shadow-2xl 
+    absolute bottom-0
+    h-fit px-7 py-4`}
     >
       {currentPage === 1 && (<MenuContent nextPage={nextPage} />)}
       {currentPage === 2 && (<UploadContent prevPage={prevPage}/>)}
