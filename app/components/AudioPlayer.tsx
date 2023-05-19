@@ -1,41 +1,44 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import ReactPlayer from 'react-player';
 import {PlayIcon, StopIcon} from '@heroicons/react/24/solid'
-import {EllipsisHorizontalCircleIcon} from '@heroicons/react/24/outline'
+import {EllipsisHorizontalCircleIcon, PauseIcon} from '@heroicons/react/24/outline'
+import useAudioPlayer, { PlayerState } from '../hooks/useAudioPlayer';
+import { useRecoilState } from 'recoil';
+import { AudioPlayerSource } from '../atoms/atoms';
+import { DownloadAudio } from './pages/SummaryContent';
+import { url } from 'inspector';
 
 
 interface Props { 
-    src: string
+    src: string | null,
+    title: string | null
 }
 
-function AudioPlayer({src} : Props) {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-  
-    const handlePlayClick = () => {
-      setIsPlaying(!isPlaying);
-    };
-  
-    const handleProgress = (state: { played: number; playedSeconds: number }) => {
-      setCurrentTime(state.playedSeconds);
-    };
-  
-    const handleDuration = (duration: number) => {
-      setDuration(duration);
-    };
-  
-    const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCurrentTime(parseFloat(event.target.value));
-    };
+function AudioPlayer({src, title} : Props) {
+
     
-    const formatTime = (time: number) => {
-      const minutes = Math.floor(time / 60);
-      const seconds = Math.floor(time % 60)
-        .toString()
-        .padStart(2, "0");
-      return `${minutes}:${seconds}`;
-    };
+    // Set new source to be played, 
+    // AudiopLayerState is set to NULL after updated 
+    const [, setAudioSource] = useRecoilState(AudioPlayerSource)
+    const [source_, setsource] = useState<string>()
+    setAudioSource(src)
+    const {
+      duration, 
+      currentTime, 
+      formatTime,
+      handlePlayClick,
+      handleSliderChange,
+      isPlaying,
+      currentState,
+      handleProgress,
+      handleEnded,
+      source,
+      playerRef,
+      setCurrent,
+      handleDuration
+    } = useAudioPlayer()
+    
+    
   
     return (
       <>  
@@ -49,10 +52,14 @@ function AudioPlayer({src} : Props) {
               className="w-full"
           />
          <ReactPlayer
-            url={src}
+            ref={(ref) => (playerRef.current = ref)}
+            url={src || ""}
+            progressInterval={1000}
             playing={isPlaying}
+            onSeek={setCurrent}
             onProgress={handleProgress}
             onDuration={handleDuration}
+            config={{ file: { forceAudio: false } }} // Force the player to use audio
             style={{ 
               display: "none", 
               width: "100%" 
@@ -66,14 +73,24 @@ function AudioPlayer({src} : Props) {
           </div>
 
           <div className='flex items-center flex-row justify-between w-full'>
-            <button onClick={handlePlayClick} className="items-center flex justify-center">{
+            <button onClick={handlePlayClick} className="items-center flex justify-center">
+            {
+                currentState &&  (currentState === PlayerState.PLAY || currentState === PlayerState.RESUME) ? 
+                <PlayIcon height={25} width={25} color="#4285f4" /> : 
+                <PauseIcon height={25} width={25} color="#4285f4" strokeWidth={4}/>
+            }
+            </button>
 
-              !isPlaying ? <PlayIcon height={24} width={24} color="#4285f4"/> : <StopIcon height={24} width={24} color="#4285f4"/>
-
-            }</button>
-
-            <button>
-              <EllipsisHorizontalCircleIcon  height={24} width={24} color="#4285f4"/>
+            <button className='dropdown dropdown-end'>
+              <EllipsisHorizontalCircleIcon tabIndex={0} height={24} width={24} color="#4285f4"/>
+              
+              <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
+                {
+                  src && (
+                    <li><DownloadAudio title={title || "Untitled"} url={src}/></li>
+                  )
+                }
+              </ul>
             </button>
 
           </div>

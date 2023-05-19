@@ -5,6 +5,7 @@ import {HomeIcon, MagnifyingGlassIcon, MicrophoneIcon, PlusIcon,
 CalendarDaysIcon } from '@heroicons/react/24/outline'
 import {RiChatVoiceLine} from 'react-icons/ri'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 interface Props { 
   icon: any
@@ -14,7 +15,7 @@ interface Props {
 function Button({icon, routerName}: Props) { 
     return (
         <Link href={`/${routerName}`} className='cursor-pointer'>
-          <div className='bg-[#424242] rounded-full p-2 cursor-pointer'>
+          <div className={`bg-[#424242] rounded-full p-2 cursor-pointer`}>
             {icon}
           </div>
         </Link>

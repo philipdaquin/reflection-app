@@ -15,6 +15,7 @@ import AddEntryContent from './AddEntryContent'
 import { HiOutlineClipboardList } from 'react-icons/hi'
 import { useRecoilState } from 'recoil'
 import { AddEntryToggle } from '../../../atoms/atoms'
+import { useRouter } from 'next/router'
 
 
 function HomeNav() {
@@ -24,6 +25,10 @@ function HomeNav() {
     const openToggle = () => { 
       setShowModal(!showModal)
     }
+
+    const router = useRouter()
+    
+    // const colour = `${router.pathname === routerName ? '' : ''}`
 
     return (
       <div className='flex flex-row sm:space-x-7 px-4 sm:justify-center justify-between '>

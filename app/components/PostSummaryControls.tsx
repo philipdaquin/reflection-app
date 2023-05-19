@@ -4,7 +4,7 @@ import {TbMessageChatbot, TbTrash} from 'react-icons/tb'
 import {CheckIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, AudioSummaryAtom } from '../atoms/atoms'
+import { AddEntryToggle, AudioPlayerSource, AudioSummaryAtom } from '../atoms/atoms'
 import { updateEntry } from '../util/audio/updateEntry'
 import { deleteEntry } from '../util/audio/deleteEntry'
 
@@ -12,7 +12,8 @@ import { deleteEntry } from '../util/audio/deleteEntry'
 function PostSummaryControls() {
     const router = useRouter()
     const audioData = useRecoilValue(AudioSummaryAtom);
-    
+    const [, setAudioSource] = useRecoilState(AudioPlayerSource)
+
     const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
     // Prevents the modal from reopening after redirects
     const resetModal = () => { 
@@ -25,6 +26,7 @@ function PostSummaryControls() {
         updateEntry(audioData)
             .then(resp => {
                 router.push('/mood_summary')
+                setAudioSource("")
                 resetModal()
             })
             .catch(e => { 
