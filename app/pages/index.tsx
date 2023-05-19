@@ -95,7 +95,7 @@ function Home({
             md:h-screen flex-col h-screen md:py-5 lg:py-14 md:px-4 relative">
 
         <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
-          <div className="flex items-center md:relative md:right-5 h-full">
+          <div className="flex items-center md:relative md:right-5">
             <div className='relative right-10 hidden md:block'>
               <NavigationButtons />        
             </div>
