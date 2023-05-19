@@ -35,7 +35,7 @@ function ModalView({children}: Props) {
       return (
           <MuiModal
             className={`
-              fixes !top-10 left-0 right-0 
+              fixed left-0 right-0 h-full
               z-50 mx-auto w-full max-w-5xl 
               overflow-hidden overflow-y-scroll 
               rounded-md rounded-b-none scrollbar-hide
@@ -45,7 +45,7 @@ function ModalView({children}: Props) {
             onClose={handleClose}
           > 
           <>
-            {/* <motion.div
+            <motion.div
              initial={{ opacity: 0 }}
              animate={{
                opacity: 1,
@@ -56,7 +56,7 @@ function ModalView({children}: Props) {
                transition: { duration: 0.3, ease: [0.36, 0.66, 0.04, 1] },
              }}
              
-            /> */}
+            />
               {children}
           </>
           
