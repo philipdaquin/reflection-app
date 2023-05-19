@@ -45,7 +45,7 @@ function ModalView({children}: Props) {
             onClose={handleClose}
           > 
           <>
-            <motion.div
+            {/* <motion.div
              initial={{ opacity: 0 }}
              animate={{
                opacity: 1,
@@ -56,7 +56,7 @@ function ModalView({children}: Props) {
                transition: { duration: 0.3, ease: [0.36, 0.66, 0.04, 1] },
              }}
              
-            />
+            /> */}
               {children}
           </>
           
