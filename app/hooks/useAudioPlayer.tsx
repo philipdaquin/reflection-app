@@ -67,7 +67,7 @@ export const AudioProvider = ({ children} : Props) => {
 
 
 
-    const [currentState, setCurrentState] = useState<PlayerState | null>(null)
+    const [currentState, setCurrentState] = useState<PlayerState | null>(PlayerState.PLAY)
     const [isStarted, setIsStarted] = useState(false)
     // 
     useEffect(() => {
@@ -76,8 +76,6 @@ export const AudioProvider = ({ children} : Props) => {
       }else if (isEnded) {
         // If the audio has ended, reset all states
         setCurrentState(PlayerState.PLAY); // Show "Play" when current time equals duration
-        setIsStarted(false)
-        setIsEnded(false)
 
       } else if (isPlaying) {
 
@@ -91,6 +89,7 @@ export const AudioProvider = ({ children} : Props) => {
     const handleEnded = useCallback(() =>{
       setIsEnded(true)
       setCurrentTime(0)
+      setIsStarted(false)
     }, [])
 
     console.log(duration, currentTime, isEnded)
@@ -108,8 +107,14 @@ export const AudioProvider = ({ children} : Props) => {
       setIsStarted(true)
     };
     const handleProgress = useCallback((state: { played: number; playedSeconds: number }) => {
-      setCurrentTime(state.playedSeconds);
-    }, []);
+      
+      if (isEnded) {
+        setCurrentTime(0)
+      } else { 
+        setCurrentTime(state.playedSeconds);
+      }
+
+    }, [isEnded]);
 
     const handleDuration = useCallback((duration: number) => {
       setDuration(duration);
