@@ -39,7 +39,7 @@ function play({data}: Props) {
 
                 <PhoneView>
                   <PlayerContents data={data}>
-                    <AudioMediaPlayer/>
+                    <AudioMediaPlayer data={data}/>
                   </PlayerContents>
                 </PhoneView>
 
@@ -56,7 +56,7 @@ function play({data}: Props) {
           </div>
         </>
       )
-}
+}    
 
 export default play
 
