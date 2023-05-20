@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { Toaster, toast } from 'react-hot-toast';
 import { UploadProgress } from '../AddAudioFile';
 import { UploadProgressProvider } from '../../hooks/useUploadProgress';
+import { initialiseAPIKeys } from '../../pages';
 
 interface Props { 
   children: any
@@ -17,8 +18,12 @@ interface Props {
 function Layout({children}: Props) {
     const showModel = useRecoilValue(AddEntryToggle);
     const showPlayer = useRecoilValue(ShowAudioPlayer);
-    const currentProgress = useRecoilValue(CurrentProgress);
+    // const currentProgress = useRecoilValue(CurrentProgress);
     const router = useRouter()
+
+    // Initialise API 
+    //  NEEDS ITS OWN CONTEXT with the  User info + Authentication  
+    initialiseAPIKeys()
     
     const isAudioPlayingPage =
       router.pathname === '/chat' ||

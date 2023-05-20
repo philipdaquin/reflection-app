@@ -229,8 +229,6 @@ function SettingsToggle() {
 
 
 function SettingsButtons() {
-    initialiseAPIKeys()
-
   return (
     <div className='flex flex-row w-full justify-between items-end '>
         <div className='flex items-center space-x-10'>

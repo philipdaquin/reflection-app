@@ -49,14 +49,6 @@ function Home({
   currentWeeklySummary, 
   weekly_entries
 }: Props) {
-
-  console.log(recent_entries)
-  // Start API keys 
-  // const [isOpen, setIsOpen] = useState(false);
-  // const showModel = useRecoilValue(AddEntryToggle);
-  // const showPlayer = useRecoilValue(ShowAudioPlayer);
-
-
   // Get the current weeks overall mood average 
   const selectedFilter = useRecoilValue(SelectedFilterOption)
   const [weeklySummary, setWeeklySummary] = useRecoilState<WeeklySummary | null>(CurrentWeekSummary)
@@ -184,21 +176,6 @@ export function initialiseAPIKeys() {
   setelevenLabs(OpenValue)
   setopenAi(ElevenValue)
 }
-
-// 
-export function getOpenAPIKey(): string | null { 
-  const [key, setKey] = useLocalStorage(OPENAI_KEY, null)
-
-  
-  return key
-}
-// 
-export function getElevenLabsAPIKey(): string | null { 
-  const [key, setKey] = useLocalStorage(ELEVEN_LABS_KEY, null)
-  return key
-}
-
-
 
 /*
   Deletes the values under these keys
