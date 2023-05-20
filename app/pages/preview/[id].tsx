@@ -70,7 +70,7 @@ function preview({data}: Props) {
               </div>
             </div>
               {/* <RecordComponent /> */}
-              {showModel && (
+              {/* {showModel && (
                 <ModalView>
                   <AddEntryContent />
                 </ModalView>
@@ -79,7 +79,7 @@ function preview({data}: Props) {
               <ModalView>
                 <PlayerModal />
               </ModalView>
-              )}
+              )} */}
             </div>
         </>
     )

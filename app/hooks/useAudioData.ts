@@ -31,9 +31,9 @@ export default function useAudioData(data: AudioData | null): AudioDataInterface
         await updateData(newData)
 
         if (updatedFavourite) {
-            toast('Added to Favourites.')
+            toast.success('Added to Favourites.')
         } else {
-            toast('Removed from Favourites.')
+            toast.success('Removed from Favourites.')
         }
     }
 

@@ -52,9 +52,9 @@ function Home({
 
   console.log(recent_entries)
   // Start API keys 
-  const [isOpen, setIsOpen] = useState(false);
-  const showModel = useRecoilValue(AddEntryToggle);
-  const showPlayer = useRecoilValue(ShowAudioPlayer);
+  // const [isOpen, setIsOpen] = useState(false);
+  // const showModel = useRecoilValue(AddEntryToggle);
+  // const showPlayer = useRecoilValue(ShowAudioPlayer);
 
 
   // Get the current weeks overall mood average 
@@ -129,7 +129,7 @@ function Home({
         </div>
 
         {/* <RecordComponent /> */}
-        {showModel && (
+        {/* {showModel && (
           <ModalView>
             <AddEntryContent />
           </ModalView>
@@ -138,7 +138,7 @@ function Home({
           <ModalView>
             <PlayerModal />
           </ModalView>
-        )}
+        )} */}
       </div>
     </>
   )

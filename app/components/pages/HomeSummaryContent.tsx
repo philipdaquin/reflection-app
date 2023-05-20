@@ -20,6 +20,8 @@ import { fullTimeFormat } from '../../util/fullTimeFormat';
 import { useRecoilValue } from 'recoil';
 import { SelectedFilterOption } from '../../atoms/atoms';
 import MoodFilter from '../MoodFilter';
+import { toast } from 'react-hot-toast';
+import { UploadProgress } from '../AddAudioFile';
 
 interface Props { 
   all_mood_data: TextClassification[] | null
@@ -42,6 +44,21 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
 
   const selectedFilter = useRecoilValue(SelectedFilterOption)
   const dateRange = selectedFilter.label === '24H' ? fullday : fullweek
+
+  // Inside your component
+  // const handleShowToaster = () => {
+  //   toast.custom(() => (
+  //     <div className='max-w-xl w-full h-20 bg-white shadow-lg rounded-lg
+  //        pointer-events-auto flex ring-1 ring-black ring-opacity-5'>
+  //       <UploadProgress currentProgress={10}/>
+  //     </div>
+  //   ), {
+  //     duration: Infinity , // Set a duration in milliseconds (e.g., 5000ms = 5 seconds)
+  //     // Other options...
+  //   });
+  // };
+  //      <button onClick={handleShowToaster}>Show Toaster</button>
+
   return (
     <section className=''> 
       <div className='flex flex-row items-center justify-between'>

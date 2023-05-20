@@ -35,10 +35,6 @@ function PhoneView({children}: Props) {
           rounded-2xl
           shadow-inherit'
           >
-          <Toaster
-            position="top-center"
-            reverseOrder={false}
-          />
           {children}
         </div>
     </div>

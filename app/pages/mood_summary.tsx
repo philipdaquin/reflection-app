@@ -79,11 +79,11 @@ function mood_summary({
             </div>
 
             {/* <RecordComponent /> */}
-            {showModel && (
+            {/* {showModel && (
               <ModalView>
                 <AddEntryContent />
               </ModalView>
-            )}
+            )} */}
 
           </div>
         </>

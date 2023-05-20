@@ -90,7 +90,7 @@ function weekly_record({
               </div>
             </div>
 
-            {showModel && (
+            {/* {showModel && (
               <ModalView>
                 <AddEntryContent />
               </ModalView>
@@ -99,7 +99,7 @@ function weekly_record({
               <ModalView>
                 <PlayerModal />
               </ModalView>
-            )}
+            )} */}
         </div>
       
       </>

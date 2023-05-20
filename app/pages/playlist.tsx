@@ -57,7 +57,7 @@ function playlist() {
                         </NavigationMobile >         
                     </div>
                 </div>
-                {showModel && (
+                {/* {showModel && (
                     <ModalView>
                         <AddEntryContent />
                     </ModalView>
@@ -66,7 +66,7 @@ function playlist() {
                 <ModalView>
                     <PlayerModal />
                 </ModalView>
-                )}
+                )} */}
             </div>
             
         </>

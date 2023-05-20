@@ -95,7 +95,7 @@ function trigger({data}: Props) {
             </div>
 
             {/* <RecordComponent /> */}
-            {showModel && (
+            {/* {showModel && (
               <ModalView>
                 <AddEntryContent />
               </ModalView>
@@ -104,7 +104,7 @@ function trigger({data}: Props) {
               <ModalView>
                 <PlayerModal />
               </ModalView>
-            )}
+            )} */}
           </div>
         </>
       )

@@ -3,24 +3,26 @@ import { AudioData } from "../../typings";
 
 // Send the WAV fle to the server 
 // Updates both DailySummary and WeeklySummary
-export async function uploadAudioRecording(wavFile: Blob | File): Promise<AudioData> {
+/* 
+ ```
+ 
+ ```
+*/
+export async function uploadAudioRecording(formData: FormData, apiKey: string, ): Promise<AudioData> {
 
     
-    console.log("Unploading to server")
-
-    const formData = new FormData();
-    formData.append('audio', wavFile);
-    const [apiKey, ] = useLocalStorage<string | null>(OPENAI_KEY, null)
-    
-    if (apiKey === null) throw new Error("Failed to get Open AI key")
-
-    console.log("APIKEY", apiKey)
+    // console.log("Unploading to server")
+    // const formData = new FormData();
+    // formData.append('audio', wavFile);
+    // const [apiKey, ] = useLocalStorage<string | null>(OPENAI_KEY, null)
+    // if (apiKey === null) throw new Error("Failed to get Open AI key")
+    // console.log("APIKEY", apiKey)
 
     const headers = {
       'Authorization': `Bearer ${apiKey}`,
     };
 
-    return fetch("http://localhost:4001/api/audio/upload", {
+    return fetch("http://localhost:4001/api/audio/batch-upload", {
       method: "POST",
       body: formData,
       headers

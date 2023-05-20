@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast"
 import { AudioData } from "../../typings"
 
 /*
@@ -18,6 +19,7 @@ export async function updateEntry(audioData: AudioData): Promise<AudioData> {
     })
     .catch(e => {
         console.error(e)
+        toast.error('Server Error. Try again later.')
         throw new Error(e)
     })
 }

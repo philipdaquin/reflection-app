@@ -75,7 +75,7 @@ function see_all({entries}: Props) {
                 </NavigationMobile >        
               </div>
             </div>
-            {showModel && (
+            {/* {showModel && (
               <ModalView>
                 <AddEntryContent />
               </ModalView>
@@ -84,7 +84,7 @@ function see_all({entries}: Props) {
               <ModalView>
                 <PlayerModal />
               </ModalView>
-            )}
+            )} */}
         </div>
       
       </>
