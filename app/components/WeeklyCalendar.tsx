@@ -83,7 +83,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
                 </button>
 
                     <div onClick={toggleCalendar} className='flex cursor-pointer flex-row items-center space-x-2 px-4 hover:bg-[#f5f5f5] hover:rounded-full active:bg-[#E0E0E0] active:rounded-full'>
-                        <div className='font-semibold text-base'>{day}, {month} {year}</div>
+                        <div className='font-semibold md:text-[14px] text-base '>{day}, {month} {year}</div>
                         <ChevronDownIcon height={16} width={16} color='#757575'/>
                     </div>
                 <button onClick={nextWeek} className={`${onHover} p-2 rounded-full`}>
@@ -108,7 +108,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
 
                 <ul className='flex flex-row items-center justify-between'>
                     {days.map((day, index) => (
-                    <li key={index} onClick={(e) => selectDate(day)}>
+                    <li key={index} onClick={(e) => {e.stopPropagation(); selectDate(day)}}>
                         <div className={`flex flex-col cursor-pointer md:w-10 w-12 items-center rounded-xl space-y-1`}>
                             <p className={`
                                 text-[10px] 
