@@ -12,6 +12,7 @@ import AudioTranscripts from '../AudioTranscripts'
 import { AudioPlayerSource, PlayResumePauseIcons, SelectedAudioPlayer } from '../../atoms/atoms'
 import { useRecoilState } from 'recoil'
 import useAudioPlayer, { PlayerState } from '../../hooks/useAudioPlayer'
+import { FavouriteButton } from '../AudioMediaPlayer'
 
 
 export const PlayIconList = [
@@ -104,10 +105,16 @@ function PreviewEntryContent({entry}: Props) {
       <div className='flex flex-row items-center justify-between pb-5'>
         <BackButton/>
         <h1 className='font-semibold text-[15px] text-center  text-[#757575]'>Preview</h1>
-  
-        <MenuItem  id={_id} customClass='dropdown-bottom h-[42px] w-[42px] bg-[#212121] items-center flex justify-center'>
-          <EllipsisHorizontalIcon height={24} width={24} color='#fff'/>
-        </MenuItem>
+
+
+        <div className='flex flex-row items-center space-x-2'>
+          <FavouriteButton data={entry} />
+          <MenuItem  id={_id} customClass='dropdown-bottom hover:bg-[#EDECEC] 
+            active:bg-[#E0E0E0] rounded-full p-1 border-2 border-[#212121] 
+            items-center flex justify-center'>
+            <EllipsisHorizontalIcon height={24} width={24} color='#212121'/>
+          </MenuItem>
+        </div>
 
       </div>
             
@@ -208,7 +215,7 @@ function PreviewEntryContent({entry}: Props) {
 
                       
       <div className='pt-[15px] space-y-1'>
-        <h1 className='text-left text-xl font-semibold '>
+        <h1 className='text-left text-md font-semibold '>
           Notes 
         </h1>
 

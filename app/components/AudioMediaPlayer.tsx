@@ -4,13 +4,14 @@ import ReactPlayer from 'react-player';
 import {MdOutlineForward10 ,  MdOutlineReplay10} from 'react-icons/md'
 import { HeartIcon, PauseIcon } from '@heroicons/react/24/outline';
 import {BsRepeat, BsRepeat1} from 'react-icons/bs'
-import useAudioPlayer, { PlayerState } from '../hooks/useAudioPlayer';
+import useAudioPlayer, { PlayBackRates, PlayerState } from '../hooks/useAudioPlayer';
 import { useRecoilValue } from 'recoil';
 import { AudioPlayerSource, PlayResumePauseIcons } from '../atoms/atoms';
 import { useRouter } from 'next/router';
 import { AudioData } from '../typings';
 
 import { updateEntry } from '../util/audio/updateEntry'
+import useAudioData from '../hooks/useAudioData';
 
 
 interface PlayerProps { 
@@ -37,7 +38,8 @@ export function Player() {
       playerRef, 
       setCurrent, 
       source,
-      handleEnded
+      handleEnded,
+      playbackRate
     } = useAudioPlayer() 
 
   useEffect(() => { 
@@ -59,14 +61,14 @@ export function Player() {
         <ReactPlayer
           ref={(ref) => (playerRef.current = ref)}
           url={src}
-          // stopOnUnmount={false}
+          stopOnUnmount={false}
           progressInterval={1000}
           playing={isPlaying}
           onSeek={setCurrent}
           onProgress={handleProgress}
           onDuration={handleDuration}
           loop={isLoop}
-          playbackRate={1} // Adjust the playbackRate as needed
+          playbackRate={playbackRate} // Adjust the playbackRate as needed
           config={{ file: { forceAudio: true } }} // Force the player to use audio
           style={{ 
           display: "none", 
@@ -80,6 +82,31 @@ export function Player() {
   )
 }
 
+interface FavouriteProps { 
+  data: AudioData
+}
+
+export function FavouriteButton({data}: FavouriteProps) { 
+  const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full p-2"
+
+  const {
+    isFavourite,
+    handleAddtoFavourites
+  } = useAudioData(data)
+  return (
+    <div className={`cursor-pointer ${onHover}`} 
+      onClick={handleAddtoFavourites}>
+      <HeartIcon 
+        height={25} 
+        width={25} 
+        color="#424242" 
+        strokeWidth={2} 
+        fill={`${isFavourite ? '#424242' : '#fff'}`}
+      />
+    </div>
+  )
+}
+
 
 interface AudioProps { 
     data: AudioData | null
@@ -88,18 +115,8 @@ function AudioMediaPlayer({data}: AudioProps) {
     
     
     const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full p-2"
-    const [isFavourite, setIsFavourite] = useState<boolean>(data?.favourite!)
 
-    const updateData = async (updatedData: AudioData) => {
-        await updateEntry(updatedData)
-    }
-    const handleAddtoFavourites = async () => { 
-      if (!data) return 
-      const update = !data.favourite
-      setIsFavourite(update)
-      const newData = { ...data, favourite: update }
-      await updateData(newData)
-    }
+
     const {
       duration, 
       currentTime, 
@@ -109,13 +126,12 @@ function AudioMediaPlayer({data}: AudioProps) {
       handlePlayerLoop,
       handleRewindBack,
       handleSliderChange,
+      handlePlaybackRate,
       isLoop,
       isPlaying,
+      playbackRate,
       currentState
     } = useAudioPlayer()
-  
-
-    console.log(data?.favourite, isFavourite)
 
     return (
         <> 
@@ -138,14 +154,27 @@ function AudioMediaPlayer({data}: AudioProps) {
 
           <div className='flex flex-row items-center justify-between w-full pt-[20px] '>
             
-            <div className={`cursor-pointer ${onHover}`} onClick={handleAddtoFavourites}>
-              <HeartIcon 
-                height={25} 
-                width={25} 
-                color="#424242" 
-                strokeWidth={2} 
-                fill={`${isFavourite ? '#424242' : '#fff'}`}
-              />
+            <div className='w-[46px]'>
+               <div className="dropdown dropdown-top">
+                  <div tabIndex={0} 
+                    className="capitalize rounded-full px-2 py-1 w-fit text-center 
+                    text-[25px] cursor-pointer active:scale-90  hover:bg-[#eaeaea]">
+                      {playbackRate}x
+                  </div>
+                  <ul tabIndex={0} 
+                    className="dropdown-content menu  shadow-sm drop-shadow-md bg-base-100 rounded-lg mb-2">
+                      {
+                          PlayBackRates.map((item, i ) => { 
+                              return (
+                                  <li className='text-xs font-medium capitalize items-center w-full text-center px-2 py-2' 
+                                    onClick={() => handlePlaybackRate(item)}>
+                                      <a className='active:bg-black text-center'>{PlayBackRates[i]}</a>
+                                  </li>
+                              )
+                          })
+                      }
+                  </ul>
+              </div>
             </div>
             
             <div onClick={handleRewindBack} 

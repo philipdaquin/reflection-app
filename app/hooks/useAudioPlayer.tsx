@@ -9,6 +9,7 @@ export enum PlayerState {
   PAUSE = 'pause', 
   RESUME = 'resume'
 }
+export const PlayBackRates = [2.00, 1.75, 1.50, 1.25, 1.00, 0.75]
 
 interface PlayerInterface { 
     source: string | null, 
@@ -17,8 +18,10 @@ interface PlayerInterface {
     isLoop: boolean;
     duration: number;
     isEnded: boolean;
+    playbackRate: number, 
     currentState: PlayerState | null;
     playerRef: MutableRefObject<ReactPlayer | null>;
+    handlePlaybackRate: (rate: number) => void;
     setCurrent: (newcurrent: number) => void;
     handleProgress: (state: { played: number; playedSeconds: number }) => void;
     handlePlayClick: () => void; 
@@ -38,8 +41,10 @@ const AudioContext = createContext<PlayerInterface>({
     isLoop: false,
     duration: 0,
     isEnded: false,
+    playbackRate: 1, 
     currentState: null, 
     playerRef: { current: null},
+    handlePlaybackRate: () => {},
     setCurrent: () => {},
     handleProgress: () => {},
     handlePlayClick: () => {},
@@ -65,6 +70,11 @@ export const AudioProvider = ({ children} : Props) => {
     const [isEnded, setIsEnded] = useState(false)
     const [isLoop, setLoop] = useState(false)
 
+    const [playbackRate, setPlaybackRate] = useState(1.00)
+
+    const handlePlaybackRate = (rate: number) => { 
+      setPlaybackRate(rate)
+    }
 
 
     const [currentState, setCurrentState] = useState<PlayerState | null>(PlayerState.PLAY)
@@ -160,12 +170,15 @@ export const AudioProvider = ({ children} : Props) => {
       source,
       handleEnded,
       isEnded,
-      currentState
+      currentState,
+      handlePlaybackRate,
+      playbackRate
     }), [
       isPlaying, currentTime, setCurrentTime, isLoop, duration, 
       audioPlayer, handleProgress, handlePlayClick, handleSliderChange, 
       handleDuration, handlePlayerLoop, handleFastForward, 
-      handleRewindBack, formatTime, source, handleEnded, isEnded, currentState
+      handleRewindBack, formatTime, source, handleEnded, isEnded, currentState,
+      playbackRate,handlePlaybackRate
     ]
     )
 
