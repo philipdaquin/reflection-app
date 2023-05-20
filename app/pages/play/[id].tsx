@@ -48,11 +48,6 @@ function play({data}: Props) {
                 <SwitchView />
               </div>
             </main>
-             {/* Settings / Footer  */}
-            <div className="flex-grow hidden lg:block"></div>
-            <div className='relative bottom-[140px]  lg:block hidden w-full'>
-              <SettingsButtons />
-            </div>
           </div>
         </>
       )

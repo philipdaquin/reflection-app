@@ -10,6 +10,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import { UploadProgress } from '../AddAudioFile';
 import { UploadProgressProvider } from '../../hooks/useUploadProgress';
 import { initialiseAPIKeys } from '../../pages';
+import SettingsButtons from '../SettingsButtons';
 
 interface Props { 
   children: any
@@ -33,7 +34,7 @@ function Layout({children}: Props) {
     
 
     return (
-      <div>   
+      <div className='relative'>   
         <UploadProgressProvider>
         <Toaster
             position="top-center"
@@ -42,6 +43,13 @@ function Layout({children}: Props) {
         <Player />
         
         {children}
+
+
+        <div className="flex-grow hidden lg:block"></div>
+        <div className='absolute bottom-3  lg:block hidden w-full md:px-4'>
+          <SettingsButtons />
+        </div>
+
 
         { !isAudioPlayingPage && 
           (showModel || showPlayer) && (

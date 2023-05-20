@@ -78,13 +78,6 @@ function trigger({data}: Props) {
               </div>
 
             </main>
-
-             {/* Settings / Footer  */}
-            <div className="flex-grow hidden lg:block"></div>
-            <div className='relative bottom-[140px]  lg:block hidden w-full'>
-              <SettingsButtons />
-            </div>
-
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center sm:mb-5 mb-0 '>
                 <NavigationMobile selectedAudio={selectedAudio}>        
@@ -93,18 +86,6 @@ function trigger({data}: Props) {
                 </NavigationMobile >       
               </div>
             </div>
-
-            {/* <RecordComponent /> */}
-            {/* {showModel && (
-              <ModalView>
-                <AddEntryContent />
-              </ModalView>
-            )}
-            {showPlayer && (
-              <ModalView>
-                <PlayerModal />
-              </ModalView>
-            )} */}
           </div>
         </>
       )
