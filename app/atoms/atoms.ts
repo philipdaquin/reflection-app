@@ -77,3 +77,11 @@ export const PlayResumePauseIcons = atom<string | null>({
     key: 'PlayResumePauseIcons',
     default: null
 })
+export const CurrentProgress = atom<number>({
+    key: 'CurrentProgress',
+    default: 0
+})
+export const ModalState = atom<boolean>({
+    key: 'ModalState',
+    default: false
+})

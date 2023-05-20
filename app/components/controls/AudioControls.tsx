@@ -104,35 +104,35 @@ function StartStopRecording() {
     // Listener: 
     // Once Process == true, convert and send over to the server
     // Next, if all ok, reset Recording states to default 
-    useEffect(() => { 
-        if (!process) return 
-        console.log("Processing")
-        // if (recordingBlob == null) return 
-        if (recordingBlob == null) return 
-        setLoading(true)
-        convertWav(recordingBlob)
-        .then((resp) => 
-          uploadAudioRecording(resp)
-            .then( (data) => { 
+    // useEffect(() => { 
+    //     if (!process) return 
+    //     console.log("Processing")
+    //     // if (recordingBlob == null) return 
+    //     if (recordingBlob == null) return 
+    //     setLoading(true)
+    //     convertWav(recordingBlob)
+    //     .then((resp) => 
+    //       uploadAudioRecording(resp, "")
+    //         .then( (data) => { 
                 
-                if (data) {
+    //             if (data) {
   
-                  router.push({
-                      pathname: `/post_analysis/${data._id}`,
+    //               router.push({
+    //                   pathname: `/post_analysis/${data._id}`,
                       
-                  })
-                  resetRecordingStates()
-                  setLoading(false)
-                }
-            })
-        )
-        .catch((error) => {
-          setLoading(false)
-          resetRecordingStates()
-          throw new Error(error)
-        })
+    //               })
+    //               resetRecordingStates()
+    //               setLoading(false)
+    //             }
+    //         })
+    //     )
+    //     .catch((error) => {
+    //       setLoading(false)
+    //       resetRecordingStates()
+    //       throw new Error(error)
+    //     })
             
-    }, [recordingBlob, process])
+    // }, [recordingBlob, process])
 
 
       const START = () => { 

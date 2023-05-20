@@ -3,7 +3,7 @@
 import MuiModal from '@mui/material/Modal'
 import React, { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { AddEntryToggle, ShowAudioPlayer } from '../../atoms/atoms';
+import { AddEntryToggle, ModalState, ShowAudioPlayer } from '../../atoms/atoms';
 import { AnimatePresence, motion } from "framer-motion";
 
 interface Props { 

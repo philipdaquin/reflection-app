@@ -6,6 +6,7 @@ import AddAudioFile from '../../AddAudioFile'
 import { useRecoilState } from 'recoil'
 import { AddEntryToggle } from '../../../atoms/atoms'
 import { AnimatePresence, motion } from "framer-motion";
+import useUploadContext from '../../../hooks/useUploadProgress'
 
 
 
@@ -77,12 +78,14 @@ interface UploadContent {
 }
 
 function UploadContent({prevPage}: UploadContent) { 
-  const [uploadFile, setUploadFile] = useState(false)
+  // const [uploadFile, setUploadFile] = useState(false)
   const [isAudioFileSelected, SelectAudioFile] = useState(false)
+  
+  // const upload = () => { 
+  //   setUploadFile(true)
+  // }
 
-  const upload = () => { 
-    setUploadFile(true)
-  }
+  const {isUploading, handleUpload} = useUploadContext()
 
   return (
     <>
@@ -90,7 +93,7 @@ function UploadContent({prevPage}: UploadContent) {
         <div className='flex flex-col'>
           <h1 className='text-lg font-semibold text-left'>
             {
-              uploadFile ? (
+              isUploading ? (
                 'Creating a new journal entry...'
                 ) : (
                 'Upload an Audio Recording'
@@ -101,7 +104,7 @@ function UploadContent({prevPage}: UploadContent) {
           <h3 className='text-xs text-[#757575]'>
             
             {
-              uploadFile ? (
+              isUploading ? (
                 'You will be redirected shortly.'
               ) : (
                 'Attach an Audio Recording to this entry.'
@@ -115,10 +118,10 @@ function UploadContent({prevPage}: UploadContent) {
       
       
       <div className='pt-7 pb-4'>
-        <AddAudioFile uploadFile={uploadFile} isFileSelected={SelectAudioFile}>
+        <AddAudioFile isFileSelected={SelectAudioFile}>
 
           {
-            !uploadFile && (
+            !isUploading && (
               <section className='w-full rounded-[20px] border-[2px] border-[#757575] 
               flex flex-col justify-center items-center py-4 border-dashed cursor-pointer'>
                 <ArrowUpTrayIcon height={40} width={40} color='#757575' strokeWidth={1}/>
@@ -134,21 +137,20 @@ function UploadContent({prevPage}: UploadContent) {
               </section>
             ) 
           }
-
         </AddAudioFile>
       </div>
       
       <hr />  
 
       <div className='w-full justify-between flex flex-row items-center pt-4 pb-4 space-x-2'>
-        <div hidden={uploadFile} onClick={prevPage} className='bg-[#fafafa] cursor-pointer border-2 font-medium text-sm border-[#e0e0e0] rounded-[10px]  py-2 text-[#757575] w-full  text-center '>
+        <div hidden={isUploading} onClick={prevPage} className='bg-[#fafafa] cursor-pointer border-2 font-medium text-sm border-[#e0e0e0] rounded-[10px]  py-2 text-[#757575] w-full  text-center '>
           Cancel
         </div>
-        <button onClick={upload} disabled={!isAudioFileSelected || uploadFile} className={`
+        <button onClick={handleUpload} disabled={!isAudioFileSelected || isUploading} className={`
          ${isAudioFileSelected ? 'bg-[#212121] text-white' : 'bg-[#e0e0e0] text-[#757575] '}
          cursor-pointer border-2 font-medium text-sm border-[#e0e0e0] rounded-[10px]  py-2  w-full text-center `}>
           {
-            uploadFile ? ('Uploading...') : ('Continue')
+            isUploading ? ('Uploading...') : ('Continue')
           }
         </button>
       </div>
@@ -158,7 +160,7 @@ function UploadContent({prevPage}: UploadContent) {
 }
 
 
-function CloseModal() { 
+export function CloseModal() { 
   const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
 
   return (

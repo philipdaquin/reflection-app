@@ -7,6 +7,8 @@ import AddEntryContent from '../navigation/mobile/AddEntryContent';
 import PlayerModal from '../modals/PlayerModal';
 import { useRouter } from 'next/router';
 import { Toaster, toast } from 'react-hot-toast';
+import { UploadProgress } from '../AddAudioFile';
+import { UploadProgressProvider } from '../../hooks/useUploadProgress';
 
 interface Props { 
   children: any
@@ -26,7 +28,8 @@ function Layout({children}: Props) {
     
 
     return (
-      <div>
+      <div>   
+        <UploadProgressProvider>
         <Toaster
             position="top-center"
             reverseOrder={false}
@@ -43,7 +46,7 @@ function Layout({children}: Props) {
             </ModalView>
           )
         }
-
+        </UploadProgressProvider>
       </div>
     )
 }

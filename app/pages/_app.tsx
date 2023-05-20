@@ -5,6 +5,7 @@ import useAudioPlayer, { AudioProvider } from '../hooks/useAudioPlayer'
 import { AnimatePresence } from 'framer-motion';
 import Layout from '../components/layout/Layout';
 import { useEffect } from 'react';
+import { UploadProgressProvider } from '../hooks/useUploadProgress';
 
 /* 
   The AudioProvider ensures that the audio can be controlled and accessed from 
@@ -36,7 +37,7 @@ function MyApp({ Component, pageProps, router }: AppProps) {
               // mode={'wait'}
               // // Fires when all exiting nodes have completed animating out
               // onExitComplete={() => null}
-          >
+          > 
             <Layout>
                   <Component {...pageProps} key={router.route} />
             </Layout>

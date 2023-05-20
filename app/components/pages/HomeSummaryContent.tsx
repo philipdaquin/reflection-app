@@ -18,10 +18,13 @@ import { OPENAI_KEY } from '../SettingsButtons';
 import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate';
 import { fullTimeFormat } from '../../util/fullTimeFormat';
 import { useRecoilValue } from 'recoil';
-import { SelectedFilterOption } from '../../atoms/atoms';
+import { CurrentProgress, SelectedFilterOption } from '../../atoms/atoms';
 import MoodFilter from '../MoodFilter';
 import { toast } from 'react-hot-toast';
 import { UploadProgress } from '../AddAudioFile';
+import useUploadContext from '../../hooks/useUploadProgress';
+import ProgressBar from '../notification/ProgressBar';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface Props { 
   all_mood_data: TextClassification[] | null
@@ -47,17 +50,28 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
 
   // Inside your component
   // const handleShowToaster = () => {
-  //   toast.custom(() => (
-  //     <div className='max-w-xl w-full h-20 bg-white shadow-lg rounded-lg
-  //        pointer-events-auto flex ring-1 ring-black ring-opacity-5'>
-  //       <UploadProgress currentProgress={10}/>
+    // toast.custom(() => (
+    //   <div className='max-w-xl w-full h-20 bg-white shadow-lg rounded-lg
+    //      pointer-events-auto flex ring-1 ring-black ring-opacity-5'>
+    //   </div>
+    // ), {
+    //   duration: Infinity , // Set a duration in milliseconds (e.g., 5000ms = 5 seconds)
+    //   // Other options...
+    // });
+  //   toast((t) => (
+  //     <div className='
+  //     flex flex-row justify-between items-center w-[200px] space-x-5 h-[45px] py-2'>
+  //       <ProgressBar/>
+  //       <button 
+  //         //@ts-ignore
+  //         onClick={() => toast.dismiss(t.id)} 
+  //         className='cursor-pointer p-1 w-[20px] h-[20px] items-center flex justify-center bg-[#e0e0e0] rounded-full '>
+  //           <XMarkIcon height={16} width={16} color="#757575" strokeWidth={3}/>
+  //        </button>
   //     </div>
-  //   ), {
-  //     duration: Infinity , // Set a duration in milliseconds (e.g., 5000ms = 5 seconds)
-  //     // Other options...
-  //   });
+  //   ))
   // };
-  //      <button onClick={handleShowToaster}>Show Toaster</button>
+      
 
   return (
     <section className=''> 
@@ -73,12 +87,12 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
                 quality={100}
             />  
       </div>
-
       {/* Widget : Mood Changes */}
       {/* **Designed this way so each widget can be reused again */}
       {/* <h1 className='items-center flex  font-semibold text-[25px] text-black'>
         Summary
       </h1> */}
+       {/* <button onClick={handleShowToaster}>Show Toaster</button> */}
       <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{dateRange}</h2>
 
       <div className='pt-[30px] space-y-6 pb-52'>

@@ -6,25 +6,44 @@ import { OPENAI_KEY } from './SettingsButtons';
 import { BsSoundwave } from 'react-icons/bs';
 import {XMarkIcon} from '@heroicons/react/24/outline'
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
-import { useRecoilState } from 'recoil';
-import { ShowAudioPlayer } from '../atoms/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { AddEntryToggle, CurrentProgress, ModalState, ShowAudioPlayer } from '../atoms/atoms';
+import { toast } from 'react-hot-toast';
+import { toDate } from 'date-fns';
+import useUploadContext from '../hooks/useUploadProgress';
+import ProgressBar from './notification/ProgressBar';
 
+
+interface ProgressProps { 
+    currentProgress: number,
+}
+export function UploadProgress({currentProgress}: ProgressProps) { 
+    return (
+        <div className=' flex flex-row w-full space-x-2 pt-2 items-center '>
+            <div className=' bg-gray-200 rounded-full w-full h-2 overflow-hidden'>
+                <div className='bg-black h-full  rounded-full w-full' style={{width: `${currentProgress}%`}}>
+                </div>
+            </div>
+            <div className="text-center text-sm relative font-bold">{currentProgress.toFixed(1)}%</div>
+        </div>
+    )
+}
 
 interface Props { 
     children: any,
-    uploadFile: boolean
     isFileSelected: any
 }
 
-function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
+function AddAudioFile({children, isFileSelected}: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [loading, setloading] = useState(false)
     const router = useRouter()
-    const [progress, setProgress] = useState(0)
 
     const [currentFile, setCurrentFile] = useState<File | null>(null)
     const [showPlayer, setshowAudioPlayer] = useRecoilState(ShowAudioPlayer)
 
+
+    const {currentProgress, isUploading} = useUploadContext()
 
     const handleAvatar = () => {    
         if (selectedFile) return  
@@ -52,10 +71,8 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
         }
       };
 
-    
-
+    const showModel = useRecoilValue(AddEntryToggle);
     const handleFormSubmit = async () => {
-
         if (!selectedFile) return
         setloading(true)
         setCurrentFile(selectedFile)
@@ -64,64 +81,66 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
         formData.append("audio.wav", selectedFile!);
         if (apiKey === null) throw new Error("Failed to get Open AI key")
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:4001/api/audio/batch-upload");
-        xhr.setRequestHeader("Authorization", `Bearer ${apiKey}`);
-        xhr.upload.addEventListener("progress", (e) =>  { 
-            if (e.lengthComputable) { 
-                const percent = (e.loaded / e.total) * 100;
-                setProgress(percent)
-            }
-        })
-        xhr.onload = async () => { 
-            if (xhr.status === 200) { 
-                const preResp = JSON.parse(xhr.response)
-                const resp: AudioData = preResp
-                router.push({ 
-                    pathname: `/post_analysis/${resp._id}`
-                })
-                setCurrentFile(null)
-            } else { 
-                throw new Error("Failed to get audio file")
-            }
-        }
-        xhr.send(formData)
-    };
+        const uploadFile = new Promise((resolve, reject) => { 
 
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:4001/api/audio/batch-upload");
+            xhr.setRequestHeader("Authorization", `Bearer ${apiKey}`);
+            xhr.upload.addEventListener("progress", (e) =>  { 
+                if (e.lengthComputable) { 
+                    const percent = (e.loaded / e.total) * 100;
+                }
+            })
+            xhr.onload = async () => { 
+                if (xhr.status === 200) { 
+                    const preResp = JSON.parse(xhr.response)
+                    const resp: AudioData = preResp
+                    router.push({ 
+                        pathname: `/post_analysis/${resp._id}`
+                    })
+                    resolve(resp);
+                    setCurrentFile(null)
+                } else { 
+                    reject(new Error("Failed to get audio file"));
+                }
+            }
+            xhr.send(formData)
+        })
+        toast.promise(
+            uploadFile,
+             {
+               loading: 
+                    <div className='
+                    flex flex-row justify-between items-center w-[200px] space-x-5 h-[45px] py-2'>
+                      <ProgressBar/>
+                      <button 
+                        //@ts-ignore
+                        onClick={() => toast.dismiss(t.id)} 
+                        className='cursor-pointer p-1 w-[20px] h-[20px] items-center flex justify-center bg-[#e0e0e0] rounded-full '>
+                          <XMarkIcon height={16} width={16} color="#757575" strokeWidth={3}/>
+                       </button>
+                    </div>,
+               success: <b>Completed!</b>,
+               error: <b>Unable to process audio.</b>,
+             }
+           );
+   
+    };
 
     // Temporary
     useEffect(() => {
-        if (!uploadFile) return 
+        if (!isUploading) return 
         if (!selectedFile) return
 
         handleFormSubmit()
-    }, [uploadFile, selectedFile, isFileSelected])
+    }, [isUploading, selectedFile, isFileSelected])
 
     const removeFile = () => { 
         setSelectedFile(null)
         setCurrentFile(null)
         isFileSelected(false)
     }
-    const [currentProgress, setCurrentProgress] = useState(0)
-    useEffect(() => {
-        if (!uploadFile) return 
-        const eventSource = new EventSource('http://localhost:4001/api/audio/events');
-        
-        eventSource.addEventListener('message', (event) => {
-          const preData = JSON.parse(event.data);
-          const data: ProgressData = preData  
-
-          console.log(data)
-            if (!data.progress) return
-
-            setCurrentProgress(data.progress);
-        });
-    
-        return () => {
-          eventSource.close();
-        };
-      }, [uploadFile]);
-
+ 
     return (
 
             <>
@@ -131,39 +150,29 @@ function AddAudioFile({children, uploadFile, isFileSelected}: Props) {
 
                 {selectedFile && (
                     <>
-                            <div className='flex px-2  border-[1px] border-[#e0e0e0] py-2 rounded-[15px] items-start justify-between'>  
-                                <div className='flex flex-col w-full'>
-                                    <div className='flex space-x-2'>
-                                        <div className='px-2 py-2 rounded-lg border-[1px] w-fit border-[#cfcfcf]  items-center flex flex-row justify-center'>
-                                            <BsSoundwave  size={24} color='black' />
-                                        </div>
-                                        <div className='flex flex-col text-left '>
-                                            <h1 className='font-semibold'>
-                                                {selectedFile?.name}
-                                            </h1>
-                                            <p className='text-left text-[#757575] text-sm'>
-                                                {selectedFile && `${(selectedFile?.size / 1000000).toFixed(2)} MB`}
-                                            </p>
-                                            {/* <div>
-                                                SSE
-                                                {currentProgress}
-                      W                      </div> */}
-                                        </div>
+                        <div className='flex px-2  border-[1px] border-[#e0e0e0] py-2 rounded-[15px] items-start justify-between'>  
+                            <div className='flex flex-col w-full'>
+                                <div className='flex space-x-2'>
+                                    <div className='px-2 py-2 rounded-lg border-[1px] w-fit border-[#cfcfcf]  items-center flex flex-row justify-center'>
+                                        <BsSoundwave  size={24} color='black' />
                                     </div>
-                                    {currentProgress > 0 && (
-                                        <div className=' flex flex-row w-full space-x-2 pt-2 items-center '>
-                                            <div className=' bg-gray-200 rounded-full w-full h-2 overflow-hidden'>
-                                                <div className='bg-black h-full  rounded-full w-full' style={{width: `${currentProgress}%`}}>
-                                                </div>
-                                            </div>
-                                            <div className="text-center text-sm relative font-bold">{currentProgress.toFixed(1)}%</div>
-                                        </div>
-                                    )} 
+                                    <div className='flex flex-col text-left '>
+                                        <h1 className='font-semibold'>
+                                            {selectedFile?.name}
+                                        </h1>
+                                        <p className='text-left text-[#757575] text-sm'>
+                                            {selectedFile && `${(selectedFile?.size / 1000000).toFixed(2)} MB`}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div onClick={removeFile} className='cursor-pointer'>
-                                    <XMarkIcon  height={20} width={20} color='#9e9e9e' />
-                                </div> 
+                                {currentProgress > 0 && (
+                                   <UploadProgress currentProgress={currentProgress}/>
+                                )} 
                             </div>
+                            <div onClick={removeFile} className='cursor-pointer'>
+                                <XMarkIcon  height={20} width={20} color='#9e9e9e' />
+                            </div> 
+                        </div>
                     </>
                 )}
             </>
