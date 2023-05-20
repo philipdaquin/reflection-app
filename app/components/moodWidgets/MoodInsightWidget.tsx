@@ -35,14 +35,19 @@ function MoodInsightWidget({dailySummary, currentWeeklySummary}: MoodProps) {
 
     const selectedFilter = useRecoilValue(SelectedFilterOption)
 
-    const [best, setBestData] = useState<AudioData | null | undefined>(currentWeeklySummary?.max)
-    const [worst, setWorstData] = useState<AudioData | null | undefined>(currentWeeklySummary?.min)
-    const [inflection, setInflectedData] = useState<AudioData | null | undefined>(currentWeeklySummary?.inflection)
-    
-    
-    let f = currentWeeklySummary?.mood_frequency?.at(0)
-    
-    const [frequency, setDominantData] = useState<MoodFrequency | null | undefined>(f)
+    const [best, setBestData] = useState<AudioData | null | undefined>(null)
+    const [worst, setWorstData] = useState<AudioData | null | undefined>(null)
+    const [inflection, setInflectedData] = useState<AudioData | null | undefined>(null)
+
+    const [frequency, setDominantData] = useState<MoodFrequency | null | undefined>(currentWeeklySummary?.mood_frequency?.at(0))
+
+
+
+    const [bestTime, setBestTime] = useState<string | null>(null)
+    const [worstTime, setWorstTime] = useState<string | null>(null)
+    const [inflectionTime, setInflectionTime] = useState<string | null>(null)
+    const [percentage, setPercentage] = useState<string | null>(null)
+    const [fullPercentage, setFullPercentage] = useState<string | null>(null)
 
     // If 24hr then only show DailySummary
     // If 1W or more, then only show WeeklySummary
@@ -58,15 +63,34 @@ function MoodInsightWidget({dailySummary, currentWeeklySummary}: MoodProps) {
             setInflectedData(currentWeeklySummary?.inflection)
             setDominantData(currentWeeklySummary?.mood_frequency ? currentWeeklySummary?.mood_frequency[0] : null)
         }
-    }, [selectedFilter])
-    
-    
-    const bestTime =  fullTimeFormat(best?.date.toString() || "")
-    const worstTime =  fullTimeFormat(worst?.date.toString() || "")
-    const inflectionTime =  fullTimeFormat(inflection?.date.toString() || "")
-    const percentage = ((frequency?.percentage ?? 0) as number).toFixed(2) 
-    const fullPercentage = (frequency?.emotion_emoji || "NaN") + " " +   percentage + "%"
+   
+   
+      
+    }, [
+        selectedFilter,
+        dailySummary,
+        currentWeeklySummary
+    ])
 
+    useEffect(() => {
+        const bestTime_ =  fullTimeFormat(best?.date.toString() || "")
+        const worstTime_ =  fullTimeFormat(worst?.date.toString() || "")
+        const inflectionTime_ =  fullTimeFormat(inflection?.date.toString() || "")
+        const percentage_ = ((frequency?.percentage ?? 0) as number).toFixed(2) 
+        const fullPercentage_ = (frequency?.emotion_emoji || "NaN") + " " +   percentage + "%"
+
+        setBestTime(bestTime_)
+        setWorstTime(worstTime_)
+        setInflectionTime(inflectionTime_)
+        setPercentage(percentage_)
+        setFullPercentage(fullPercentage_)
+
+    }, [best,
+        worst,
+        inflection,
+        frequency
+    ])
+    
 
     return (
         <div className='flex flex-col space-y-4 '>
