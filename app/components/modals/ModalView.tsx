@@ -35,11 +35,11 @@ function ModalView({children}: Props) {
       return (
           <MuiModal
             className={`
-              fixed left-0 right-0 h-full
+              fixed left-0 right-0 h-full !bottom-10
               z-50 mx-auto w-full max-w-5xl 
               overflow-hidden overflow-y-scroll 
               rounded-md rounded-b-none scrollbar-hide
-              duration-700 ease-out transition-all
+              duration-700 ease-out transition-all 
             `}
             open={isOpen}
             onClose={handleClose}

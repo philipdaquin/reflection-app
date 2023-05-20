@@ -103,13 +103,13 @@ function SummaryContent({data}: Props) {
         .setImageUrl(image_url)
         .setAudioUrl(audio_url)
         .setAuthor(author)
-        .setDescription(description)
+        .setDescription(editedDescription)
         .setDuration(duration)
         .setFavourite(favourite)
         .setDay(day)
         .setSummary(editedSummary)
         .setTextClassification(text_classification)
-        .setTags(tags)
+        .setTags(editedTags)
         .build()
         setUpdatedAudioData(builder);
       }, [
@@ -117,12 +117,12 @@ function SummaryContent({data}: Props) {
         editedTitle,
         transcription, 
         editedSummary, 
+        editedDescription,
         text_classification, 
         editedTags, 
         date, 
         day,
         author, 
-        description,
         duration, 
         favourite, 
         image_url,
@@ -134,7 +134,7 @@ function SummaryContent({data}: Props) {
     const handleToggleSummary = () => settoggleTag(!toggleTag)
     
     const [showSummary, setShowSummary] = useState(false)
-    const filteredSummary = showSummary ? summary : summary?.slice(0, 150) + "..." 
+    const filteredSummary = showSummary ? summary : summary?.length || 0 > 150 ? summary?.slice(0, 150) + "..." : summary
     const handleShowSummary = () => setShowSummary(!showSummary)
 
     useEffect(() => { 

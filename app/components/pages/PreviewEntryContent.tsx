@@ -40,7 +40,17 @@ export type IconTitle = {
 
 function PreviewEntryContent({entry}: Props) {
   
-  const { _id, title, summary, date, text_classification, tags, transcription } = entry 
+  const { _id, title, summary, date, 
+      text_classification, tags, 
+      transcription, 
+      description,
+      favourite,
+      duration,
+      author,
+      audio_url,
+      image_url,
+      
+  } = entry 
 
   const router = useRouter()
 
@@ -163,7 +173,6 @@ function PreviewEntryContent({entry}: Props) {
           <p className='text-sm text-[#757575]'>
             {filteredSummary} <span className='cursor-pointer text-sm text-blue-400 hover:text-blue-300 font-semibold' onClick={showSummary} hidden={toggleSummary}>
               Read more
-
             </span>
           </p>
         </div>
@@ -196,6 +205,20 @@ function PreviewEntryContent({entry}: Props) {
             <InsightContainer date={`${emotionPercent}`} title='Mood Rating'/>
           </div>
       </div>
+
+                      
+      <div className='pt-[15px] space-y-1'>
+        <h1 className='text-left text-xl font-semibold '>
+          Notes 
+        </h1>
+
+        <div>
+          <p className='text-sm text-[#757575]'>
+            {description}
+          </p>
+        </div>
+      </div>
+
       
       <div className='pt-5 w-full '>
         <div onClick={showTranscript} className='w-full flex flex-row items-center justify-between cursor-pointer  py-2 rounded-lg'>
