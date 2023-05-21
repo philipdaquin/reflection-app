@@ -1,11 +1,11 @@
-import { getElevenLabsAPIKey, getOpenAPIKey } from "../../pages"
+import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY } from "../../hooks/useLocalStorage"
 
 // Send the WAV fle to the server 
 export async function uploadChatRecording(wavFile: Blob): Promise<Blob> {
 
     
-    const elevenLabsApiKey = getElevenLabsAPIKey()
-    const apiKey = getOpenAPIKey()
+    const elevenLabsApiKey = useLocalStorage(ELEVEN_LABS_KEY, null)
+    const apiKey = useLocalStorage(OPENAI_KEY, null)
 
     
     if (elevenLabsApiKey === null) throw new Error("Failed to get Open AI key")
@@ -23,7 +23,7 @@ export async function uploadChatRecording(wavFile: Blob): Promise<Blob> {
     return fetch("http://localhost:4001/api/audio/upload", {
       method: "POST",
       body: formData,
-      headers
+    //   headers,
     })
     .then(async (response) => {
 
