@@ -18,7 +18,7 @@ import { OPENAI_KEY } from '../SettingsButtons';
 import { getWeekStartAndEndDates } from '../../util/getWeekStartandEndDate';
 import { fullTimeFormat } from '../../util/fullTimeFormat';
 import { useRecoilValue } from 'recoil';
-import { CurrentProgress, SelectedFilterOption } from '../../atoms/atoms';
+import { AddEntryToggle, CurrentProgress, SelectedFilterOption } from '../../atoms/atoms';
 import MoodFilter from '../MoodFilter';
 import { toast } from 'react-hot-toast';
 import { UploadProgress } from '../AddAudioFile';
@@ -48,31 +48,6 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
   const selectedFilter = useRecoilValue(SelectedFilterOption)
   const dateRange = selectedFilter.label === '24H' ? fullday : fullweek
 
-  // Inside your component
-  // const handleShowToaster = () => {
-    // toast.custom(() => (
-    //   <div className='max-w-xl w-full h-20 bg-white shadow-lg rounded-lg
-    //      pointer-events-auto flex ring-1 ring-black ring-opacity-5'>
-    //   </div>
-    // ), {
-    //   duration: Infinity , // Set a duration in milliseconds (e.g., 5000ms = 5 seconds)
-    //   // Other options...
-    // });
-  //   toast((t) => (
-  //     <div className='
-  //     flex flex-row justify-between items-center w-[200px] space-x-5 h-[45px] py-2'>
-  //       <ProgressBar/>
-  //       <button 
-  //         //@ts-ignore
-  //         onClick={() => toast.dismiss(t.id)} 
-  //         className='cursor-pointer p-1 w-[20px] h-[20px] items-center flex justify-center bg-[#e0e0e0] rounded-full '>
-  //           <XMarkIcon height={16} width={16} color="#757575" strokeWidth={3}/>
-  //        </button>
-  //     </div>
-  //   ))
-  // };
-      
-
   return (
     <section className=''> 
       <div className='flex flex-row items-center justify-between'>
@@ -92,7 +67,7 @@ function HomeSummaryContent({all_mood_data, recent_entries, dailyMoodSummary, cu
       {/* <h1 className='items-center flex  font-semibold text-[25px] text-black'>
         Summary
       </h1> */}
-       {/* <button onClick={handleShowToaster}>Show Toaster</button> */}
+       {/* <button onClick={handleShowProgress}>Show Toaster</button> */}
       <h2 className='flex flex-row text-[15px] text-[#9e9e9e] font-regular'>{dateRange}</h2>
 
       <div className='pt-[30px] space-y-6 pb-52'>

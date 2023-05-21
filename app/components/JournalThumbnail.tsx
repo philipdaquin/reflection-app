@@ -70,10 +70,10 @@ function JournalThumbnail() {
                     
                     <div className='relative'>
                         <Image src={imageUrl} 
-                            className='rounded-[50px] object-fill border-[#F6F6F6] border-8 h-[156px] w-[156px]' 
+                            className='rounded-[50px] object-fill border-[#F6F6F6] border-8 h-[200px] w-[200px]' 
                             alt='User Profile'  
-                            height={156}
-                            width={156}
+                            height={200}
+                            width={200}
                             quality={100}
                         /> 
                          <div className='absolute right-0 bottom-0 bg-[#424242] rounded-full p-2  items-center flex justify-center w-fit cursor-pointer ' onClick={deleteImage}  >
@@ -82,7 +82,7 @@ function JournalThumbnail() {
                     </div>
                     ) : (
                         // Placeholder 
-                        <div className='rounded-[50px] items-center justify-center flex border-dotted cursor-pointer border-[#747474] border-2 h-[156px] w-[156px]'>
+                        <div className='rounded-[50px] items-center justify-center flex border-dotted cursor-pointer border-[#747474] border-2 h-[200px] w-[200px]'>
                             <h1>Upload photo</h1>
                         </div>
                     )

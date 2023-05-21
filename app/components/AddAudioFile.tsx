@@ -36,14 +36,9 @@ interface Props {
 
 function AddAudioFile({children, isFileSelected}: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [loading, setloading] = useState(false)
-    const router = useRouter()
+    const {currentProgress, isUploading, handleFileUpload} = useUploadContext()
 
-    const [currentFile, setCurrentFile] = useState<File | null>(null)
-    const [showPlayer, setshowAudioPlayer] = useRecoilState(ShowAudioPlayer)
-
-
-    const {currentProgress, isUploading} = useUploadContext()
+    
 
     const handleAvatar = () => {    
         if (selectedFile) return  
@@ -55,7 +50,6 @@ function AddAudioFile({children, isFileSelected}: Props) {
         input.onchange = handleFileChange
         input.click();
     }
-    const [apiKey, setApiKey] = useLocalStorage<string | null>(OPENAI_KEY, null) 
 
     const handleFileChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
         ev.preventDefault()
@@ -70,74 +64,14 @@ function AddAudioFile({children, isFileSelected}: Props) {
             isFileSelected(false)
         }
       };
-
-    const showModel = useRecoilValue(AddEntryToggle);
-    const handleFormSubmit = async () => {
-        if (!selectedFile) return
-        setloading(true)
-        setCurrentFile(selectedFile)
-        setshowAudioPlayer(false)
-        const formData = new FormData();
-        formData.append("audio.wav", selectedFile!);
-        if (apiKey === null) throw new Error("Failed to get Open AI key")
-
-        const uploadFile = new Promise((resolve, reject) => { 
-
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "http://localhost:4001/api/audio/batch-upload");
-            xhr.setRequestHeader("Authorization", `Bearer ${apiKey}`);
-            xhr.upload.addEventListener("progress", (e) =>  { 
-                if (e.lengthComputable) { 
-                    const percent = (e.loaded / e.total) * 100;
-                }
-            })
-            xhr.onload = async () => { 
-                if (xhr.status === 200) { 
-                    const preResp = JSON.parse(xhr.response)
-                    const resp: AudioData = preResp
-                    router.push({ 
-                        pathname: `/post_analysis/${resp._id}`
-                    })
-                    resolve(resp);
-                    setCurrentFile(null)
-                } else { 
-                    reject(new Error("Failed to get audio file"));
-                }
-            }
-            xhr.send(formData)
-        })
-        toast.promise(
-            uploadFile,
-             {
-               loading: 
-                    <div className='
-                    flex flex-row justify-between items-center w-[200px] space-x-5 h-[45px] py-2'>
-                      <ProgressBar/>
-                      <button 
-                        //@ts-ignore
-                        onClick={() => toast.dismiss(t.id)} 
-                        className='cursor-pointer p-1 w-[20px] h-[20px] items-center flex justify-center bg-[#e0e0e0] rounded-full '>
-                          <XMarkIcon height={16} width={16} color="#757575" strokeWidth={3}/>
-                       </button>
-                    </div>,
-               success: <b>Completed!</b>,
-               error: <b>Unable to process audio.</b>,
-             }
-           );
-   
-    };
-
     // Temporary
     useEffect(() => {
-        if (!isUploading) return 
-        if (!selectedFile) return
-
-        handleFormSubmit()
+        if (!isUploading || !selectedFile) return 
+        handleFileUpload(selectedFile)
     }, [isUploading, selectedFile, isFileSelected])
 
     const removeFile = () => { 
         setSelectedFile(null)
-        setCurrentFile(null)
         isFileSelected(false)
     }
  

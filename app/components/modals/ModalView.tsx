@@ -2,9 +2,10 @@
 // export default ModalView
 import MuiModal from '@mui/material/Modal'
 import React, { useState, useEffect } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddEntryToggle, ModalState, ShowAudioPlayer } from '../../atoms/atoms';
 import { AnimatePresence, motion } from "framer-motion";
+import useUploadContext from '../../hooks/useUploadProgress';
 
 interface Props { 
   children: any

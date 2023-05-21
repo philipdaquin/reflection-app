@@ -4,17 +4,22 @@ import {TbMessageChatbot, TbTrash} from 'react-icons/tb'
 import {CheckIcon} from '@heroicons/react/24/outline'
 import { useRouter } from 'next/router'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { AddEntryToggle, AudioPlayerSource, AudioSummaryAtom } from '../atoms/atoms'
+import { AddEntryToggle, AudioPlayerSource, AudioSummaryAtom, SelectedAudioPlayer } from '../atoms/atoms'
 import { updateEntry } from '../util/audio/updateEntry'
 import { deleteEntry } from '../util/audio/deleteEntry'
+import useUploadContext from '../hooks/useUploadProgress'
+import useAudioPlayer from '../hooks/useAudioPlayer'
 
 
 function PostSummaryControls() {
     const router = useRouter()
     const audioData = useRecoilValue(AudioSummaryAtom);
+    const [, setSelectedPlayer] = useRecoilState(SelectedAudioPlayer)
     const [, setAudioSource] = useRecoilState(AudioPlayerSource)
-
     const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
+    
+    const {resetPlayer, handleDisableAutoPlay} = useAudioPlayer()
+    
     // Prevents the modal from reopening after redirects
     const resetModal = () => { 
         if (showModal) setShowModal(false)
@@ -25,12 +30,24 @@ function PostSummaryControls() {
         if (!audioData) return 
         updateEntry(audioData)
             .then(resp => {
-                router.push('/mood_summary')
-                setAudioSource("")
+                // temp
+                setSelectedPlayer(null)
+                handleDisableAutoPlay(true)
+                setAudioSource(null)
+                resetPlayer(true)
                 resetModal()
+                router.push('/mood_summary').then(() => { 
+                    router.reload()
+                });
+
             })
             .catch(e => { 
                 console.error(e)
+                resetPlayer(true)
+                handleDisableAutoPlay(true)
+
+                setSelectedPlayer(null)
+                setAudioSource(null)
                 throw new Error(e)
             })
     }
@@ -41,7 +58,12 @@ function PostSummaryControls() {
 
         deleteEntry(audioData._id.toString())
             .then(resp => { 
+                resetPlayer(true)
+                handleDisableAutoPlay(true)
 
+                setSelectedPlayer(null)
+                setAudioSource(null)
+                resetModal()
                 // if False
                 if (!resp) { 
                     throw new Error("Failed to delete entry")
@@ -49,11 +71,16 @@ function PostSummaryControls() {
 
                 // else 
                 // route the user back to the homepage
-                router.push('/')
-                resetModal()
+                router.push('/').then(() => { 
+                    router.reload()
+                })
 
             }).catch(e => { 
                 console.error(e)
+                resetPlayer(true)
+
+                setSelectedPlayer(null)
+                setAudioSource(null)
                 throw new Error(e)
             })
     }

@@ -124,8 +124,8 @@ function SettingSlot({title, savedValue, component}: SettingsProps) {
                 // ref={dropdownRef}
                 onClick={openAIDrop} 
                 className='dropdown dropdown-right cursor-pointer rounded-[11px] w-[180px] hover:bg-[#F5F5F5] py-3 flex flex-col '>
-                <label tabIndex={0} className='text-[#505050] text-[13px] text-left w-full '>{title}</label>
-                { savedValue && <input readOnly={true} type='password' className='outline-none text-xs bg-inherit w-full text-[#BDBDBD] tracking-widest font-light' value={savedValue}/>}
+                <label tabIndex={0} className='text-[#505050] text-[13px] text-left w-full cursor-pointer '>{title}</label>
+                { savedValue && <input readOnly={true} type='password' className='outline-none text-xs bg-inherit w-full text-[#BDBDBD] tracking-widest font-light cursor-pointer' value={savedValue}/>}
             </div>  
             
                 { openAIToggle && component }
@@ -167,11 +167,11 @@ function SettingsToggle() {
             <div className='flex flex-col'>
                 {/* {toggle && <ShowSettings/> } */}
                 <div className='cursor-pointer dropdown dropdown-top' >
-                    <label tabIndex={0} className="btn btn-link" onClick={openDrop}>
+                    <label tabIndex={0} className="btn btn-link">
                         <Cog8ToothIcon height={24} width={24} color={`${toggle ? 'black' : '#757575'} `} />
                     </label>
-                    <ul tabIndex={0} className=" dropdown-content p-2 mb-5 menu active shadow bg-base-100 rounded-box">
-                        <li>
+                    <ul tabIndex={0} className="cursor-pointer dropdown-content p-2 mb-5 menu active shadow bg-base-100 rounded-box">
+                        <li className='cursor-pointer'>
                             <SettingSlot 
                                 savedValue={openAi} 
                                 title='Eleven Labs API Key'
@@ -184,7 +184,7 @@ function SettingsToggle() {
                                 }
                             />
                         </li>
-                        <li>
+                        <li className='cursor-pointer'>
                             <SettingSlot
                                 savedValue={elevenLabs}
                                 title='OpenAI API Key'

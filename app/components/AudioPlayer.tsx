@@ -4,14 +4,15 @@ import {PlayIcon, StopIcon} from '@heroicons/react/24/solid'
 import {EllipsisHorizontalCircleIcon, PauseIcon} from '@heroicons/react/24/outline'
 import useAudioPlayer, { PlayerState } from '../hooks/useAudioPlayer';
 import { useRecoilState } from 'recoil';
-import { AudioPlayerSource } from '../atoms/atoms';
+import { AudioPlayerSource, SelectedAudioPlayer } from '../atoms/atoms';
 import { DownloadAudio } from './pages/SummaryContent';
 import { url } from 'inspector';
+import { AudioData } from '../typings';
 
 
 interface Props { 
     src: string | null,
-    title: string | null
+    title: string | null,
 }
 
 function AudioPlayer({src, title} : Props) {
@@ -35,11 +36,11 @@ function AudioPlayer({src, title} : Props) {
       source,
       playerRef,
       setCurrent,
-      handleDuration
+      handleDuration,
+      handleDisableAutoPlay,
+      resetPlayer
     } = useAudioPlayer()
-    
-    
-  
+
     return (
       <>  
         <div className='w-full flex'>
@@ -55,7 +56,7 @@ function AudioPlayer({src, title} : Props) {
             ref={(ref) => (playerRef.current = ref)}
             url={src || ""}
             progressInterval={1000}
-            playing={isPlaying}
+            playing={!isPlaying}
             onSeek={setCurrent}
             onProgress={handleProgress}
             onDuration={handleDuration}

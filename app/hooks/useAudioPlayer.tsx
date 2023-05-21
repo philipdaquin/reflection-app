@@ -31,7 +31,9 @@ interface PlayerInterface {
     handleFastForward: () => void;
     handleRewindBack: () => void;
     handlePlayerLoop: () => void;
-    formatTime: (time: number) => string
+    formatTime: (time: number) => string,
+    handleDisableAutoPlay: (setting: boolean) => void, 
+    resetPlayer: (input: boolean) => void
 }
   
 const AudioContext = createContext<PlayerInterface>({
@@ -55,7 +57,10 @@ const AudioContext = createContext<PlayerInterface>({
     handleFastForward: () => {},
     handleRewindBack: () => {},
     handlePlayerLoop: () => {},
-    formatTime: () => ""
+    formatTime: () => "",
+    handleDisableAutoPlay: () => {},
+    resetPlayer: () => {},
+
 }) 
 
 interface Props { 
@@ -63,15 +68,25 @@ interface Props {
 }
 
 export const AudioProvider = ({ children} : Props) => { 
+
+    const [disableAutoPlay, setDisableAutoPlay] = useState<boolean | null>(null)
+    const handleDisableAutoPlay = (input: boolean) => { 
+      setDisableAutoPlay(input)
+    }
+    const [isPlaying, setIsPlaying] = useState<boolean>(disableAutoPlay === null ? true : !disableAutoPlay);
+
     const audioPlayer = useRef<ReactPlayer | null>(null)
-    const [isPlaying, setIsPlaying] = useState(true);
+    const resetPlayer = (input: boolean) => { 
+      if (input) {
+        audioPlayer.current = null
+      }
+    }
+
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [isEnded, setIsEnded] = useState(false)
     const [isLoop, setLoop] = useState(false)
-
     const [playbackRate, setPlaybackRate] = useState(1.00)
-
     const handlePlaybackRate = (rate: number) => { 
       setPlaybackRate(rate)
     }
@@ -172,13 +187,15 @@ export const AudioProvider = ({ children} : Props) => {
       isEnded,
       currentState,
       handlePlaybackRate,
-      playbackRate
+      playbackRate,
+      handleDisableAutoPlay,
+      resetPlayer
     }), [
       isPlaying, currentTime, setCurrentTime, isLoop, duration, 
       audioPlayer, handleProgress, handlePlayClick, handleSliderChange, 
       handleDuration, handlePlayerLoop, handleFastForward, 
       handleRewindBack, formatTime, source, handleEnded, isEnded, currentState,
-      playbackRate,handlePlaybackRate
+      playbackRate,handlePlaybackRate, handleDisableAutoPlay, resetPlayer
     ]
     )
 

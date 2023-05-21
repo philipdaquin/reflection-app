@@ -1,45 +1,13 @@
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {ArrowUpTrayIcon, MicrophoneIcon, XMarkIcon, FolderPlusIcon} from '@heroicons/react/24/outline'
 import { RiChatVoiceLine } from 'react-icons/ri'
 import AddAudioFile from '../../AddAudioFile'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { AddEntryToggle } from '../../../atoms/atoms'
 import { AnimatePresence, motion } from "framer-motion";
 import useUploadContext from '../../../hooks/useUploadProgress'
 
-
-
-// interface ModalProps { 
-//   title: string
-//   subtitle: string
-//   children: any
-//   nextPage?: any
-//   prevPage?: any
-// }
-
-// function ModalContent({
-//   title, 
-//   subtitle, 
-//   children,
-//   nextPage,
-//   prevPage
-// }: ModalProps) { 
-//   return (
-//     <>
-//       <div className='flex flex-row justify-between items-center'>
-//         <div className='flex flex-col'>
-//           <h1 className='text-lg font-semibold text-left'>{title}</h1>
-//           <h3 className='text-xs text-[#757575]'>{subtitle}</h3>
-//         </div>
-//         <CloseModal />
-//       </div>
-//       <div className=' flex flex-row w-full pt-[24px]  justify-between'>
-//         {children}
-//       </div>
-//     </>
-//   )
-// }
 
 interface Props { 
     children: any
@@ -80,12 +48,7 @@ interface UploadContent {
 function UploadContent({prevPage}: UploadContent) { 
   // const [uploadFile, setUploadFile] = useState(false)
   const [isAudioFileSelected, SelectAudioFile] = useState(false)
-  
-  // const upload = () => { 
-  //   setUploadFile(true)
-  // }
-
-  const {isUploading, handleUpload} = useUploadContext()
+  const {isUploading, handleUpload, handleShowProgress} = useUploadContext()  
 
   return (
     <>

@@ -8,7 +8,7 @@ import PlayerModal from '../modals/PlayerModal';
 import { useRouter } from 'next/router';
 import { Toaster, toast } from 'react-hot-toast';
 import { UploadProgress } from '../AddAudioFile';
-import { UploadProgressProvider } from '../../hooks/useUploadProgress';
+import useUploadContext, { UploadProgressProvider } from '../../hooks/useUploadProgress';
 import { initialiseAPIKeys } from '../../pages';
 import SettingsButtons from '../SettingsButtons';
 
@@ -31,7 +31,6 @@ function Layout({children}: Props) {
       router.pathname === '/record' ||
       router.pathname === '/mood_summary' ||
       router.pathname.startsWith('/post_analysis/');
-    
 
     return (
       <div className='relative'>   

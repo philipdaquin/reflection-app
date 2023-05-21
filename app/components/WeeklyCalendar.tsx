@@ -108,7 +108,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
 
                 <ul className='flex flex-row items-center justify-between'>
                     {days.map((day, index) => (
-                    <li key={index} onClick={(e) => {e.stopPropagation(); selectDate(day)}}>
+                    <li key={index} onClick={(e) => selectDate(day)}>
                         <div className={`flex flex-col cursor-pointer md:w-10 w-12 items-center rounded-xl space-y-1`}>
                             <p className={`
                                 text-[10px] 
