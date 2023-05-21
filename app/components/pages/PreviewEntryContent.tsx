@@ -104,7 +104,7 @@ function PreviewEntryContent({entry}: Props) {
     <section className='flex flex-col h-full w-full'>
       <div className='flex flex-row items-center justify-between pb-5'>
         <BackButton/>
-        <h1 className='font-semibold text-[15px] text-center  text-[#757575]'>Preview</h1>
+        <h1 className='font-semibold md:text-[15px] text-lg  text-end relative left-5 text-[#757575]'>Preview</h1>
 
 
         <div className='flex flex-row items-center space-x-2'>

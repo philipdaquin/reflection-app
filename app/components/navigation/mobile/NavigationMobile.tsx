@@ -32,37 +32,45 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
     const { 
       handlePlayClick,
       handleFastForward,
-      currentState
+      currentState,
+      currentTime
     } = useAudioPlayer() 
     
     return (
       <>
-      <div className={`hover:bg-[#F5F5F5] border-t-2 mb-5 border-b-2 sm:mb-2
-        border-[#F0F0F0] sm:border-none rounded-t-3xl h-full
-        cursor-pointer pb-5 px-5 sm:px-4 flex flex-row pr-4
-        justify-between w-full items-center py-4 sm:py-4`}>
-        <div  onClick={togglePlayer} className='flex flex-row items-start space-x-2 w-full'>
-          <div className='bg-black w-14 h-14 rounded-lg '>
+      <div className='mb-5'>
+
+        <div className={`hover:bg-[#F5F5F5] border-t-2 border-b-2 sm:mb-2
+          border-[#F0F0F0] sm:border-none rounded-t-3xl h-full
+          cursor-pointer pb-5 px-5 sm:px-4 flex flex-row pr-4
+          justify-between w-full items-center py-4 sm:py-4`}>
+          <div  onClick={togglePlayer} className='flex flex-row items-start space-x-2 w-full'>
+            <div className='bg-black w-14 h-14 rounded-lg '>
+            </div>
+            <div className=''>
+              <h1 className='font-semibold text-[15px]'>{slicedTitle}</h1>
+              <p className='text-[#757575] text-xs'>{fullDate}</p>
+            </div>
           </div>
-          <div className=''>
-            <h1 className='font-semibold text-[15px]'>{slicedTitle}</h1>
-            <p className='text-[#757575] text-xs'>{fullDate}</p>
+          <div className='flex flex-row space-x-3 sm:space-x-1 z-50'>
+            <div className={`${onHover} p-2`} onClick={handlePlayClick} >
+              { currentState &&  (currentState === PlayerState.PLAY || currentState === PlayerState.RESUME) ? (
+                    <PlayIcon height={24} width={24} color='#000' />
+                  ) : (
+                    <PauseIcon height={25} width={25} color="#000" strokeWidth={4}/>
+                )
+              }
+            </div>
+            <div className={`${onHover} p-2`} onClick={handleFastForward} >
+              <MdOutlineForward10 size={24} color="#000"/>    
+            </div>
           </div>
         </div>
-        <div className='flex flex-row space-x-3 sm:space-x-1 z-50'>
-          <div className={`${onHover} p-2`} onClick={handlePlayClick} >
-            { currentState &&  (currentState === PlayerState.PLAY || currentState === PlayerState.RESUME) ? (
-                  <PlayIcon height={24} width={24} color='#000' />
-                ) : (
-                  <PauseIcon height={25} width={25} color="#000" strokeWidth={4}/>
-              )
-            }
-          </div>
-          <div className={`${onHover} p-2`} onClick={handleFastForward} >
-            <MdOutlineForward10 size={24} color="#000"/>    
+          <div className=' bg-gray-200 rounded-full w-full h-1 overflow-hidden duration-300 relative bottom-1'>
+            <div className='bg-black h-full  w-full' style={{width: `${currentTime}%`}}>
+            </div>
           </div>
         </div>
-      </div>
       </>
       
     )
