@@ -39,8 +39,8 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
     return (
       <>
       <div className='mb-5'>
-
-        <div className={`hover:bg-[#F5F5F5] border-t-2 border-b-2 sm:mb-2
+      {/* F5F5F5 */}
+        <div className={`hover:bg-[#F5F5F5] border-t-2 border-b-none sm:mb-2
           border-[#F0F0F0] sm:border-none rounded-t-3xl h-full
           cursor-pointer pb-5 px-5 sm:px-4 flex flex-row pr-4
           justify-between w-full items-center py-4 sm:py-4`}>

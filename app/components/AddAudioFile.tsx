@@ -38,10 +38,8 @@ function AddAudioFile({children, isFileSelected}: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const {currentProgress, isUploading, handleFileUpload} = useUploadContext()
 
-    
-
     const handleAvatar = () => {    
-        if (selectedFile) return  
+        // if (selectedFile) return  
         const input = document.createElement("input");
         // input.id = "audioFile";
         input.type = "file";
@@ -55,10 +53,9 @@ function AddAudioFile({children, isFileSelected}: Props) {
         ev.preventDefault()
         const file = ev.target.files?.[0];
 
-        if (!file) return 
-        setSelectedFile(file);
-        
+        // if (!file) return 
         if (file) {
+            setSelectedFile(file);
             isFileSelected(true)
         } else { 
             isFileSelected(false)
@@ -66,7 +63,8 @@ function AddAudioFile({children, isFileSelected}: Props) {
       };
     // Temporary
     useEffect(() => {
-        if (!isUploading || !selectedFile) return 
+        if (!isUploading) return 
+        if (!selectedFile) return 
         handleFileUpload(selectedFile)
     }, [isUploading, selectedFile, isFileSelected])
 

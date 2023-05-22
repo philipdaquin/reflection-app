@@ -1,36 +1,20 @@
 import Head from 'next/head'
 import React from 'react'
-import { useAudioRecorder } from 'react-audio-voice-recorder'
-import AudioControls from '../components/controls/AudioControls'
-import AudioVisualizer from '../components/AudioVisualizer'
 import NavigationButtons from '../components/navigation/NavigationButtons'
-import ChatContent from '../components/pages/ChatContent'
-import RecordContent from '../components/pages/RecordContent'
 import PhoneView from '../components/PhoneView'
-import RecordComponent from '../components/RecordComponent'
 import SwitchView from '../components/SwitchView'
-import SettingsButtons from '../components/SettingsButtons'
 import NavigationMobile, { PlayerAttachment } from '../components/navigation/mobile/NavigationMobile'
-import SeeAllContent from '../components/pages/SeeAllContent'
+import { SelectedAudioPlayer } from '../atoms/atoms'
+import { useRecoilValue } from 'recoil'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { GetServerSideProps } from 'next'
-import { AudioData } from '../typings'
-import { getAll } from '../util/audio/getAll'
-import { Toaster } from 'react-hot-toast'
-import { useRecoilValue } from 'recoil'
-import { AddEntryToggle, SelectedAudioPlayer, ShowAudioPlayer } from '../atoms/atoms'
-import ModalView from '../components/modals/ModalView'
-import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
-import PlayerModal from '../components/modals/PlayerModal'
-import { Player } from '../components/AudioMediaPlayer'
 
 
 interface Props { 
-  entries: AudioData[] | null
 }
 
-function see_all({entries}: Props) {
-    const selectedAudio = useRecoilValue(SelectedAudioPlayer)
+function collections({}: Props) {
+  const selectedAudio = useRecoilValue(SelectedAudioPlayer)
 
     return (
       <>
@@ -48,13 +32,13 @@ function see_all({entries}: Props) {
                   </div>
 
                     <PhoneView>
-                      <SeeAllContent entries={entries}/>
                     </PhoneView>
                 
                 </div>
                 <div className='lg:block hidden'>
                     <SwitchView />
                 </div>
+            {/* <RecordComponent /> */}
             </main>
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
               <div className='flex items-center  md:hidden justify-center  sm:mb-5 mb-0  '>
@@ -69,22 +53,9 @@ function see_all({entries}: Props) {
     )
 }
 
-export default see_all
+export default collections
 
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const [entries] = await Promise.all([
-      ( await getAll() ),
-  ]) 
-  if (!entries) return { 
-    notFound: true
-  }
-  
-  // console.log(response)
-
-  return { 
-    props: { 
-      entries,
-    }
-  }
-}
+// export const getServerSideProps: GetServerSideProps<Props> = async () => {
+ 
+// }

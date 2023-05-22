@@ -55,7 +55,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
     }
 
 
-    const onHover = "hover:bg-[#f5f5f5] active:bg-[#E0E0E0] active:rounded-full"
+    const onHover = "hover:bg-[#EDECEC] active:bg-[#E0E0E0] rounded-full"
     const WeeklyColour = showWeekly === 'Weekly' ? 'text-white bg-black' : 'border-2 bg-white text-black border-[#e0e0e0' 
     const DailyColour = showWeekly === 'Daily' ? 'text-white bg-black' : 'border-2 bg-white text-black border-[#e0e0e0' 
 
@@ -76,7 +76,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
 
 
     return (
-        <div className='w-full bg-[#FEFEFE] space-y-5 relative md:rounded-t-[70px] md:px-3 px'>
+        <div className='w-full bg-[#FEFEFE] space-y-5 relative md:rounded-t-[70px] md:px-1 px-[5px]'>
              <div className='flex flex-row justify-between py-2 space-x-2 '>
                 <button onClick={prevWeek} className={`${onHover} p-2 rounded-full`}>
                     <ChevronLeftIcon height={20} width={20} color='#757575'/>
@@ -109,7 +109,7 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
                 <ul className='flex flex-row items-center justify-between'>
                     {days.map((day, index) => (
                     <li key={index} onClick={(e) => selectDate(day)}>
-                        <div className={`flex flex-col cursor-pointer md:w-10 w-12 items-center rounded-xl space-y-1`}>
+                        <div className={`flex flex-col cursor-pointer md:w-10 w-12 items-center rounded-xl space-y-1 pb-2 ${onHover}`}>
                             <p className={`
                                 text-[10px] 
                                 w-8 h-8  p-2
@@ -117,9 +117,9 @@ function WeeklyCalendar({setCurrDate, setShowWeekly, showWeekly}: Props) {
                                 rounded-full
                                 ${selectedDate && selectedDate.getUTCDate() === day.getUTCDate() ? 
                                     'bg-black text-white  ' : 
-                                    'bg-white '
+                                    ` ` 
                                 }
-                                font-medium text-[#757575]`}>
+                                font-medium text-[#757575] `}>
 
                                 {daysOfWeek[index].slice(0, 2)} 
                             </p>

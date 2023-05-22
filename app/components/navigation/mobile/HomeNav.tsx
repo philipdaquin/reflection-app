@@ -12,10 +12,11 @@ import {
 import {RiChatVoiceLine} from 'react-icons/ri'
 import NavButton from './NavButton'
 import AddEntryContent from './AddEntryContent'
-import { HiOutlineClipboardList } from 'react-icons/hi'
+import { HiOutlineClipboardList, HiOutlineCollection } from 'react-icons/hi'
 import { useRecoilState } from 'recoil'
 import { AddEntryToggle } from '../../../atoms/atoms'
 import { useRouter } from 'next/router'
+import { BsCollection, BsFillCollectionFill } from 'react-icons/bs'
 
 
 function HomeNav() {
@@ -47,8 +48,8 @@ function HomeNav() {
               routerName='playlist'
               icon={<HiOutlineClipboardList size={24} color="black"/>}/>
           <NavButton 
-              routerName='playlist'
-              icon={<MusicalNoteIcon height={24} width={24} color="black"/>}/>
+              routerName='collections'
+              icon={<HiOutlineCollection size={24} color="black"/>}/>
     </div>
     )
 }

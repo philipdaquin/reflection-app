@@ -91,7 +91,7 @@ function SummaryContent({data}: Props) {
           } = data
     const [editedSummary, setEditedSummary] = useState(summary)
     const [editedTags, setEditedTags] = useState(tags)
-    const [editedTitle, setEditedTitle] = useState(title)
+    const [editedTitle, setEditedTitle] = useState(title || 'Untitled')
     const [editedDescription, setEditedDescription] = useState(description)
     
 
@@ -134,7 +134,7 @@ function SummaryContent({data}: Props) {
     const handleToggleSummary = () => settoggleTag(!toggleTag)
     
     const [showSummary, setShowSummary] = useState(false)
-    const filteredSummary = showSummary ? summary : summary?.length || 0 > 150 ? summary?.slice(0, 150) + "..." : summary
+    const filteredSummary = showSummary ? summary : summary?.length || 0 > 250 ? summary?.slice(0, 250) + "..." : summary
     const handleShowSummary = () => setShowSummary(!showSummary)
 
     useEffect(() => { 
@@ -145,6 +145,8 @@ function SummaryContent({data}: Props) {
         setEditedDescription(event.target.value);
     }
     const handleTitleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        if (event.target.value.length >= 50) return 
+
         setEditedTitle(event.target.value);
     }
     const [toggleTranscript, setToggleTranscript] = useState(false)
@@ -187,15 +189,32 @@ function SummaryContent({data}: Props) {
             
             <div className='flex flex-col items-center space-y-6 pb-6'>
                 <JournalThumbnail />
-                <textarea
-                    value={editedTitle || ''}
-                    onChange={handleTitleChange}
-                    style={{height: "40px"}}
-                    className='text-[20px] font-bold text-center outline-none w-full bg-gray-100 rounded-2xl '/>
 
-                { !editedTitle  && <div className='text-sm text-red-500 '>
-                    Enter Journal Title 
-                </div>}
+                <div className='w-full static'>
+                    <textarea
+                        value={editedTitle || ''}
+                        onChange={handleTitleChange}
+                        style={{height: "50px"}}
+                        placeholder='Add Title'
+                        className='text-[16px] font-medium text-center outline-none w-full bg-gray-100 border-[#E0E0E0] border-2 rounded-2xl py-2 px-4'/>
+                    <div className='flex flex-row justify-between'>
+                        { (!editedTitle || editedTitle.length >= 50) && 
+                            <div className='text-sm text-red-500 '>
+                                Enter Journal Title 
+                            </div>
+                        }
+                        {
+                            editedTitle && (
+                                <div>
+
+                                </div>
+                            )
+                        }
+                        <div className={`px-2 text-[13px] text-gray-600`}>
+                            {editedTitle?.length} / 50
+                        </div>
+                    </div>
+                </div>
             </div>
             {/* media player */}
             <AudioPlayer 
@@ -235,26 +254,6 @@ function SummaryContent({data}: Props) {
             </div>
             {/* Suggested Tags */}
             <h1 className="text-md font-bold pt-5">Tags</h1>
-            {/* <div className="pt-3">
-                <div className="flex flex-wrap items-center">
-                    {tags?.map((tag, index) => (
-                        <div className='relative'>
-
-                            <div className='absolute p-2 bg-red-500 right-0 top-0 rounded-full'>
-                            </div>
-
-                            <SuggestedTags  key={tag}>
-                                {tag}
-                            </SuggestedTags>
-                        </div>
-                    ))}
-                    <div>
-                        <SuggestedTags>
-                            <PlusIcon height={20} width={20}  color='#4285f4'/>
-                        </SuggestedTags>
-                    </div>
-                </div>
-            </div> */}
             <div className="pt-3">
                 <div className="flex flex-wrap items-center">
                     {editedTags?.map((tag, index) => (

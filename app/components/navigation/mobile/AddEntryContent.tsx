@@ -48,7 +48,7 @@ interface UploadContent {
 function UploadContent({prevPage}: UploadContent) { 
   // const [uploadFile, setUploadFile] = useState(false)
   const [isAudioFileSelected, SelectAudioFile] = useState(false)
-  const {isUploading, handleUpload, handleShowProgress} = useUploadContext()  
+  const {isUploading, handleUpload, handleShowProgress, } = useUploadContext()  
 
   return (
     <>
