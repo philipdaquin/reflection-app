@@ -41,7 +41,6 @@ function AddAudioFile({children, isFileSelected}: Props) {
     const handleAvatar = () => {    
         // if (selectedFile) return  
         const input = document.createElement("input");
-        // input.id = "audioFile";
         input.type = "file";
         input.accept = ".wav";
         // @ts-ignore
