@@ -25,7 +25,8 @@ impl RecommendedActivity {
         //     "The text encourages the reader to take time to reflect on what they want out of life and to remember that they're not alone. It also encourages them not to give up on themselves and to reach out for help when needed. The message is that it's okay to feel overwhelmed and uncertain in difficult circumstances and that there are people who care and are willing to support them.".to_string(),
         //     "Despite the difficulty of the current situation, it is okay to feel overwhelmed and uncertain. Taking time to reflect on what one truly wants out of life and what steps one can take to make progress towards that can be helpful. There are people who care and want to support, and one should not give up on themselves and reach out for help when needed.".to_string(),
         // ];
-
+ 
+ 
         // Serialise the array  
         let input = serde_json::to_string(&summaries).unwrap();
         // Send context and input to OpenAI 
