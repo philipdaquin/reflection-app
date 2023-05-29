@@ -47,6 +47,10 @@ pub struct AudioDataDTO {
     pub favourite: bool, 
     
     // Server Generated 
+    // pub genre: Option<String>,
+    
+
+
     pub date: Option<DateTime>,
     pub day: Option<String>,
     pub transcription: Option<String>,
