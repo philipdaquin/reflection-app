@@ -48,7 +48,7 @@ pub struct TextClassification {
     #[serde(rename = "_weekly_ref", skip_serializing_if = "Option::is_none")]
     pub weekly_ref: Option<ObjectId>,
 
-    
+    /// Date Created 
     pub date: Option<DateTime>,
     pub day: String,
     pub emotion: Option<String>,
