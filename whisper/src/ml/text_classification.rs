@@ -59,6 +59,7 @@ pub struct TextClassification {
 impl TextClassification { 
 
     ///
+    /// 
     /// Inserting a daily input 
     /// 1. Check the date of the daily input 
     /// 2. Retrieve the corresponding weekly record based on the date of the daily input 
