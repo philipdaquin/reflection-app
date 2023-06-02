@@ -51,14 +51,21 @@ pub struct TextClassification {
     /// Date Created 
     pub date: Option<DateTime>,
     pub day: String,
+
+    /// Overall emotion of the user 
     pub emotion: Option<String>,
+    
+    /// Emoji to represent the emotion 
     pub emotion_emoji: Option<String>, 
+
+    /// Average Mood of the User 
     pub average_mood: Option<f32>
 }
 
 impl TextClassification { 
 
     ///
+    /// 
     /// 
     /// Inserting a daily input 
     /// 1. Check the date of the daily input 
