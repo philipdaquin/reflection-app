@@ -50,6 +50,8 @@ pub struct TextClassification {
 
     /// Date Created 
     pub date: Option<DateTime>,
+
+    // Day
     pub day: String,
 
     /// Overall emotion of the user 
