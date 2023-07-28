@@ -21,8 +21,6 @@ function MyApp({ Component, pageProps, router }: AppProps) {
     
 
   }, [playerRef, isPlaying])
-  
-
   return (
       <RecoilRoot>
           {/* <AuthProvider> */}
