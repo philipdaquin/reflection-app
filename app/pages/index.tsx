@@ -27,6 +27,7 @@ import PlayerModal from '../components/modals/PlayerModal'
 import ModalView from '../components/modals/ModalView'
 import useAudioPlayer from '../hooks/useAudioPlayer'
 import { Player } from '../components/AudioMediaPlayer'
+import Headers from '../components/headers/Headers'
 
 
 
@@ -83,8 +84,12 @@ function Home({
       </Head>
         
       {/*  md:px-[104px]  */}
-      <div className="md:bg-[#EEEEEE] bg-white flex 
-            md:h-screen flex-col h-screen md:py-5 lg:py-14 md:px-4 relative">
+      <div className="md:bg-[#fffefe] bg-white flex md:h-screen
+        flex-col h-screen md:py-5 lg:py-7 md:px-[59px] relative">
+          
+        <Headers />
+
+
 
         <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
           <div className="flex items-center md:relative md:right-5">
@@ -102,9 +107,9 @@ function Home({
             </PhoneView>
 
           </div>
-          <div className='lg:block hidden '>
+          {/* <div className='lg:block hidden '>
               <SwitchView />
-          </div>
+          </div> */}
         </main> 
         <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
           <div className='flex items-center md:hidden justify-center sm:mb-5 mb-0 '>

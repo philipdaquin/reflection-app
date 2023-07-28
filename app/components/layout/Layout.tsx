@@ -33,7 +33,7 @@ function Layout({children}: Props) {
       router.pathname.startsWith('/post_analysis/');
 
     return (
-      <div className='relative'>   
+      <div className='relative font-primary'>   
         <UploadProgressProvider>
         <Toaster
             position="top-center"
