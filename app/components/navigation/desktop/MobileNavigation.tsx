@@ -2,6 +2,11 @@ import React, { useState } from 'react'
 import {DevicePhoneMobileIcon, ComputerDesktopIcon} from '@heroicons/react/24/outline'
 import { DeviceTabletIcon } from '@heroicons/react/20/solid'
 
+import {BsSuitHeartFill} from 'react-icons/bs'
+import {MdOutlineReceiptLong} from 'react-icons/md'
+import {HiChartBar, HiViewGrid} from 'react-icons/hi'
+import {PlusIcon} from '@heroicons/react/24/solid'
+
 interface Prop { 
     title: string, 
     icon: any,
@@ -21,7 +26,7 @@ function Button({title, icon, isSelected, onClick}: Prop) {
     )
 }
 
-function SwitchView() {
+function MobileNavigation() {
 
     const [selectedVersion, setSelectedVersion] = useState("Mobile")
 
@@ -30,22 +35,18 @@ function SwitchView() {
     }
 
     return (
-        <div className='p-2 w-[244px]  justify-between items-center h-[53px] flex flex-row space-x-1 rounded-[20px] bg-white shadow-xl'>
-                <Button icon={<ComputerDesktopIcon height={24} width={24}/>}
-                        title={"Desktop"}
-                        isSelected={selectedVersion === "Desktop"}
-                        onClick={() => handleSelect("Desktop")}
-
-                />
-                <Button icon={<DevicePhoneMobileIcon height={24} width={24}/>}
-                        title={"Mobile"}
-                        isSelected={selectedVersion === "Mobile"}
-                        onClick={() => handleSelect("Mobile")}
-                />
+        <div className='w-fit px-[19px] space-x-9 justify-between items-center h-[52px] flex flex-row rounded-[18px] bg-white'
+        style={{boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.25)'}}
+        >
+            <BsSuitHeartFill size={24} color='#000'/>
+            <MdOutlineReceiptLong size={24} color='#000'/>
+            <PlusIcon height={24} width={24} color="#000"/>
+            <HiChartBar size={24} color='#000'/>
+            <HiViewGrid size={24} color='#000'/>
         </div>
     )
 }
 
-export default SwitchView
+export default MobileNavigation
 
 

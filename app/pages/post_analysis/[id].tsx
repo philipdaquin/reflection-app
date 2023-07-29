@@ -5,7 +5,7 @@ import React from 'react'
 import SummaryContent from '../../components/pages/SummaryContent'
 import PhoneView from '../../components/PhoneView'
 import PostSummaryControls from '../../components/PostSummaryControls'
-import SwitchView from '../../components/SwitchView'
+import SwitchView from '../../components/navigation/desktop/MobileNavigation'
 import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
 import { getEntry } from '../../util/audio/getEntry'
 import { AudioData } from '../../typings'

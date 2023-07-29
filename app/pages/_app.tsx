@@ -3,9 +3,12 @@ import type { AppProps } from 'next/app'
 import { RecoilRoot } from 'recoil'
 import useAudioPlayer, { AudioProvider } from '../hooks/useAudioPlayer'
 import { AnimatePresence } from 'framer-motion';
-import Layout from '../components/layout/Layout';
+import Layout from '../layout/Layout';
 import { useEffect } from 'react';
 import { UploadProgressProvider } from '../hooks/useUploadProgress';
+import AudioPlayerComponent from '../components/player/AudioPlayerComponent';
+import { Player } from '../components/AudioMediaPlayer';
+import { Toaster } from 'react-hot-toast';
 
 /* 
   The AudioProvider ensures that the audio can be controlled and accessed from 
@@ -24,24 +27,32 @@ function MyApp({ Component, pageProps, router }: AppProps) {
   return (
       <RecoilRoot>
           {/* <AuthProvider> */}
-        <AudioProvider>
-          <AnimatePresence
-              // // Disable any initial animations on children that
-              // // are present when the component is first rendered
-              // initial={true}
-              // // Only render one component at a time.
-              // // The exiting component will finish its exit
-              // // animation before entering component is rendered
-              // mode={'wait'}
-              // // Fires when all exiting nodes have completed animating out
-              // onExitComplete={() => null}
-          > 
-            <Layout>
-                  <Component {...pageProps} key={router.route} />
-            </Layout>
-          </AnimatePresence>
-        {/* </AuthProvider> */}
-        </AudioProvider>
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+          />
+          <AudioProvider>
+            <UploadProgressProvider>
+              <AnimatePresence
+                  // // Disable any initial animations on children that
+                  // // are present when the component is first rendered
+                  // initial={true}
+                  // // Only render one component at a time.
+                  // // The exiting component will finish its exit
+                  // // animation before entering component is rendered
+                  // mode={'wait'}
+                  // // Fires when all exiting nodes have completed animating out
+                  // onExitComplete={() => null}
+              > 
+                <Layout>
+                      <Component {...pageProps} key={router.route} />
+                </Layout>
+              </AnimatePresence>
+
+            <AudioPlayerComponent />
+            </UploadProgressProvider>
+          {/* </AuthProvider> */}
+          </AudioProvider>
       </RecoilRoot>
   )
 }
