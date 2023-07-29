@@ -38,6 +38,8 @@ function Footer() {
                 <p className=''>Log In</p>
               </Link>
 
+
+
           </div>
         <QRCode />
       </div>
