@@ -15,9 +15,9 @@ function signin() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <div className='flex flex-col w-full justify-center items-center font-primary shrink-0'>
+      <div className='flex flex-col justify-center h-full w-full items-center font-primary shrink-0 py-14'>
         
-        <main className='pt-14'>
+        <main className='space-y-5 w-fit h-full '>
 
           <div className='text-center flex flex-col justify-center space-y-3.5'>
             <h1 className='font-semibold text-[35px] '>
@@ -26,16 +26,12 @@ function signin() {
             <h3 className='text-[#757575] text-[17px]'>
               Transform your well-being with Reflection today.
             </h3>
-          </div>
-
-          <div className='space-y-5 pt-[49px]'>
-            <div className='w-[411px] py-6 bg-[#edeff3] rounded-xl px-3'>
+            <div className='w-[411px] py-[17px] bg-[#edeff3] rounded-xl px-3'>
               <input type="email" placeholder='Email Address' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
             </div>
 
-
             <div className='flex flex-col justify-center space-y-5'>
-              <div className='w-[411px] py-6 bg-[#edeff3] rounded-xl px-3'>
+              <div className='w-[411px] py-[17px] bg-[#edeff3] rounded-xl px-3'>
                 <input type="password" placeholder='Password' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
               </div>
               <h2 className='text-xs font-bold text-center'>Forgot Password?</h2>
@@ -43,24 +39,23 @@ function signin() {
           </div>
 
 
-          <div className='pt-[33px] space-y-12'>
+
+          <div className='pt-[50px] space-y-12'>
             <div className=' py-4 w-full items-center flex flex-row justify-center bg-[#212121] rounded-[25px]'>
               <h1 className='font-semibold text-[16px] text-white'>
                 Sign in
               </h1>
             </div>
 
-            <h1 className=' font-medium text-[#424242] text-[16px] text-center'>
+            <h1 className=' font-medium text-[#424242] text-[15px] text-center'>
               Don't have an account yet? 
-                <span className='font-semibold underline cursor-pointer'>
+                <span className='font-semibold underline cursor-pointer ml-1'>
                   <Link href="/onboarding/signup">
                     Sign up for free
                   </Link>
                 </span>
             </h1>
           </div>
-
-
 
           <div className='flex flex-col justify-center space-y-11 pt-10'>
 

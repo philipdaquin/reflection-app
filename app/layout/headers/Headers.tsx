@@ -13,7 +13,8 @@ function Headers() {
 
     const NotHomePage =
         router.pathname === '/signin' ||
-        router.pathname === '/onboarding/signup'
+        router.pathname.includes('/onboarding') || 
+        router.pathname.includes('/verification') 
    
   
   

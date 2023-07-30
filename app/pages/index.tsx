@@ -20,6 +20,7 @@ import Headers from '../layout/headers/Headers'
 import MobileNavigation from '../components/navigation/desktop/MobileNavigation'
 import Footer from '../layout/footer/Footer'
 import DesktopLogo from '../layout/headers/components/DesktopLogo'
+import Link from 'next/link'
 
 
 
@@ -77,7 +78,7 @@ function Home({
       </Head>
       <Headers />
       {/*  md:px-[104px]  */}
-      <div className="md:bg-[#fffefe] bg-white flex md:h-screen
+      <section className="md:bg-[#fffefe] bg-white flex md:h-screen
         flex-col h-screen md:py-5 lg:pt-7 lg:pb-[84px] md:px-[59px] relative">
           
 
@@ -106,7 +107,7 @@ function Home({
               <MobileNavigation />
             </div>
           </div>
-  <div className='absolute bottom-[15px]  lg:block hidden w-full '>
+  <div className='fixed bottom-[15px]  lg:block hidden w-full '>
           <Footer />
         </div>
 
@@ -119,7 +120,7 @@ function Home({
               </NavigationMobile >        
           </div>
         </div>
-      </div>
+      </section>
     </>
   )
 }

@@ -21,26 +21,25 @@ function Footer() {
   return (
 
     <>
-      <div className='flex flex-row w-full justify-between items-center md:px-[59px]'>
+      <div className='flex flex-row w-full justify-between items-center md:px-[59px] '>
         <div className='flex items-center space-x-4 text-[#757575]  flex-row  text-left text-[12px] font-medium'>
               {/* <SettingsToggle /> */}
               
-              <Link href={`/onboarding/signup`} className='cursor-pointer'>     
-                <div className=' duration-400  px-3 py-2 bg-[#FFFEFE]
-                hover:bg-[#d4d4d4] transition-colors delay-500 rounded-md'>
-                    <p className=''>Sign Up</p>
-                  </div>         
+              <Link href={`/onboarding/signup`} className='cursor-pointer  duration-400  px-3 py-2 bg-[#FFFEFE]
+                hover:bg-[#eaeaea] transition-colors delay-500 rounded-md'>     
+                  <p className=''>Sign Up</p>
               </Link>
 
-              <SmallButton />
-
-              <Link href={`/signin`} className='cursor-pointer'>
-                <p className=''>Log In</p>
+              <Link href={`/signin`} className='cursor-pointer  duration-400  px-3 py-2 bg-[#FFFEFE]
+                hover:bg-[#eaeaea] transition-colors delay-500 rounded-md'>     
+                  <p className=''>Log In</p>
               </Link>
-
 
 
           </div>
+
+
+
         <QRCode />
       </div>
     </>
