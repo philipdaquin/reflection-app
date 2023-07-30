@@ -17,7 +17,7 @@ function signin() {
       
       <div className='flex flex-col py-10 justify-between h-full w-full items-center font-primary shrink-0'>
         
-        <main className='space-y-5'>
+        <main className='space-y-5 w-[411px]'>
           <div className='text-center flex flex-col justify-center space-y-3.5'>
             <h1 className='font-semibold text-[35px] '>
               Welcome to Reflection
@@ -25,12 +25,12 @@ function signin() {
             <h3 className='text-[#757575] text-[17px]'>
               Transform your well-being with Reflection today.
             </h3>
-            <div className='w-[411px] py-[17px] bg-[#edeff3] rounded-xl px-3'>
+            <div className='w-full py-[17px] bg-[#edeff3] rounded-xl px-3'>
               <input type="email" placeholder='Email Address' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
             </div>
 
             <div className='flex flex-col justify-center space-y-5'>
-              <div className='w-[411px] py-[17px] bg-[#edeff3] rounded-xl px-3'>
+              <div className='w-full py-[17px] bg-[#edeff3] rounded-xl px-3'>
                 <input type="password" placeholder='Password' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
               </div>
               <h2 className='text-xs font-bold text-center'>Forgot Password?</h2>

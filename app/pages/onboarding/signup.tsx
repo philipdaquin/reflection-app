@@ -12,7 +12,7 @@ function signup() {
           <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className='w-full py-14 justify-between flex h-screen flex-col items-center font-primary shrink-0'>
+      <div className='w-full  justify-between py-14  flex h-full flex-col items-center font-primary shrink-0'>
         <main className='space-y-4'>
           <section className='space-y-4'>
             <div className='text-center flex flex-col justify-center space-y-3.5'>

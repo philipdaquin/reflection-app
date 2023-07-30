@@ -34,7 +34,6 @@ function Layout({children}: Props) {
         {/* <div className='lg:block hidden w-full '>
 
         </div> */}
-
         {children}
 
 
