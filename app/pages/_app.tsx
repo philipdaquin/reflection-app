@@ -9,6 +9,12 @@ import { UploadProgressProvider } from '../hooks/useUploadProgress';
 import AudioPlayerComponent from '../components/player/AudioPlayerComponent';
 import { Player } from '../components/AudioMediaPlayer';
 import { Toaster } from 'react-hot-toast';
+import { Inter } from 'next/font/google'
+
+
+
+// If loading a variable font, you don't need to specify the font weight
+const inter = Inter({ subsets: ['latin'] })
 
 /* 
   The AudioProvider ensures that the audio can be controlled and accessed from 
@@ -44,9 +50,11 @@ function MyApp({ Component, pageProps, router }: AppProps) {
                   // // Fires when all exiting nodes have completed animating out
                   // onExitComplete={() => null}
               > 
-                <Layout>
-                      <Component {...pageProps} key={router.route} />
-                </Layout>
+                <main className={inter.className}>
+                  <Layout>
+                        <Component {...pageProps} key={router.route} />
+                  </Layout>
+                </main>
               </AnimatePresence>
 
             <AudioPlayerComponent />
