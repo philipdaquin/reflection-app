@@ -5,6 +5,8 @@ import Headers from '../layout/headers/Headers'
 import {FcGoogle} from 'react-icons/fc'
 import Link from 'next/link'
 import TermsPrivacy from '../components/terms_and_privacy/TermsPrivacy'
+import GenericButton, { GenericButtonVariant } from '../components/button/GenericButton'
+import { Button } from '@mui/material'
 
 
 function signin() {
@@ -33,13 +35,22 @@ function signin() {
               <div className='w-full py-[17px] bg-[#edeff3] rounded-xl px-3'>
                 <input type="password" placeholder='Password' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
               </div>
-              <h2 className='text-xs font-bold text-center'>Forgot Password?</h2>
+
+
+              <Link href={"/password_reset"} className='cursor-pointer'>
+                <h2 className='text-xs font-bold text-center hover:underline'>Forgot Password?</h2>
+              </Link>
             </div>
           </div>
 
 
 
           <div className='pt-[50px] space-y-12'>
+
+            <Link href={'/signin'}>
+              <GenericButton title='Sign in' variant={GenericButtonVariant.EMPTY} />
+            </Link>
+
             <div className=' py-4 w-full items-center flex flex-row justify-center bg-[#212121] rounded-[25px]'>
               <h1 className='font-semibold text-[16px] text-white'>
                 Sign in
@@ -70,12 +81,14 @@ function signin() {
               </div>
             </div>
 
-            <div className=' py-4 w-full items-center flex flex-row justify-center bg-[#f5f5f5] rounded-[25px]'>
-                <FcGoogle size={25} className='relative right-[40px]'/>
-                <h1 className='font-medium text-[16px] text-center text-black justify-center flex flex-row'>
-                  Continue with Google
-                </h1>
-            </div>
+            <Link href={'/'}>
+              <div className=' py-4 w-full items-center flex flex-row justify-center bg-[#f5f5f5] rounded-[25px]'>
+                  <FcGoogle size={25} className='relative right-[40px]'/>
+                  <h1 className='font-medium text-[16px] text-center text-black justify-center flex flex-row'>
+                    Continue with Google
+                  </h1>
+              </div>
+            </Link>
           </div>
         </main>
 
