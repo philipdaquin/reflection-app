@@ -15,10 +15,9 @@ function signin() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <div className='flex flex-col justify-center h-full w-full items-center font-primary shrink-0 py-14'>
+      <div className='flex flex-col py-10 justify-between h-full w-full items-center font-primary shrink-0'>
         
-        <main className='space-y-5 w-fit h-full '>
-
+        <main className='space-y-5'>
           <div className='text-center flex flex-col justify-center space-y-3.5'>
             <h1 className='font-semibold text-[35px] '>
               Welcome to Reflection
@@ -79,6 +78,8 @@ function signin() {
             </div>
           </div>
         </main>
+
+
         <TermsPrivacy />
       </div>
          
