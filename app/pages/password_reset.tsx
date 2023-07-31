@@ -6,8 +6,24 @@ import GenericButton, { GenericButtonVariant } from '../components/button/Generi
 
 function CheckEmail() {
   return (
-    <section>
-
+    <section className='w-[411px] space-y-10'>
+      <div className='text-center flex flex-col justify-center space-y-3.5'>
+        <h1 className='font-semibold text-[35px] '>
+          Check your email
+        </h1>
+        <h3 className='text-[#757575] text-[17px]'>
+          We sent an email to <span className='font-semibold'>john@appleseed.com</span>
+        </h3>
+        <h3 className='text-[#757575] text-[17px] pt-8'>
+          Please check your inbox and click the received link to reset a password.
+        </h3>
+      </div>
+      
+      <div>
+        <Link href={'/signin'}>
+          <GenericButton title='Back to login' variant={GenericButtonVariant.FILLED}/>
+        </Link>
+      </div>
     </section>
   )
 }
@@ -54,26 +70,8 @@ function password_reset() {
 
       <div className='flex flex-col relative py-10 justify-between h-full w-full items-center font-primary shrink-0'>
       
-    
-        <section className='w-[411px] space-y-10'>
-          <div className='text-center flex flex-col justify-center space-y-3.5'>
-            <h1 className='font-semibold text-[35px] '>
-              Check your email
-            </h1>
-            <h3 className='text-[#757575] text-[17px]'>
-              We sent an email to <span className='font-semibold'>john@appleseed.com</span>
-            </h3>
-            <h3 className='text-[#757575] text-[17px] pt-8'>
-              Please check your inbox and click the received link to reset a password.
-            </h3>
-          </div>
-          
-          <div>
-            <Link href={'/signin'}>
-              <GenericButton title='Back to login' variant={GenericButtonVariant.FILLED}/>
-            </Link>
-          </div>
-        </section>
+      {/* <ResetPassword />   */}
+      <CheckEmail />
 
       </div>
          

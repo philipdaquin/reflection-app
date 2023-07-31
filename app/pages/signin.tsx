@@ -46,17 +46,9 @@ function signin() {
 
 
           <div className='pt-[50px] space-y-12'>
-
             <Link href={'/signin'}>
               <GenericButton title='Sign in' variant={GenericButtonVariant.EMPTY} />
             </Link>
-
-            <div className=' py-4 w-full items-center flex flex-row justify-center bg-[#212121] rounded-[25px]'>
-              <h1 className='font-semibold text-[16px] text-white'>
-                Sign in
-              </h1>
-            </div>
-
             <h1 className=' font-medium text-[#424242] text-[15px] text-center'>
               Don't have an account yet? 
                 <span className='font-semibold underline cursor-pointer ml-1'>
