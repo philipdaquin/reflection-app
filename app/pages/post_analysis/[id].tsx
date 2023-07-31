@@ -9,7 +9,6 @@ import SwitchView from '../../components/navigation/desktop/MobileNavigation'
 import { GetServerSideProps, NextPage, GetServerSidePropsContext  } from 'next';
 import { getEntry } from '../../util/audio/getEntry'
 import { AudioData } from '../../typings'
-import SettingsButtons from '../../components/SettingsButtons'
 import NavigationMobile, { PlayerAttachment } from '../../components/navigation/mobile/NavigationMobile'
 import { useRecoilValue } from 'recoil'
 import { SelectedAudioPlayer } from '../../atoms/atoms'

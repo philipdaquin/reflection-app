@@ -21,4 +21,15 @@
           rounded-t-3xl rounded-b-none;
     }
 
+    .input {
+        @apply outline-none 
+            placeholder:text-[#757575]
+            transition-colors
+            duration-200
+            ease-in-out
+            text-black focus:outline-none
+            text-[17px] focus:bg-[#eaeaea] w-full
+            py-[17px] bg-[#edeff3] rounded-xl px-3
+    }
+
 }

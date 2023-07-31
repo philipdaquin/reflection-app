@@ -14,7 +14,7 @@ function QRCode() {
             <ul tabIndex={0} className="dropdown-content z-[1] menu relative mb-5">
                 <li><QRmodal /></li>
             </ul>
-            <label tabIndex={0} className="">
+            <label tabIndex={0} className="cursor-pointer ">
                 <QRButton />
             </label>
         </div>

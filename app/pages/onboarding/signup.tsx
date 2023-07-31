@@ -2,8 +2,32 @@ import React from 'react'
 import TermsPrivacy from '../../components/terms_and_privacy/TermsPrivacy'
 import Link from 'next/link'
 import Head from 'next/head'
+import GenericButton, { GenericButtonVariant } from '../../components/button/GenericButton'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { SignUpInputs } from '../../models/user'
+import useAuth from '../../hooks/useAuth'
+
+
 
 function signup() {
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    getValues,
+    formState: { errors, dirtyFields },
+  } = useForm<SignUpInputs>()
+
+
+  const {signIn, signUp} = useAuth();
+
+  const onSubmit: SubmitHandler<SignUpInputs> = async ({email, password, firstName, lastName}) => await signUp(email, password)
+
+  const buttonVariant = (dirtyFields.email && dirtyFields.password) && !errors.email && !errors.password ? 
+    GenericButtonVariant.FILLED : GenericButtonVariant.EMPTY 
+
+
   return (
 
     <>
@@ -24,54 +48,76 @@ function signup() {
               </h3>
             </div>
 
-            <div className='space-y-6'>
-              <div className='w-[411px] py-5 bg-[#edeff3] rounded-xl px-3'>
-                <input type="email" placeholder='Email Address' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
-              </div>
+            <form action="" className='' onSubmit={handleSubmit(onSubmit)}>
+              
+              <label htmlFor="" className='h-[67px] space-y-1'>
+                <input type="email" 
+                placeholder='Email Address' 
+                className='input'
+                {...register('email', {required: true })}
+                />
+                  {
+                    errors.email && (
 
-              <div className='flex flex-row justify-between items-center'>
-                <div className='w-[190px] py-5 bg-[#edeff3] rounded-xl px-3'>
-                  <input type="text" placeholder='First Name' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
-                </div>
+                      <p className='text-red-600 text-xs text-left'>
+                        Please enter valid email address.
+                      </p>
+                    )
+                  }
+              </label>
+              
+              <div className='flex flex-row justify-between mt-5 mb-4 items-center space-x-3'>
+                <label htmlFor="" className='space-y-1 flex flex-col justify-center'>
+                  <input type="text" placeholder='First Name' className='input w-[190px]'/>
+                  <p className='text-xs text-right text-[#757575]'>Optional</p>
+                </label>  
 
+                
                 <div className='w-[2px] bg-[#bdbdbd] h-[19px]'>
                 </div>
 
-                <div className='w-[190px] py-5 bg-[#edeff3] rounded-xl px-3'>
-                  <input type="text" placeholder='Last Name' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
-                </div>
+                <label htmlFor="" className='space-y-1 flex flex-col justify-center'>
+                  <input type="text" placeholder='Last Name' className='input w-[190px]'/>
+                  <p className='text-xs text-right text-[#757575]'>Optional</p>
+                </label>  
+
               </div>
-            </div>
-            
-            <div className='w-[411px] py-5 bg-[#edeff3] rounded-xl px-3'>
-              <input type="password" placeholder='Password' className='outline-none text-[#757575] text-[17px] bg-inherit w-full'/>
-            </div>
+              
+              <label htmlFor="" className='h-[67px] space-y-1'>
+                <input type="password" 
+                placeholder='Password' 
+                className='input'
+                {...register('password', {required: true })}
+                />
+                {
+                 errors.password && (
+                    <p className='text-red-600 text-xs text-left'>
+                      Your password must contain between 4 and 60 characters.
+                    </p>
+                  )
+                }
+              </label>
+
+              <div className='pt-[31px] space-y-5 mt-4'>
+                <button className='w-full' type='submit'>
+                      <GenericButton title='Continue' variant={buttonVariant} />
+                </button>
+
+                <h1 className=' font-medium text-[#424242] text-[16px] text-center'>
+                  Already have an account? 
+                    <span className='font-semibold underline cursor-pointer ml-1'>
+                      <Link href="/signin">
+                        Sign In
+                      </Link>
+                    </span>
+                </h1>
+              </div>
+            </form>
           </section>
-          <div className='pt-[31px] space-y-5'>
-            <div className=' py-4 w-full items-center flex flex-row justify-center bg-[#212121] rounded-[25px]'>
-              <h1 className='font-semibold text-[16px] text-white'> 
-                Continue
-              </h1>
-            </div>
-            <h1 className=' font-medium text-[#424242] text-[16px] text-center'>
-              Already have an account? 
-                <span className='font-semibold underline cursor-pointer ml-1'>
-                  <Link href="/signin">
-                    Sign In
-                  </Link>
-                </span>
-            </h1>
-          </div>
         </main>
-
-
         <TermsPrivacy />
       </div>
-
     </>
-
-
-
   )
 }
 
