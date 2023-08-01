@@ -1,6 +1,11 @@
 import { GoogleAuthProvider, User, applyActionCode, confirmPasswordReset, 
     
-    createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth"
+    createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail,
+     signInWithEmailAndPassword, signInWithPopup, signOut,
+    
+     updateEmail
+    
+    } from "firebase/auth"
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { auth } from "../firebase"
 import { useRouter } from "next/router"
@@ -13,10 +18,15 @@ interface InterfaceAuth {
     signIn: (email: string, password: string) => Promise<void>,
     signOut: () => Promise<void>,
     
+    // Change Email 
+    changeEmail: (user: User, newEmail: string) => Promise<void>,
+    emailChangeConfirmation: boolean,
+
+    // Password Reset 
     passwordReset: (email: string) => Promise<void>,
     passwordResetEmailSend: boolean,
 
-
+    // Confirm Password Change
     passwordResetSuccess: boolean, 
     confirmPasswordReset: (oobCode: string, newPassword: string) => Promise<void>,
     googleSignin: () => Promise<void>,
@@ -29,6 +39,10 @@ const AuthContext = createContext<InterfaceAuth>({
     signUp: async () => {},
     signIn: async () => {},
     signOut: async () => {},
+
+    changeEmail: async () => {},
+    emailChangeConfirmation: false,
+
     
     passwordReset: async () => {},
     passwordResetEmailSend: false,
@@ -57,8 +71,10 @@ export const AuthProvider = ({children}: Props) => {
     const [error, setError] = useState<string | null>(null)
 
     const [passwordResetSuccess, setpasswordResetSuccess] = useState(false)
+
     const [passwordResetEmailSend, setpasswordResetEmailSend] = useState(false)
 
+    const [emailChangeConfirmation, setEmailChangeConfirmation] = useState(false)
 
     const mounted = useMounted()
 
@@ -185,8 +201,20 @@ export const AuthProvider = ({children}: Props) => {
                 console.log("Missing Oobcode")
             })
             .finally(() =>  mounted.current && setpasswordResetSuccess(false))
-    }
+    }   
 
+    const changeEmail = async (user: User, newEmail: string) => { 
+        if (!user && !newEmail) return
+        await updateEmail(user, newEmail)
+            .then(() => setEmailChangeConfirmation(true))
+            .catch((e) => { 
+                // alert(e.message)
+                setError(e.code)
+                console.log("Missing Oobcode")
+            })
+            .finally(() =>  mounted.current && setEmailChangeConfirmation(false))
+            
+    }
 
 
     const memo = useMemo(() => ({
@@ -200,8 +228,10 @@ export const AuthProvider = ({children}: Props) => {
          passwordReset, 
          confirmPasswordReset: sendPasswordReset,
          passwordResetSuccess,
-         passwordResetEmailSend
-    }), [user, loading, passwordResetSuccess, passwordResetEmailSend, error])
+         passwordResetEmailSend, 
+         emailChangeConfirmation,
+         changeEmail
+    }), [user, loading, passwordResetSuccess, passwordResetEmailSend, error, emailChangeConfirmation])
 
 
     return <AuthContext.Provider value={memo}>{

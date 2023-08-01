@@ -1,6 +1,7 @@
 import React from 'react'
 import useAuth from '../../../../hooks/useAuth'
 import {FaUser} from 'react-icons/fa'
+import ChangeEmail from '../options/ChangeEmail'
 function ProfileModal() {
     const {user, signOut} = useAuth()
 
@@ -18,26 +19,32 @@ function ProfileModal() {
 
 
       <div className='text-left space-y-3 w-full'>
-        <div className='button'>
-          <h1 className='text-[13px] text-[#424242]'>Change Email</h1>
-          <p className='text-[#757575] text-[12px]'>john@appleseed.com</p>
-        </div>
+        <ul className='button !hover:bg-[#F5F5F5]'>
+          <label htmlFor="">
+            <h1 className='text-[13px] text-[#424242]'>Change Email</h1>
+            <p className='text-[#757575] text-[12px]'>{user?.email}</p>
+          </label>
+          {/* <ul className='z-[1] absolute top-0 right-0'>
+            <li>
+              <ChangeEmail />
+            </li>
+          </ul> */}
+        </ul>
 
-        <div className='button'>
+        <div className='button !hover:bg-[#F5F5F5]'>
           <h1 className={head}>Change Password</h1>
           <p className={subhead}>•••••••••</p>
         </div>
 
-        <div className='h-[1px] bg-[#e0e0e0] w-full'>
+        <div className='h-[1px] bg-[#e0e0e0] w-full !hover:bg-[#F5F5F5]'>
         </div>
         <div className='button' onClick={signOut}>
           <h1 className={head}>
             Log Out
           </h1>
         </div>
+
       </div>   
-
-
     </div>
   )
 }

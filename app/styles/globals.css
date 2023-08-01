@@ -28,7 +28,7 @@
             duration-200
             ease-in-out
             text-black focus:outline-none
-            text-[17px] focus:bg-[#eaeaea] w-full
+            text-[17px] focus:bg-[#DDE0E5] w-full
             py-[17px] bg-[#edeff3] rounded-xl px-3
     }
 

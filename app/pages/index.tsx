@@ -21,6 +21,8 @@ import MobileNavigation from '../components/navigation/desktop/MobileNavigation'
 import Footer from '../layout/footer/Footer'
 import DesktopLogo from '../layout/headers/components/DesktopLogo'
 import Link from 'next/link'
+import { AddAPIKeys } from '../components/SettingsButtons'
+import ChangeEmail, { EmailConfirmation } from '../components/profile/desktop/options/ChangeEmail'
 
 
 
@@ -86,8 +88,7 @@ function Home({
         <div className='lg:block hidden w-full '>
           <DesktopLogo />
         </div>
-
-
+        {/* <AddAPIKeys redirectLink={""} title='Eleven Labs' apiKeyName={""}/> */}
         <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
           <div className="flex flex-col items-center">
             {/* <div className='relative right-10 hidden md:block'>
