@@ -32,4 +32,9 @@
             py-[17px] bg-[#edeff3] rounded-xl px-3
     }
 
+    .button {
+        @apply cursor-pointer  duration-200  px-3 py-2 bg-[#FFFEFE]
+        hover:bg-[#eaeaea] ease-in-out transition-colors rounded-md
+    }
+
 }

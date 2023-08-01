@@ -66,14 +66,14 @@ function signup() {
                   }
               </label>
               
-              <div className='flex flex-row justify-between mt-5 mb-4 items-center space-x-3'>
+              <div className='flex flex-row w-full justify-between mt-5 mb-4 items-center space-x-3'>
                 <label htmlFor="" className='space-y-1 flex flex-col justify-center'>
                   <input type="text" placeholder='First Name' className='input w-[190px]'/>
                   <p className='text-xs text-right text-[#757575]'>Optional</p>
                 </label>  
 
                 
-                <div className='w-[2px] bg-[#bdbdbd] h-[19px]'>
+                <div className='w-[2px] bg-[#bdbdbd] h-[19px] relative bottom-3'>
                 </div>
 
                 <label htmlFor="" className='space-y-1 flex flex-col justify-center'>

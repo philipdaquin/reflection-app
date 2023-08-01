@@ -4,7 +4,7 @@ import Headers from '../../layout/headers/Headers'
 import TermsPrivacy from '../../components/terms_and_privacy/TermsPrivacy'
 import Link from 'next/link'
 
-function verification() {
+function verify() {
   return (
     <>
       <Head>
@@ -67,4 +67,4 @@ function verification() {
   )
 }
 
-export default verification
+export default verify

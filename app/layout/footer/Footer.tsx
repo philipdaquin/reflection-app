@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Router } from 'next/router'
 import SmallButton from '../../components/button/SmallButton'
 import useAuth from '../../hooks/useAuth'
+import Profile from '../../components/profile/desktop/Profile'
 
 function Footer() {
   const {signOut, user}  = useAuth()
@@ -19,13 +20,11 @@ function Footer() {
             <div className='flex items-center space-x-4 text-[#757575]  flex-row  text-left text-[12px] font-medium'>
               {/* <SettingsToggle /> */}
 
-              <div>
-                {user.email}
-              </div>
+              <Profile />
 
-              <button className="w-full" onClick={signOut}>
+              {/* <button className="w-full" onClick={signOut}>
                 <SmallButton title='Log Out'/>
-              </button>
+              </button> */}
             </div>
           ) : (
             <div className='flex items-center space-x-4 text-[#757575]  flex-row  text-left text-[12px] font-medium'>

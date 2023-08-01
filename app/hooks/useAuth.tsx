@@ -1,7 +1,8 @@
-import { GoogleAuthProvider, User, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth"
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { GoogleAuthProvider, User, confirmPasswordReset, createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth"
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { auth } from "../firebase"
 import { useRouter } from "next/router"
+import useMounted from "./useMounted"
 
 interface InterfaceAuth { 
     user: User | null, 
@@ -9,6 +10,13 @@ interface InterfaceAuth {
     signUp: (email: string, password: string) => Promise<void>,
     signIn: (email: string, password: string) => Promise<void>,
     signOut: () => Promise<void>,
+    
+    passwordReset: (email: string) => Promise<void>,
+    passwordResetEmailSend: boolean,
+
+
+    passwordResetSuccess: boolean, 
+    confirmPasswordReset: (oobCode: string, newPassword: string) => Promise<void>,
     googleSignin: () => Promise<void>,
     error: string | null,
     loading: boolean   
@@ -19,6 +27,13 @@ const AuthContext = createContext<InterfaceAuth>({
     signUp: async () => {},
     signIn: async () => {},
     signOut: async () => {},
+    
+    passwordReset: async () => {},
+    passwordResetEmailSend: false,
+
+    confirmPasswordReset: async () => {},
+    passwordResetSuccess: false,
+
     googleSignin: async () => {},
     error: null, 
     loading: false
@@ -39,6 +54,12 @@ export const AuthProvider = ({children}: Props) => {
 
     const [error, setError] = useState<string | null>(null)
 
+    const [passwordResetSuccess, setpasswordResetSuccess] = useState(false)
+    const [passwordResetEmailSend, setpasswordResetEmailSend] = useState(false)
+
+
+    const mounted = useMounted()
+
     const router = useRouter()  
 
     /*
@@ -51,7 +72,7 @@ export const AuthProvider = ({children}: Props) => {
         } else { 
             setUser(null)
             setLoading(true)
-            router.push('/signin')
+            // router.push('/signin')
         }
         setstartLoading(false)
     }), [auth])
@@ -63,16 +84,16 @@ export const AuthProvider = ({children}: Props) => {
             .then((credential) => { 
                 // Cache the user 
                 setUser(credential.user)
-                // Go back to the homepage 
-                router.push('/')
+                // new users will need to verify their accounts
+                router.push('/auth/verify')
                 // Reset state
                 setLoading(false)
             })
             .catch((e) => { 
                 // alert(e.message)
-                setError(e)
+                setError(e.code)
             })
-            .finally(() => setLoading(false))
+            .finally(() => mounted.current && setLoading(false))
     }
 
     const signIn = async (email: string, password: string) => {
@@ -85,9 +106,9 @@ export const AuthProvider = ({children}: Props) => {
             })
             .catch((e) => { 
                 // alert(e.message)
-                setError(e)
+                setError(e.code)
             })
-            .finally(() => setLoading(false))
+            .finally(() =>  mounted.current && setLoading(false))
     }
 
 
@@ -97,13 +118,13 @@ export const AuthProvider = ({children}: Props) => {
             .then(() => { 
                 setUser(null)
                 // router.push('/')
-                // setLoading(false)
+                setLoading(false)
             })
             .catch((e) => { 
                 // alert(e.message)
-                setError(e)
+                setError(e.code)
             })
-            .finally(() => setLoading(false))
+            .finally(() =>  mounted.current && setLoading(false))
     }
 
     const googleSignin = async () => { 
@@ -122,21 +143,64 @@ export const AuthProvider = ({children}: Props) => {
           })
           .catch((e) => { 
             // alert(e.message)
-            setError(e)
+            setError(e.code)
+
         })
-        .finally(() => setLoading(false))
+        .finally(() =>  mounted.current && setLoading(false))
 
     }
     
 
+    const passwordReset = async (email: string) => {
+        return await sendPasswordResetEmail(auth, email)
+            .then(() => setpasswordResetEmailSend(true))
+            .catch((e) => { 
+                console.log(e.code)
+                // console.error(e.message)
+                // alert(e.message)
+                setError(e.code.toString())
+
+                if (e.code === 'auth/invalid-action-code') { 
+                    setError('Something is wrong. Try again later!')
+                }
+
+            })
+            .finally(() =>  mounted.current && setpasswordResetEmailSend(false))
+
+    }
+
+    const sendPasswordReset = async (oob: string, newPassword: string) => { 
+        if (!oob && !newPassword) return;
+        await confirmPasswordReset(auth, oob, newPassword)
+            .then(() => setpasswordResetSuccess(true))
+            .catch((e) => { 
+                // alert(e.message)
+                setError(e.code)
+                console.log("Missing Oobcode")
+            })
+            .finally(() =>  mounted.current && setpasswordResetSuccess(false))
+    }
+
 
 
     const memo = useMemo(() => ({
-         user, signUp, signIn, signOut : logOut, loading, error , googleSignin
-    }), [user, loading])
+         user, 
+         signUp, 
+         signIn, 
+         signOut : logOut, 
+         loading, 
+         error, 
+         googleSignin, 
+         passwordReset, 
+         confirmPasswordReset: sendPasswordReset,
+         passwordResetSuccess,
+         passwordResetEmailSend
+    }), [user, loading, passwordResetSuccess, passwordResetEmailSend, error])
 
 
-    return <AuthContext.Provider value={memo}>{!startLoading && children}</AuthContext.Provider>
+    return <AuthContext.Provider value={memo}>{
+            !startLoading && children
+            }</AuthContext.Provider>
 }
 
 export default function useAuth() { 

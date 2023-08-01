@@ -9,7 +9,7 @@ interface Props {
 function SmallButton({title}: Props) {
     return  (
       <div className='cursor-pointer  duration-200  px-3 py-2 bg-[#FFFEFE]
-        hover:bg-[#eaeaea] ease-in-out transition-colors delay-500 rounded-md'>     
+        hover:bg-[#eaeaea] ease-in-out transition-colors rounded-md'>     
           <p className=''>{title}</p>
       </div>
     )
