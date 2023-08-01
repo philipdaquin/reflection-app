@@ -1,4 +1,6 @@
-import { GoogleAuthProvider, User, confirmPasswordReset, createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth"
+import { GoogleAuthProvider, User, applyActionCode, confirmPasswordReset, 
+    
+    createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth"
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { auth } from "../firebase"
 import { useRouter } from "next/router"
@@ -81,11 +83,15 @@ export const AuthProvider = ({children}: Props) => {
         setLoading(true)
 
         await createUserWithEmailAndPassword(auth, email, password) 
-            .then((credential) => { 
+            .then(async (credential) => { 
                 // Cache the user 
                 setUser(credential.user)
+                
+                // Send verification 
+                // await sendEmailVerification(credential.user, )
+
                 // new users will need to verify their accounts
-                router.push('/auth/verify')
+                router.push('/')
                 // Reset state
                 setLoading(false)
             })
