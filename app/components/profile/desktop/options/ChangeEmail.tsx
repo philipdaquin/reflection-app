@@ -79,7 +79,7 @@ function ChangeEmail({setOpenToggle1}: Props) {
     }
 
 
-    const buttonVariant = (dirtyFields.newEmail ) && !errors.newEmail ? 
+    const buttonVariant = (dirtyFields.newEmail && dirtyFields.password ) && !errors.newEmail && !errors.password ? 
       GenericButtonVariant.FILLED : GenericButtonVariant.EMPTY 
     
 
