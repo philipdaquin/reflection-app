@@ -4,13 +4,11 @@ import GenericButton, { GenericButtonVariant } from '../../../button/GenericButt
 import { SubmitHandler, useForm } from 'react-hook-form'
 import useAuth from '../../../../hooks/useAuth'
 import {EnvelopeIcon} from '@heroicons/react/24/outline'
-import { auth } from '../../../../firebase'
-import { getAuth } from 'firebase/auth'
 
-interface ConfirmationEmail { 
+interface PasswordInput { 
     email: string
 }
-export function EmailConfirmation({email}: ConfirmationEmail) { 
+export function PasswordConfirmation({email}: PasswordInput) { 
     return (
         <div className='w-[331px] items-center rounded-[20px] bg-white px-[19px] pt-[32px] pb-[36px]
         flex flex-col' 
@@ -35,61 +33,58 @@ export function EmailConfirmation({email}: ConfirmationEmail) {
 }
 
 
-interface NewEmailInput { 
-    newEmail: string, 
-    password: string
+interface NewPasswordInput { 
+    email: string,
+    // newPassword: string 
 }
-
 interface Props { 
-    setOpenToggle1: any
+    setOpenToggle2: any
 }
 
-function ChangeEmail({setOpenToggle1}: Props) {
+function ChangePassword({setOpenToggle2}: Props) {
     const {
         register,
         handleSubmit,
         watch,
         getValues,
         setError,
+        clearErrors,
         formState: { errors, dirtyFields },
-        clearErrors
-      } = useForm<NewEmailInput>()
+      } = useForm<NewPasswordInput>()
+      const [currentEmail, setCurrentEmail] = useState<string | null>('')
 
 
-    const { changeEmail, emailChangeConfirmation, user
-    } = useAuth()
-    const [currentEmail, setCurrentEmail] = useState<string | null>('')
-
-    // Get the email 
-    const onSubmit: SubmitHandler<NewEmailInput> = async ({newEmail, password}) =>{
-        if (!user || !newEmail) return
-
-        if (user?.email === newEmail) {
-            setError("newEmail" , {
+      const {passwordReset, passwordResetSuccess,
+        passwordResetEmailSend, error, user
+      } = useAuth()
+    
+      // Get the email 
+    const onSubmit: SubmitHandler<NewPasswordInput> = async ({email}) =>{
+        if (user?.email !== email) {setError("email" , {
             type: "custom",
-            message: "You can't use the same email address." })
-            
-            return
+            message: "You must use the same email address for this account"            
+        })
+            return 
         }
         setCurrentEmail(user?.email || '')
-        await changeEmail(user, newEmail, password)
-
-        clearErrors("newEmail")
+        await passwordReset(email)
+        clearErrors("email")
 
     }
-
-
-    const buttonVariant = (dirtyFields.newEmail ) && !errors.newEmail ? 
-      GenericButtonVariant.FILLED : GenericButtonVariant.EMPTY 
+      const buttonVariant = (dirtyFields.email) && !errors.email ? 
+        GenericButtonVariant.FILLED : GenericButtonVariant.EMPTY 
     
+    
+      const [confirmedEmail, ] = useState(getValues("email"))
+    
+    const close = () => setOpenToggle2(true)
 
-    const close = () => setOpenToggle1(true)
 
   return (
     <>
         {
-            emailChangeConfirmation && currentEmail ? (
-                <EmailConfirmation email={currentEmail}/>
+            passwordResetEmailSend && currentEmail ? (
+                <PasswordConfirmation email={currentEmail}/>
             ) : (
                 <div className='w-[331px] items-start rounded-[20px] bg-white px-[19px] py-[21px] 
                 flex flex-col' 
@@ -97,12 +92,14 @@ function ChangeEmail({setOpenToggle1}: Props) {
 
                 <div className='flex flex-col space-y-2 w-full pb-3'>
                     <div className='items-center flex flex-row justify-between'>
-                        <h1 className='font-semibold text-[14px] text-left text-black'>Change your email</h1>
-                        <div onClick={close} className='bg-[#F5F5F5] p-[9px] rounded-full cursor-pointer button !hover:bg-[#E0E0E0]'>
+                        <h1 className='font-semibold text-[14px] text-left text-black'>Change your password</h1>
+                        <div onClick={close}  className='bg-[#F5F5F5] p-[9px] rounded-full cursor-pointer button !hover:bg-[#E0E0E0]'>
                             <XMarkIcon height={12} width={12} color='#9E9E9E' strokeWidth={2}/>
                         </div>
                     </div>
-                    <p className='text-[12px] text-[#757575]'>An email will be sent to your original email address to verify the change.</p>
+                    <p className='text-[12px] text-[#757575]'>
+                        Please enter your email address to request a password reset.
+                    </p>
                 </div>
 
                 <div className='flex flex-col space-y-2.5 w-full'>
@@ -111,42 +108,33 @@ function ChangeEmail({setOpenToggle1}: Props) {
                             <div className='text-center flex flex-col text-[13px] justify-center space-y-3.5'>
                                 <label className='inline-block w-full space-y-2'>
                                     <input type="email" 
-                                        placeholder='New Email Address' 
+                                        placeholder='Email Address' 
                                         className='input !py-[13px] !text-[13px] placeholder:text-[13px]'
-                                        {...register('newEmail', {required: true })}
+                                        {...register('email', {required: true })}
                                         />
                                         {
-                                        errors.newEmail && (
+                                        errors.email && (
                                                 <p className='text-red-600 text-xs text-left'>
-                                                Email already in use. Try again.
+                                                Please enter your email address for this account.
                                                 </p>
                                             )
                                         }
                                 </label>              
-                                <label className='inline-block w-full space-y-1'>
+                                {/* <label className='inline-block w-full space-y-1'>
                                     <input type="password" 
                                         placeholder='Current Password' 
                                         className='input py-[13px] !text-[13px]  placeholder:text-[13px]'
-                                        {...register('password', {required: true })}
+                                        {...register('newPassword', {required: true })}
                                         />
                                         {
-                                        errors.password && (
+                                        errors.newPassword && (
                                             <p className='text-red-600 text-[10px] text-left'>
-                                            Please enter your password.
+                                            Please enter valid email address.
                                             </p>
                                         )
                                         }
-                                </label>              
+                                </label>               */}
                             </div>
-                            {errors.root?.message}
-                            {
-                                errors.root?.message && (
-                                    <p className='text-red-600 text-[10px] text-left'>
-                                        {errors.root?.message}
-                                    </p>
-                                )
-                            }
-                            
                                 
                             <button className='w-full mt-[25px] !rounded-non ' type='submit'>
                                 <GenericButton title='Save Changes' variant={buttonVariant} />
@@ -162,4 +150,4 @@ function ChangeEmail({setOpenToggle1}: Props) {
   )
 }
 
-export default ChangeEmail
+export default ChangePassword

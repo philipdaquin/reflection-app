@@ -1,15 +1,22 @@
-import { GoogleAuthProvider, User, applyActionCode, confirmPasswordReset, 
+import { EmailAuthCredential, GoogleAuthProvider, User, applyActionCode, confirmPasswordReset, 
     
     createUserWithEmailAndPassword, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail,
      signInWithEmailAndPassword, signInWithPopup, signOut,
     
-     updateEmail
+     updateEmail,
+     linkWithCredential,
+     reauthenticateWithCredential,
+     AuthCredential,
+     getAuth,
+     EmailAuthProvider
     
     } from "firebase/auth"
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { auth } from "../firebase"
 import { useRouter } from "next/router"
 import useMounted from "./useMounted"
+import { FirebaseError } from "firebase/app"
+import firebase from 'firebase/app';
 
 interface InterfaceAuth { 
     user: User | null, 
@@ -19,7 +26,7 @@ interface InterfaceAuth {
     signOut: () => Promise<void>,
     
     // Change Email 
-    changeEmail: (user: User, newEmail: string) => Promise<void>,
+    changeEmail: (user: User, newEmail: string, password: string) => Promise<void>,
     emailChangeConfirmation: boolean,
 
     // Password Reset 
@@ -187,11 +194,12 @@ export const AuthProvider = ({children}: Props) => {
                 }
 
             })
-            .finally(() =>  mounted.current && setpasswordResetEmailSend(false))
+            // .finally(() => setpasswordResetEmailSend(false))
 
     }
 
     const sendPasswordReset = async (oob: string, newPassword: string) => { 
+        
         if (!oob && !newPassword) return;
         await confirmPasswordReset(auth, oob, newPassword)
             .then(() => setpasswordResetSuccess(true))
@@ -200,22 +208,49 @@ export const AuthProvider = ({children}: Props) => {
                 setError(e.code)
                 console.log("Missing Oobcode")
             })
-            .finally(() =>  mounted.current && setpasswordResetSuccess(false))
+            // .finally(() =>  mounted.current && setpasswordResetSuccess(false))
     }   
 
-    const changeEmail = async (user: User, newEmail: string) => { 
+    const changeEmail = async (user: User, newEmail: string, password: string) => { 
         if (!user && !newEmail) return
-        await updateEmail(user, newEmail)
-            .then(() => setEmailChangeConfirmation(true))
-            .catch((e) => { 
-                // alert(e.message)
-                setError(e.code)
-                console.log("Missing Oobcode")
+
+        return await reauthenticateUser(password)
+            .then(async () => {
+                await updateEmail(user, newEmail)
+                    .then(() => {
+                        setEmailChangeConfirmation(true)
+                        console.log("EMAIL CHANGED SUCCESSFULLYT")
+                    })
+                    .catch((e) => { 
+                        alert(e.message)
+                        setError(e.code)
+                        console.log("Missing Oobcode")
+                    })
+                    // .finally(() =>  mounted.current && setEmailChangeConfirmation(false))
             })
-            .finally(() =>  mounted.current && setEmailChangeConfirmation(false))
+
             
     }
 
+
+    const reauthenticateUser = async (password: string) => { 
+        console.log("authenticating user ")
+        setLoading(true)
+        const user = getAuth().currentUser
+        if (!user || !user.email) return
+        
+        const credential = EmailAuthProvider.credential(user.email, password)
+        reauthenticateWithCredential(user, credential)  
+            .then((resp) => {
+                const user = resp.user
+                setUser(user)
+                setLoading(false)
+            })
+            .catch((e) => { 
+                console.log(e.code)
+                setError(e.code.toString())
+            })
+    }
 
     const memo = useMemo(() => ({
          user, 
