@@ -8,7 +8,11 @@ import { EmailAuthCredential, GoogleAuthProvider, User, applyActionCode, confirm
      reauthenticateWithCredential,
      AuthCredential,
      getAuth,
-     EmailAuthProvider
+     EmailAuthProvider,
+     verifyBeforeUpdateEmail,
+
+     verifyPasswordResetCode,
+         
     
     } from "firebase/auth"
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
@@ -216,6 +220,7 @@ export const AuthProvider = ({children}: Props) => {
 
         return await reauthenticateUser(password)
             .then(async () => {
+                // await verifyBeforeUpdateEmail(user, newEmail)
                 await updateEmail(user, newEmail)
                     .then(() => {
                         setEmailChangeConfirmation(true)
@@ -227,9 +232,10 @@ export const AuthProvider = ({children}: Props) => {
                         console.log("Missing Oobcode")
                     })
                     // .finally(() =>  mounted.current && setEmailChangeConfirmation(false))
+            }).catch((e) => { 
+                console.log(e.code)
+                setError(e.code.toString())
             })
-
-            
     }
 
 

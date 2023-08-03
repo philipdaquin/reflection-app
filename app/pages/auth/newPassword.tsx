@@ -172,4 +172,40 @@ function newPassword() {
   )
 }
 
+
+function changeEmail() { 
+  return (
+    <>
+    </>
+  )
+}
+
+/*
+  if mode === recoverEmail { 
+    changeEmail 
+  } 
+
+
+  if mode === recoverPassword {
+    changePassword 
+  }
+  if mode === verifyAndChangeEmail {
+    verifyAndChangeEmail 
+  }
+
+*/
+function updateUserDetails() {
+  const searchParams = useSearchParams()
+ 
+  const mode: string | null = searchParams.get('mode')
+
+
+  return (
+    <>
+    </>
+  )
+
+}
+
+
 export default newPassword

@@ -58,7 +58,7 @@ function ChangeEmail({setOpenToggle1}: Props) {
 
     const { changeEmail, emailChangeConfirmation, user
     } = useAuth()
-    const [currentEmail, setCurrentEmail] = useState<string | null>('')
+    // const [currentEmail, setCurrentEmail] = useState<string | null>('')
 
     // Get the email 
     const onSubmit: SubmitHandler<NewEmailInput> = async ({newEmail, password}) =>{
@@ -71,7 +71,7 @@ function ChangeEmail({setOpenToggle1}: Props) {
             
             return
         }
-        setCurrentEmail(user?.email || '')
+        // setCurrentEmail(user?.email || '')
         await changeEmail(user, newEmail, password)
 
         clearErrors("newEmail")
@@ -88,8 +88,8 @@ function ChangeEmail({setOpenToggle1}: Props) {
   return (
     <>
         {
-            emailChangeConfirmation && currentEmail ? (
-                <EmailConfirmation email={currentEmail}/>
+            emailChangeConfirmation && getValues('newEmail') ? (
+                <EmailConfirmation email={getValues('newEmail') }/>
             ) : (
                 <div className='w-[331px] items-start rounded-[20px] bg-white px-[19px] py-[21px] 
                 flex flex-col' 
