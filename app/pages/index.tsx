@@ -104,7 +104,7 @@ function Home({
               />
             </PhoneView>
 
-            <div className='mt-[42px] '>
+            <div className='mt-[42px]'>
               <MobileNavigation />
             </div>
           </div>
