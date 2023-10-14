@@ -9,7 +9,6 @@ import { AddEntryToggle, MoodTriggerPage, SelectedAudioPlayer, ShowAudioPlayer }
 import { AudioData } from '../../typings'
 import { GetServerSideProps } from 'next'
 import { getRecentAudioEntries } from '../../util/audio/getRecentAudioEntries'
-import SettingsButtons from '../../components/SettingsButtons'
 import HomeNav from '../../components/navigation/mobile/HomeNav'
 import NavigationMobile, { PlayerAttachment } from '../../components/navigation/mobile/NavigationMobile'
 import ModalView from '../../components/modals/ModalView'

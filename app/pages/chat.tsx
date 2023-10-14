@@ -3,14 +3,13 @@ import React from 'react'
 import NavigationButtons from '../components/navigation/NavigationButtons'
 import ChatContent from '../components/pages/ChatContent'
 import PhoneView from '../components/PhoneView'
-import SwitchView from '../components/navigation/desktop/SwitchView'
 import AudioControls from '../components/controls/AudioControls'
 import NavigationMobile from '../components/navigation/mobile/NavigationMobile'
-import SettingsButtons from '../components/SettingsButtons'
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { useRecoilValue } from 'recoil'
 import { SelectedAudioPlayer } from '../atoms/atoms'
 import ChatControls from '../components/controls/ChatControls'
+import SwitchView from '../components/navigation/desktop/MobileNavigation'
 
 function chat() {
     const selectedAudio = useRecoilValue(SelectedAudioPlayer)
