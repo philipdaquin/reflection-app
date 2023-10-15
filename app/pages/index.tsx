@@ -78,7 +78,7 @@ function Home({
   return (
     <>
       <Head>
-        <title>Hello John 👋</title>
+        <title>Hello to Reflection V1  👋</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
         
