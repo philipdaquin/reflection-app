@@ -78,12 +78,10 @@ function Home({
         <title>Hello John 👋</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Headers />
+      {/* <Headers /> */}
       {/*  md:px-[104px]  */}
       <section className="md:bg-[#fffefe] bg-white flex md:h-screen
         flex-col h-screen md:py-5 lg:pt-7 lg:pb-[84px] md:px-[59px] relative">
-          
-
 
         <div className='lg:block hidden w-full '>
           <DesktopLogo />

@@ -11,7 +11,7 @@ function Headers() {
   
   const router = useRouter()
 
-    const NotHomePage =
+    const Hidden =
         router.pathname === '/signin' ||
         router.pathname.includes('/onboarding') || 
         router.pathname.includes('/verification') ||
@@ -22,7 +22,7 @@ function Headers() {
   return (
     <>
       {
-        NotHomePage && (
+        Hidden && (
           <div className='mx-auto max-w-7xl px-10 pt-5 pb-5' style={{boxShadow: '0 0 4px 0 rgba(0, 0, 0, 0.15)'}}>
               <div className='ml-10 flex shrink-0 items-center w-full  '>
                 <Link href={'/'}>
@@ -36,6 +36,9 @@ function Headers() {
           </div>
         )
       }
+      {/* <div className='lg:block hidden w-full '>
+          <DesktopLogo />
+      </div> */}
     </>
   )
 }
