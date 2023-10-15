@@ -22,7 +22,7 @@
     "eslint-config-next": "^13.4.12",
     "firebase": "^10.5.0",
     "framer-motion": "^10.12.12",
-    "next": "^13.4.12",
+    "next": "^13.5.4",
     "react": "^18.2.0",
     "react-audio-voice-recorder": "^1.0.5",
     "react-datepicker": "^4.11.0",
