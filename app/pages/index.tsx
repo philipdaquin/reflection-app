@@ -1,13 +1,9 @@
 import type { GetServerSideProps, NextPage } from 'next'
 import Head from 'next/head'
 import PhoneView from '../components/PhoneView'
-import SwitchView from '../components/SwitchView'
-import NavigationButtons from '../components/navigation/NavigationButtons'
 import { AudioData, DailySummary, MoodFrequency, TextClassification, WeeklySummary } from '../typings'
 import { getMoodSummary } from '../util/analysis/getMoodSummary'
-import SettingsButtons from '../components/SettingsButtons'
 import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY, 
-  // initialiseAPIKeys 
 } from '../hooks/useLocalStorage'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { AddEntryToggle, CurrentWeekSummary, ElevenLabsApiKey, OpenAIApiKey, SelectedAudioPlayer, SelectedFilterOption, ShowAudioPlayer } from '../atoms/atoms'
@@ -15,18 +11,18 @@ import NavigationMobile, { PlayerAttachment } from '../components/navigation/mob
 import HomeNav from '../components/navigation/mobile/HomeNav'
 import { getRecentAudioEntries } from '../util/audio/getRecentAudioEntries'
 import { useEffect, useState } from 'react'
-import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
-import MoodActivityChart from '../components/MoodActivityChart'
 import HomeSummaryContent from '../components/pages/HomeSummaryContent'
 import { getAllAnalysis } from '../util/analysis/getAllAnalysis'
 import { getDailyByDate } from '../util/daily/getDailyByDate'
 import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
-import QRCode from '../components/QRCode'
 import { getCurrentWeek } from '../util/audio/getCurrentWeek'
-import PlayerModal from '../components/modals/PlayerModal'
-import ModalView from '../components/modals/ModalView'
-import useAudioPlayer from '../hooks/useAudioPlayer'
-import { Player } from '../components/AudioMediaPlayer'
+import Headers from '../layout/headers/Headers'
+import MobileNavigation from '../components/navigation/desktop/MobileNavigation'
+import Footer from '../layout/footer/Footer'
+import DesktopLogo from '../layout/headers/components/DesktopLogo'
+import Link from 'next/link'
+import { AddAPIKeys } from '../components/SettingsButtons'
+import ChangeEmail, { EmailConfirmation } from '../components/profile/desktop/options/ChangeEmail'
 
 
 
@@ -76,21 +72,26 @@ function Home({
   ])
   const selectedAudio = useRecoilValue(SelectedAudioPlayer)
   return (
-    <>
+    <>  
+    
       <Head>
         <title>Hello to Reflection V1  👋</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-        
+      {/* <Headers /> */}
       {/*  md:px-[104px]  */}
-      <div className="md:bg-[#EEEEEE] bg-white flex 
-            md:h-screen flex-col h-screen md:py-5 lg:py-14 md:px-4 relative">
+      <section className="md:bg-[#fffefe] bg-white flex md:h-screen
+        flex-col h-screen md:py-5 lg:pt-7 lg:pb-[84px] md:px-[59px] relative">
 
+        <div className='lg:block hidden w-full '>
+          <DesktopLogo />
+        </div>
+        {/* <AddAPIKeys redirectLink={""} title='Eleven Labs' apiKeyName={""}/> */}
         <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
-          <div className="flex items-center md:relative md:right-5">
-            <div className='relative right-10 hidden md:block'>
+          <div className="flex flex-col items-center">
+            {/* <div className='relative right-10 hidden md:block'>
               <NavigationButtons />        
-            </div>
+            </div> */}
 
             <PhoneView>
               <HomeSummaryContent 
@@ -101,10 +102,14 @@ function Home({
               />
             </PhoneView>
 
+            <div className='mt-[42px]'>
+              <MobileNavigation />
+            </div>
           </div>
-          <div className='lg:block hidden '>
-              <SwitchView />
-          </div>
+  <div className='fixed bottom-[15px]  lg:block hidden w-full '>
+          <Footer />
+        </div>
+
         </main> 
         <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
           <div className='flex items-center md:hidden justify-center sm:mb-5 mb-0 '>
@@ -114,7 +119,7 @@ function Home({
               </NavigationMobile >        
           </div>
         </div>
-      </div>
+      </section>
     </>
   )
 }

@@ -1,3 +1,6 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,6 +19,22 @@
           sm:rounded-3xl w-screen  border-t-2 border-[#F0F0F0] sm:border-none
           sm:w-full ring-4 ring-[#E0E0E0]/20 backdrop-blur-lg  
           rounded-t-3xl rounded-b-none;
+    }
+
+    .input {
+        @apply outline-none 
+            placeholder:text-[#757575]
+            transition-colors
+            duration-200
+            ease-in-out
+            text-black focus:outline-none
+            text-[17px] focus:bg-[#DDE0E5] w-full
+            py-[17px] bg-[#edeff3] rounded-xl px-3
+    }
+
+    .button {
+        @apply cursor-pointer  duration-200  px-3 py-2 bg-[#FFFEFE]
+        hover:bg-[#eaeaea] ease-in-out transition-colors rounded-md
     }
 
 }

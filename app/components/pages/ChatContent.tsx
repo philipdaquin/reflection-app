@@ -1,5 +1,5 @@
 import React from 'react'
-import BackButton from '../BackButton'
+import BackButton from '../button/BackButton'
 import GeneratePrompt from '../GeneratePrompt'
 import LiveNotification from '../LiveNotification'
 import UserChannel from '../UserChannel'

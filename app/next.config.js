@@ -8,5 +8,8 @@ module.exports = {
       'images.unsplash.com',
       'cdn.discordapp.com'
     ],
+  },
+  env: { 
+    apiKey: process.env.APIKEY
   }
 }

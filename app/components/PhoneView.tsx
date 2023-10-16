@@ -8,11 +8,15 @@ interface Props {
 
 function PhoneView({children}: Props) {
   return (
-    <div className='md:w-[424px] md:h-[803px]
+    <div className='md:w-[424px] md:h-[768px]
       md:relative
-      bg-white md:shadow-xl md:rounded-[70px] 
-      md:border-[#F5F5F5] md:border-8 
-      border-white shadow-inherit '>
+      bg-white 
+      md:rounded-[60px] 
+      md:border-8 
+      border-white 
+      md:border-[#F5F5F5] 
+      ' 
+      style={{ boxShadow: ' 0 7px 41px 0 rgba(0, 0, 0, 0.27)' }}>
         <div className='
           md:w-full 
           md:px-3

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import BackButton from '../BackButton'
+import BackButton from '../button/BackButton'
 import { AudioData, MoodFrequency, MoodTriggerType } from '../../typings'
 import DailyAudioEntries from '../moodWidgets/DailyAudioEntries'
 import MoodActivityWidget from '../moodWidgets/MoodActivityWidget'
