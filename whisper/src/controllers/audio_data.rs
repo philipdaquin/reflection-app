@@ -3,7 +3,7 @@ use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
 use chrono::{NaiveDate, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use crate::{ml::{
-    whisper::{AudioDataDTO, upload_audio}, 
+    audio_transcription::{AudioDataDTO, upload_audio}, 
     prompt::GENERAL_CONTEXT, 
     chat::get_chat_response, 
     tts::process_text_to_audio, 

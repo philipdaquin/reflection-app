@@ -5,7 +5,7 @@ use chrono::{Utc, Duration, TimeZone, NaiveTime, NaiveDate, DateTime, Datelike, 
 use futures::TryStreamExt;
 use uuid::Uuid;
 use crate::error::{Result, ServerError};
-use crate::ml::whisper::AudioDataDTO;
+use crate::ml::audio_transcription::AudioDataDTO;
 use mongodb::Collection;
 use mongodb::bson::{doc, oid::ObjectId, Document};
 

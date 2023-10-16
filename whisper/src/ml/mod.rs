@@ -1,4 +1,5 @@
 pub mod whisper;
+pub mod audio_transcription;
 pub mod chat;
 pub mod tts;
 pub mod prompt;
