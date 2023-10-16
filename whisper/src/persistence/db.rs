@@ -5,8 +5,8 @@ use lazy_static::lazy_static;
 
 lazy_static! { 
     pub static ref MONGO_URI: String = std::env::var("MONGODB_URI").unwrap_or_else(|_| "mongodb://localhost:27017".into());
-    pub static ref MONGODB_USERNAME: String = std::env::var("MONGODB_USERNAME").unwrap_or_else(|_| "mongodb://localhost:27017".into());
-    pub static ref MONGODB_PASSWORD: String = std::env::var("MONGODB_PASSWORD").unwrap_or_else(|_| "mongodb://localhost:27017".into());
+    pub static ref MONGODB_USERNAME: String = std::env::var("MONGODB_USERNAME").unwrap_or_else(|_| "username".into());
+    pub static ref MONGODB_PASSWORD: String = std::env::var("MONGODB_PASSWORD").unwrap_or_else(|_| "password".into());
 }
 
 

@@ -20,7 +20,7 @@ RUN rm ./target/release/deps/whisper*
 RUN cargo build --release
 
 # our final base
-FROM rust:1.49
+FROM rust:latest
 
 # copy the build artifact from the build stage
 COPY --from=build /whisper/target/release/whisper .

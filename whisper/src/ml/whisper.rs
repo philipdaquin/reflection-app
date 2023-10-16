@@ -24,6 +24,8 @@ struct WhisperResponse {
 pub async fn transcribe_audio_in_whisper(buffer: &Vec<u8>) -> Result<String> { 
     dotenv().ok();
 
+    log::info!("transcribing with whisper");
+
     let https = HttpsConnector::new();
     let client = Client::builder()
         .http2_keep_alive_timeout(Duration::from_secs(60))
@@ -51,6 +53,9 @@ pub async fn transcribe_audio_in_whisper(buffer: &Vec<u8>) -> Result<String> {
         log::error!("API call failed with status: {:#?}", resp.status());
         return Ok(String::new());
     }
+    
+
+    log::info!("Calling Whisper API");
 
     let body_bytes = hyper::body::to_bytes(resp.into_body())
         .await
@@ -58,6 +63,8 @@ pub async fn transcribe_audio_in_whisper(buffer: &Vec<u8>) -> Result<String> {
     let response_json: WhisperResponse = serde_json::from_slice(&body_bytes)?;
 
     if let Some(transcript) = response_json.text { 
+        log::info!("{:#?}", transcript.to_string());
+        
         return Ok(transcript.to_string());
     } 
 
