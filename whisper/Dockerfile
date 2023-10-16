@@ -1,22 +1,29 @@
-FROM rust:1.59
+FROM rust:1.49-slim-buster as build
 
-# Set the working directory to /app
-WORKDIR /app
+# create a new empty shell project
+RUN USER=root cargo new --bin whisper
+WORKDIR /whisper
 
-# Copy the Cargo.toml and Cargo.lock files to the container
-COPY Cargo.toml Cargo.lock ./
+# copy over your manifests
+COPY ./Cargo.lock ./Cargo.lock
+COPY ./Cargo.toml ./Cargo.toml
 
-# Build the dependencies to cache them
+# this build step will cache your dependencies
+RUN cargo build --release
+RUN rm src/*.rs
+
+# copy your source tree
+COPY ./src ./src
+
+# build for release
+RUN rm ./target/release/deps/whisper*
 RUN cargo build --release
 
-# Copy the rest of the application code to the container
-COPY src/ ./src/
+# our final base
+FROM rust:1.49
 
-# Build the application with release optimizations
-RUN cargo build --release
+# copy the build artifact from the build stage
+COPY --from=build /whisper/target/release/whisper .
 
-# Expose port 8000 for the Actix server to listen on
-EXPOSE 4001
-
-# Start the Actix server when the container starts
-CMD ["./target/release/whisper"]
+# set the startup command to run your binary
+CMD ["./whisper"]
