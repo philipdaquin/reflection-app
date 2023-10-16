@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { AudioData, DEFAULT_IMAGE_URL } from '../../typings'
-import BackButton from '../BackButton'
+import BackButton from '../button/BackButton'
 import { ThumbnailPlayer } from './PlayerContents'
 import { useRouter } from 'next/router'
 import { PauseIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'

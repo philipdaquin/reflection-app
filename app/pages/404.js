@@ -2,7 +2,7 @@ import { Head } from "next/document";
 import Home from ".";
 import ErrorPageContent from "../components/pages/ErrorPageContent";
 import PhoneView from "../components/PhoneView";
-import SwitchView from "../components/SwitchView";
+import SwitchView from "../components/navigation/desktop/MobileNavigation";
 import SettingsButtons from "../components/SettingsButtons";
 import NavigationMobile from "../components/navigation/mobile/NavigationMobile";
 import HomeNav from "../components/navigation/mobile/HomeNav";

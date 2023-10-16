@@ -1,6 +1,6 @@
 import React, { ChangeEvent, ChangeEventHandler, useEffect, useState } from 'react'
 import AudioPlayer from '../AudioPlayer'
-import BackButton from '../BackButton'
+import BackButton from '../button/BackButton'
 import JournalThumbnail from '../JournalThumbnail'
 import SuggestedTags from '../SuggestedTags'
 import {CgTranscript} from 'react-icons/cg'

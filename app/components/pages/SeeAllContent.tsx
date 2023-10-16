@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import BackButton from '../BackButton'
+import BackButton from '../button/BackButton'
 import { AudioData, EntryType } from '../../typings'
 import Link from 'next/link'
 import AudioEntry from '../AudioEntry'

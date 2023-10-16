@@ -95,20 +95,19 @@ function NavigationMobile({children, selectedAudio} : Props) {
   const navContainer = `
     bg-[#FCFCFC] md:px-8 sm:py-5 pb-10  
     shadow-xl sm:drop-shadow-lg drop-shadow-2xl  
-    sm:rounded-3xl w-screen  border-t-2 border-[#F0F0F0] sm:border-none
-    sm:w-full ring-4 ring-[#E0E0E0]/20 backdrop-blur-lg  
-    rounded-t-3xl rounded-b-none
+    sm:rounded-3xl w-screen border-[#F0F0F0] sm:border-none
+    sm:w-full h-[92px] rounded-b-none
   `
 
   return (
     <>
       {
         !isAudioPlayingPage  ? (
-          <div className={` ${navContainer} ${selectedAudio ? 'sm:pt-0' : 'py-5'}`}>
+          <div style={{boxShadow: 'box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.2)'}} className={` ${navContainer} ${selectedAudio ? 'sm:pt-0' : 'py-5'}`}>
             {children}
           </div>
         ) : (
-          <div className={` ${navContainer} py-5`}>
+          <div  style={{boxShadow: 'box-shadow: 0 1px 15px 0 rgba(0, 0, 0, 0.2)'}}  className={` ${navContainer} py-5`}>
             {children}
           </div>
         )

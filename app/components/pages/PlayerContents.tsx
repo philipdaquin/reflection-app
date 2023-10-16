@@ -2,7 +2,7 @@ import Image from 'next/image'
 import React, { useState } from 'react'
 import AudioMediaPlayer from '../AudioMediaPlayer'
 import AudioPlayer from '../AudioPlayer'
-import BackButton from '../BackButton'
+import BackButton from '../button/BackButton'
 import JournalThumbnail from '../JournalThumbnail'
 
 import {ChevronDownIcon} from '@heroicons/react/24/solid'
