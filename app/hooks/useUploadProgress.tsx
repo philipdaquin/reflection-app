@@ -42,6 +42,11 @@ export const UploadProgressProvider = ({children}: Props) => {
     const handleUpload = () => { 
         setUploadState(true)
     }
+
+
+    /*
+        Upload a file to be transcribed by 
+    */
     const handleFileUpload = async (selectedFile: File | null) => {
         if (!selectedFile) return
         setLoading(true)

@@ -102,9 +102,10 @@ function Home({
             </PhoneView>
 
           </div>
-          <div className='lg:block hidden '>
+          {/* <div className='lg:block hidden '>
               <SwitchView />
           </div>
+           */}
         </main> 
         <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
           <div className='flex items-center md:hidden justify-center sm:mb-5 mb-0 '>
