@@ -34,12 +34,4 @@ services:
     container_name: redis-db
     command: [ "redis-server", "--protected-mode", "no" ]
     ports:
-    - "6379:6379"
-    networks:
-      - whisper-local
-
-networks: 
-  whisper-local: 
-    external: false
-volumes:
-  mongodb_data_container:
+      - '6379:6379'
