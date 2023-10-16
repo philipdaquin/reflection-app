@@ -7,7 +7,7 @@ use serde::{Serialize, Deserialize};
 use crate::{error::{Result, ServerError}, persistence::{audio_db::{AudioDB, AudioInterface}, 
 weekly_db::{WeeklyAnalysisDB, WeeklyAnalysisInterface}, audio_analysis::AnalysisDb, get_current_week}};
 
-use super::{text_classification::{MoodFrequency, TextClassification}, recommendation::RecommendedActivity, whisper::{AudioDataDTO}};
+use super::{text_classification::{MoodFrequency, TextClassification}, recommendation::RecommendedActivity, audio_transcription::{AudioDataDTO}};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct ImportantEvents { 

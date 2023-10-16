@@ -1,7 +1,7 @@
 use chrono::{ Utc, Datelike, DateTime};
 use serde::{Serialize, Deserialize};
 
-use crate::ml::{text_classification::TextClassification, whisper::AudioDataDTO};
+use crate::ml::{text_classification::TextClassification, audio_transcription::AudioDataDTO};
 
 use super::audioanalysis::AudioAnalysis;
 

@@ -6,7 +6,7 @@ use serde::{Serialize, Deserialize};
 
 use crate::{error::{Result, ServerError}, ml::text_classification::TextClassification, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, audio_db::{AudioDB, AudioInterface}, daily_db::{DailyAnalysisDb, DailyAnalysisInterface}, get_current_day}};
 
-use super::{whisper::AudioDataDTO, text_classification::MoodFrequency};
+use super::{audio_transcription::AudioDataDTO, text_classification::MoodFrequency};
 
 
 

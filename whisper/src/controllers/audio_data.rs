@@ -3,7 +3,7 @@ use actix_web::{ route, http::header, HttpResponse, Result, web, HttpRequest};
 use chrono::{NaiveDate, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use crate::{ml::{
-    whisper::{AudioDataDTO, upload_audio, batch_upload_audio}, 
+    audio_transcription::{AudioDataDTO, upload_audio}, 
     prompt::GENERAL_CONTEXT, 
     chat::get_chat_response, 
     tts::process_text_to_audio, 
@@ -314,7 +314,7 @@ pub async fn batch_upload(
     progress.progress += 10;
     broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;
 
-    let mut audio = batch_upload_audio(payload).await?;
+    let mut audio = upload_audio(payload).await?;
         
         progress.progress += 20;
         broadcast.broadcast(&serde_json::to_string(&progress).unwrap()).await;

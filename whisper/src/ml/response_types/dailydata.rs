@@ -5,7 +5,8 @@ use bson::{oid::ObjectId, DateTime};
 use chrono::{Utc, NaiveDate, TimeZone};
 use serde::{Serialize, Deserialize};
 
-use crate::{error::{Result, ServerError}, ml::{text_classification::{TextClassification, MoodFrequency}, whisper::AudioDataDTO, daily_summary::DailySummaryDTO}, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, audio_db::{AudioDB, AudioInterface}, daily_db::{DailyAnalysisDb, DailyAnalysisInterface}, get_current_day}};
+use crate::{error::{Result, ServerError}, ml::{text_classification::{TextClassification, MoodFrequency}, 
+    audio_transcription::AudioDataDTO, daily_summary::DailySummaryDTO}, persistence::{audio_analysis::{AnalysisDb, TextAnalysisInterface}, audio_db::{AudioDB, AudioInterface}, daily_db::{DailyAnalysisDb, DailyAnalysisInterface}, get_current_day}};
 
 use super::audiodata::AudioData;
 
