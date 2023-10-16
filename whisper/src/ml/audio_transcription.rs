@@ -12,7 +12,7 @@ use num_cpus;
 use crate::ml::prompt::GET_TAGS;
 use futures_util::stream::{TryStreamExt, StreamExt};
 use actix_web::{Result as ActixResult};
-use super::text_classification::TextClassification;
+use super::{text_classification::TextClassification, whisper::transcribe_audio_in_whisper};
 use rayon::prelude::*;
 use crossbeam::channel::{unbounded};
 
@@ -54,13 +54,12 @@ impl AudioDataDTO {
     /// 
     /// Upload as a single chunk
     pub async fn new(bytes: Vec<u8>) -> Result<Self> { 
-        let wav = parse_wav_file(bytes).await?;
         let id = ObjectId::new().to_string();
         let created_date = Utc::now();
         let bson_date_time = bson::DateTime::from_chrono(created_date);
 
         let day = created_date.weekday().to_string();
-        let transcription = AudioDataDTO::transcribe_audio(wav).await?;
+        let transcription = transcribe_audio_in_whisper(&bytes).await?;
 
         Ok(Self { 
             id: Some(id), 
@@ -191,6 +190,22 @@ async fn parse_wav_file(bytes: Vec<u8>) -> Result<Vec<i16>> {
     Ok(wav_data)
 
 }
+
+/// 
+/// 
+/// Split the payload into multiple smaller batches, which will be processed in parallel 
+/// to reduce processing time 
+pub async fn upload_single_chunk(mut payload: Multipart) -> Result<Vec<u8>> { 
+    let mut bytes = Vec::new();
+    while let Some(mut item) = payload.try_next().await.unwrap() { 
+        // Write the content of the file of the temporary file 
+        while let Some(chunk) = item.try_next().await.unwrap() { 
+            bytes.write_all(&chunk).await?;
+        }
+    }
+    Ok(bytes)
+}
+
 
 /// 
 /// Helper function for uploading payload into a single chunk
