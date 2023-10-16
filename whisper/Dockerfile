@@ -1,4 +1,4 @@
-FROM rust:1.49-slim-buster as build
+FROM rust:latest as build
 
 # create a new empty shell project
 RUN USER=root cargo new --bin whisper
