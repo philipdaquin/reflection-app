@@ -57,13 +57,13 @@ actix-web-lab = "0.19.1"
 # actix = "0.13.0"
 # actix-rt = "2.8.0"
 
-[profile.release]
-# Less code to include into binary
-panic = 'abort'
-# Optimization over all codebase ( better optimization, slower build )
-codegen-units = 1
-# Optimization for size ( most aggressive )
-opt-level = 'z'
-# Link time optimization using using whole-program analysis
-lto = true
-debug = true
+# [profile.release]
+# # Less code to include into binary
+# panic = 'abort'
+# # Optimization over all codebase ( better optimization, slower build )
+# codegen-units = 1
+# # Optimization for size ( most aggressive )
+# opt-level = 'z'
+# # Link time optimization using using whole-program analysis
+# lto = true
+# debug = true
