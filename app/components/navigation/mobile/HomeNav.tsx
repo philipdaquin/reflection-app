@@ -49,7 +49,7 @@ function HomeNav() {
           </div>
       
           <NavButton 
-              routerName='playlist'
+              routerName='mood_summary'
               title='Insights'
 
               icon={<HiChartBar size={33} color='#000'/>}/>

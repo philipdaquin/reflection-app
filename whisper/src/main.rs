@@ -7,9 +7,9 @@ async fn main() -> Result<()> {
     dotenv().ok();
 
     let backup = std::env::var("BACKUP_PORT")
-        .unwrap()
+        .unwrap_or("4001".to_string())
         .parse::<u32>()
-        .unwrap();
+        .unwrap_or(4001);
 
     let port = std::env::var("PORT")
         .ok()
