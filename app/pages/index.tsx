@@ -106,6 +106,10 @@ function Home({
               <MobileNavigation />
             </div>
           </div>
+          <div className='fixed bottom-[15px]  lg:block hidden w-full '>
+          <Footer />
+        </div>
+
           {/* <div className='lg:block hidden '>
               <SwitchView />
           </div>

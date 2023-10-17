@@ -6,6 +6,7 @@ import GenericButton, { GenericButtonVariant } from '../../components/button/Gen
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { SignUpInputs } from '../../models/user'
 import useAuth from '../../hooks/useAuth'
+import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
 
 
@@ -20,7 +21,7 @@ function signup() {
   } = useForm<SignUpInputs>()
 
 
-  const {signIn, signUp} = useAuth();
+  const {signIn, signUp, error} = useAuth();
 
   const onSubmit: SubmitHandler<SignUpInputs> = async ({email, password, firstName, lastName}) => await signUp(email, password)
 
@@ -97,8 +98,19 @@ function signup() {
                   )
                 }
               </label>
-
               <div className='pt-[31px] space-y-5 mt-4'>
+              <div>
+                {
+                  error && error === "auth/email-already-in-use" && (
+                    <div className='items-center space-x-2 flex flex-row justify-center'>
+                      <InformationCircleIcon height={24} width={24} color='#FF0000'/>
+                      <p className='text-red-600 text-sm font-semibold text-center'>
+                        Email Already In Use! Try again!
+                      </p>
+                    </div>
+                  )
+                }
+              </div>
                 <button className='w-full' type='submit'>
                       <GenericButton title='Continue' variant={buttonVariant} />
                 </button>

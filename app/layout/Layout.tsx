@@ -42,7 +42,6 @@ function Layout({children}: Props) {
           <SettingsButtons />
         </div> */}
 
-
       </div>
     )
 }

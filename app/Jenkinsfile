@@ -1,0 +1,51 @@
+pipeline { 
+    agent any 
+    environment { 
+        APP_IMAGE = "philipasd/reflection-client"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        COMMIT_ID = "${env.BUILD_NUMBER}"
+
+    }
+    stages{
+        stage {
+            steps { 
+                checkout scm 
+            }
+        }
+
+        stage('Compile code') { 
+            steps { 
+                sh 'cd app && npm i'
+            }
+        }
+
+        stage('Build Production') { 
+            steps { 
+                sh 'cd app && npm run build'
+            }
+        }
+        stage('Build Docker Image') { 
+            steps { 
+                sh "docker build -t ${APP_IMAGE}:${COMMIT_ID} -f config_service/Dockerfile config_service/"
+            }
+        }
+        stage('Push Image to DockerHub') {
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push ${APP_IMAGE}:${COMMIT_ID}'
+            }
+        } 
+    }
+    post { 
+        success { 
+            echo "Build Success"
+            echo "Successfully built ${env.JOB_NAME} - ${env.BUILD_ID} on ${env.BUILD_URL}" 
+        }
+        failure { 
+            echo "Build failed - ${env.JOB_NAME} - ${env.BUILD_ID} on ${env.BUILD_URL}"
+        }
+        aborted { 
+            echo "${env.JOB_NAME} Build - ${env.BUILD_ID} Aborted!"
+        }
+    }
+}

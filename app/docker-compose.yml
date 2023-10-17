@@ -1,0 +1,7 @@
+version: "1.0"
+services:
+  client: 
+    build: .
+    ports:
+      - "3000:3000"
+    

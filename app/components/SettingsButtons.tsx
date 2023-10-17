@@ -135,7 +135,7 @@ function SettingSlot({title, savedValue, component}: SettingsProps) {
     )
 }
 
-function SettingsToggle() { 
+export default function SettingsToggle() { 
     const [toggle, setToggle] = useState(false)
     const openDrop = () => { setToggle(!toggle) }
 

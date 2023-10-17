@@ -1,29 +1,27 @@
-FROM rust:latest as build
+FROM lukemathwalker/cargo-chef:latest-rust-1.73-slim-buster AS chef
+WORKDIR /app
 
-# create a new empty shell project
-RUN USER=root cargo new --bin whisper
-WORKDIR /whisper
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# copy over your manifests
-COPY ./Cargo.lock ./Cargo.lock
-COPY ./Cargo.toml ./Cargo.toml
+FROM chef AS builder
+RUN apt-get update
+RUN apt-get install -y protobuf-compiler
+COPY --from=planner /app/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+# Build application
+COPY . .
+# ENV SQLX_OFFLINE true
+RUN cargo build --release --bin whisper
 
-# this build step will cache your dependencies
-RUN cargo build --release
-RUN rm src/*.rs
-
-# copy your source tree
-COPY ./src ./src
-
-# build for release
-RUN rm ./target/release/deps/whisper*
-RUN cargo build --release
-
-# our final base
-FROM rust:latest
-
-# copy the build artifact from the build stage
-COPY --from=build /whisper/target/release/whisper .
-
-# set the startup command to run your binary
-CMD ["./whisper"]
+FROM debian:buster-slim AS runtime
+WORKDIR /app
+RUN apt-get update
+RUN apt-get install -y libssl-dev
+COPY --from=builder /app/target/release/whisper /usr/local/bin
+# COPY configuration.yaml configuration.yaml
+# COPY resources resources
+ENV RUST_LOG info,tracing_actix_web=warn,actix_web_demo=debug,sqlx=off
+ENTRYPOINT ["/usr/local/bin/whisper"]

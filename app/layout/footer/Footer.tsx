@@ -5,6 +5,7 @@ import { Router } from 'next/router'
 import SmallButton from '../../components/button/SmallButton'
 import useAuth from '../../hooks/useAuth'
 import Profile from '../../components/profile/desktop/Profile'
+import SettingsToggle from '../../components/SettingsButtons'
 
 function Footer() {
   const {signOut, user}  = useAuth()
@@ -36,6 +37,7 @@ function Footer() {
                 <Link href={`/signin`}>     
                   <SmallButton title="Log In" />
                 </Link>
+                <SettingsToggle />
             </div>
           )
         }
