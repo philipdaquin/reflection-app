@@ -14,7 +14,7 @@ interface Props {
     
 
       return (
-          <Link href={`${routerName}`} className='cursor-pointer flex flex-col space-y-2 items-center justify-center'>
+          <Link href={`/${routerName}`} className='cursor-pointer flex flex-col space-y-2 items-center justify-center'>
             <div className={`p-0 cursor-pointer ${onHover}`}>
               {icon}
             </div>

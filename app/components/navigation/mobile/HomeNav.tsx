@@ -14,7 +14,7 @@ import NavButton from './NavButton'
 import AddEntryContent from './AddEntryContent'
 import { HiChartBar, HiOutlineClipboardList, HiOutlineCollection, HiViewGrid } from 'react-icons/hi'
 import { useRecoilState } from 'recoil'
-import { AddEntryToggle } from '../../../atoms/atoms'
+import { AddEntryToggle, AudioPlayerSource } from '../../../atoms/atoms'
 import { useRouter } from 'next/router'
 import { BsCollection, BsFillCollectionFill, BsSuitHeartFill } from 'react-icons/bs'
 import { MdOutlineReceiptLong } from 'react-icons/md'
@@ -29,9 +29,10 @@ type NavObject = {
 function HomeNav() {
     const [toggle, setToggle] = useState(false)
 
-    const [showModal, setShowModal] = useRecoilState(AddEntryToggle);
+    const [showAddModal, setShowModal] = useRecoilState(AddEntryToggle);
+    const [showAudio, ] = useRecoilState(AudioPlayerSource);
     const openToggle = () => { 
-      setShowModal(!showModal)
+      setShowModal(!showAddModal)
     }
 
     
@@ -77,7 +78,7 @@ function HomeNav() {
 
             icon={<MdOutlineReceiptLong size={33} color={colour('/weekly_calendar')}/>}/>
           
-          <div onClick={openToggle} className='bg-[#000] relative bottom-[39px] px-[14px] rounded-full items-center flex flex-row justify-center cursor-pointer'>
+          <div onClick={openToggle}  className='bg-[#000] relative bottom-[39px] px-[14px] rounded-full items-center flex flex-row justify-center cursor-pointer'>
             <PlusIcon height={30} width={30} color="white"/>
           </div>
       

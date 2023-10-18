@@ -2,7 +2,7 @@ import { PauseIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
 import React, { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { AudioPlayerSource, PlayResumePauseIcons, SelectedAudioPlayer, ShowAudioPlayer } from '../../../atoms/atoms'
-import { AudioData } from '../../../typings'
+import { AudioData, DEFAULT_IMAGE_URL } from '../../../typings'
 import { fullTimeFormat } from '../../../util/fullTimeFormat'
 import { EllipsisHorizontalCircleIcon } from '@heroicons/react/24/outline'
 import { MdOutlineForward10 } from 'react-icons/md'
@@ -10,6 +10,8 @@ import ReactPlayer from 'react-player'
 import useAudioPlayer, { PlayerState } from '../../../hooks/useAudioPlayer'
 import { IconTitle, PlayIconList } from '../../pages/PreviewEntryContent'
 import { useRouter } from 'next/router'
+import { ThumbnailPlayer } from '../../pages/PlayerContents'
+import Image from 'next/image'
 
 
 
@@ -33,7 +35,8 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
       handlePlayClick,
       handleFastForward,
       currentState,
-      currentTime
+      currentTime,
+      duration
     } = useAudioPlayer() 
     
     return (
@@ -41,11 +44,18 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
       <div className='mb-5'>
       {/* F5F5F5 */}
         <div className={`hover:bg-[#F5F5F5] border-t-2 border-b-none sm:mb-2
-          border-[#F0F0F0] sm:border-none rounded-t-3xl h-full
+          border-[#F0F0F0] sm:border-none rounded-t-3xl h-full 
           cursor-pointer pb-5 px-5 sm:px-4 flex flex-row pr-4
           justify-between w-full items-center py-4 sm:py-4`}>
           <div  onClick={togglePlayer} className='flex flex-row items-start space-x-2 w-full'>
             <div className='bg-black w-14 h-14 rounded-lg '>
+              <Image src={DEFAULT_IMAGE_URL} 
+                className='rounded-lg object-fill h-14 w-14' 
+                alt='User Profile'  
+                height={56}
+                width={56}
+                quality={100}
+            />  
             </div>
             <div className=''>
               <h1 className='font-semibold text-[15px]'>{slicedTitle}</h1>
@@ -66,10 +76,10 @@ export function PlayerAttachment({audio: {title, _id, date}}: PlayerProps
             </div>
           </div>
         </div>
-          <div className=' bg-gray-200 rounded-full w-full h-1 overflow-hidden duration-300 relative bottom-1'>
-            <div className='bg-black h-full  w-full' style={{width: `${currentTime}%`}}>
-            </div>
+        <div className=" bg-gray-200  rounded-full h-1 overflow-hidden duration-300 relative">
+          <div className=" bg-black h-full" style={{ width: `${(currentTime / duration) * 100}%` }}>
           </div>
+        </div>  
         </div>
       </>
       
@@ -96,7 +106,7 @@ function NavigationMobile({children, selectedAudio} : Props) {
     bg-[#FCFCFC] md:px-8 sm:py-5 pb-10  
     shadow-xl sm:drop-shadow-lg drop-shadow-2xl  
     sm:rounded-3xl w-screen border-[#F0F0F0] sm:border-none
-    sm:w-full h-[92px] rounded-b-none
+    sm:w-full  rounded-b-none
   `
 
   return (

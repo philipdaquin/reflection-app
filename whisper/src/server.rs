@@ -11,7 +11,8 @@ pub async fn new_server(port: u32) -> std::io::Result<()> {
 
     let mongodb_client = MongoDbClient::establish_connection()
         .await
-        .expect("Unable to establish MongoDB connection");
+        .unwrap(); 
+    // Fail fast
 
     // This createa new SSE Client
     let broadcaster = Broadcaster::create();
