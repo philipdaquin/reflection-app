@@ -37,7 +37,7 @@ function ModalView({children}: Props) {
           <MuiModal
             className={`
               fixed left-0 right-0 h-full 
-              z-50 mx-auto w-full max-w-5xl
+              z-50 mx-auto w-full max-w-xl
               overflow-hidden overflow-y-scroll 
               rounded-md rounded-b-none scrollbar-hide
               duration-700 ease-out transition-all 

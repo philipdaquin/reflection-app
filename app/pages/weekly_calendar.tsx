@@ -24,6 +24,9 @@ import { GetServerSideProps } from 'next'
 import { AudioData, DailySummary, TextClassification } from '../typings'
 import PlayerModal from '../components/modals/PlayerModal'
 import { Player } from '../components/AudioMediaPlayer'
+import DesktopLogo from '../layout/headers/components/DesktopLogo'
+import MobileNavigation from '../components/navigation/desktop/MobileNavigation'
+import Footer from '../layout/footer/Footer'
 
 
 interface Props { 
@@ -50,15 +53,15 @@ function weekly_record({
             <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <div className="md:bg-[#EEEEEE] bg-white flex 
-            md:h-screen flex-col h-screen md:py-5 lg:py-14 md:px-4 relative">
+        <section className="md:bg-[#fffefe]
+       sm:h-screen
+        bg-white flex md:h-screen
+        flex-col h-screen md:py-5 lg:pt-7 lg:pb-[84px] md:px-[59px] relative">
+            <div className='lg:block hidden w-full '>
+              <DesktopLogo />
+            </div>
             <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
-                <div className="flex items-center md:relative md:right-5 h-full">
-                    
-                    <div className='relative right-10 hidden md:block'>
-                        <NavigationButtons />       
-                    </div>
-
+              <div className="flex flex-col items-center">
                     <PhoneView>
                         <WeeklyCalendarContent 
                           all_mood_data={mood_data}
@@ -66,11 +69,16 @@ function weekly_record({
                           dailyMoodSummary={dailyMoodSummary}
                         />
                     </PhoneView>
-                
+                    <div className='mt-[42px] z-0 md:z-50 hidden md:block'>
+                      <MobileNavigation />
+                    </div>
                 </div>
-                <div className='lg:block hidden'>
+                <div className='fixed bottom-[15px]  lg:block hidden w-full '>
+                  <Footer />
+                </div>
+                {/* <div className='lg:block hidden'>
                     <SwitchView />
-                </div>
+                </div> */}
             {/* <RecordComponent /> */}
             </main>
             <div className='z-50 fixed bottom-0 left-1/2 transform -translate-x-1/2'>
@@ -81,7 +89,7 @@ function weekly_record({
                 </NavigationMobile >         
               </div>
             </div>
-        </div>
+        </section>
       </>
     )
 }

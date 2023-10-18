@@ -16,6 +16,9 @@ import { AddEntryToggle, SelectedAudioPlayer } from '../atoms/atoms'
 import AddEntryContent from '../components/navigation/mobile/AddEntryContent'
 import { getCurrentWeeklySummary } from '../util/weekly/getCurrentWeeklySummary'
 import ModalView from '../components/modals/ModalView'
+import DesktopLogo from '../layout/headers/components/DesktopLogo'
+import MobileNavigation from '../components/navigation/desktop/MobileNavigation'
+import Footer from '../layout/footer/Footer'
 
 
 
@@ -39,14 +42,16 @@ function mood_summary({
             <link rel="icon" href="/favicon.ico" />
           </Head>
           
-          <div className="md:bg-[#EEEEEE] bg-white flex 
-            md:h-screen flex-col h-screen md:py-5 lg:py-14 md:px-4 relative">
-            <main className=" justify-center flex flex-col items-center space-y-[27px] md:h-full">
-              <div className="flex items-center md:relative md:right-5 h-full">
-                
-                <div className='relative right-10 hidden md:block'>
-                  <NavigationButtons />        
-                </div>
+          <section className="md:bg-[#fffefe]
+             sm:h-screen
+            bg-white flex md:h-screen
+            flex-col h-screen md:py-5 lg:pt-7 lg:pb-[84px] md:px-[59px] relative">
+            <div className='lg:block hidden w-full '>
+              <DesktopLogo />
+            </div>
+            {/* <AddAPIKeys redirectLink={""} title='Eleven Labs' apiKeyName={""}/> */}
+            <main className="justify-center flex flex-col items-center space-y-[27px] md:h-full">
+              <div className="flex flex-col items-center">
 
                 <PhoneView>
                   <MoodSummaryContents 
@@ -54,11 +59,12 @@ function mood_summary({
                     weekly_summary={weekly_summary}
                     />
                 </PhoneView>
-
-
+                <div className='mt-[42px] z-0 md:z-50 hidden md:block'>
+                  <MobileNavigation />
+                </div>
               </div>
-              <div className='lg:block hidden'>
-                <SwitchView />
+              <div className='fixed bottom-[15px]  lg:block hidden w-full '>
+                <Footer />
               </div>
             {/* <RecordComponent /> */}
     
@@ -71,7 +77,7 @@ function mood_summary({
                 </NavigationMobile >   
               </div>
             </div>
-          </div>
+          </section>
         </>
       )
 }
