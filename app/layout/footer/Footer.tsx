@@ -30,13 +30,13 @@ function Footer() {
           ) : (
             <div className='flex items-center space-x-4 text-[#757575]  flex-row  text-left text-[12px] font-medium'>
                 {/* <SettingsToggle /> */}
-                <Link href={`/onboarding/signup`}>     
+                {/* <Link href={`/onboarding/signup`}>     
                   <SmallButton title="Sign Up" />
-                </Link>
+                </Link> */}
 
-                <Link href={`/signin`}>     
+                {/* <Link href={`/signin`}>     
                   <SmallButton title="Log In" />
-                </Link>
+                </Link> */}
                 <SettingsToggle />
             </div>
           )

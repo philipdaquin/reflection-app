@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React from 'react'
 
 interface Props { 
@@ -9,9 +10,11 @@ interface Props {
   
   function NavButton({icon, routerName, title}: Props) { 
     const onHover = " button active:bg-[#E0E0E0] rounded-md"
+    const router = useRouter()
+    
 
       return (
-          <Link href={`/${routerName}`} className='cursor-pointer flex flex-col space-y-2 items-center justify-center'>
+          <Link href={`${routerName}`} className='cursor-pointer flex flex-col space-y-2 items-center justify-center'>
             <div className={`p-0 cursor-pointer ${onHover}`}>
               {icon}
             </div>

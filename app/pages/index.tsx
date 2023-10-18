@@ -80,7 +80,9 @@ function Home({
       </Head>
       {/* <Headers /> */}
       {/*  md:px-[104px]  */}
-      <section className="md:bg-[#fffefe] bg-white flex md:h-screen
+      <section className="md:bg-[#fffefe]
+       sm:h-screen
+        bg-white flex md:h-screen
         flex-col h-screen md:py-5 lg:pt-7 lg:pb-[84px] md:px-[59px] relative">
 
         <div className='lg:block hidden w-full '>
@@ -102,7 +104,7 @@ function Home({
               />
             </PhoneView>
 
-            <div className='mt-[42px]'>
+            <div className='mt-[42px] z-0 md:z-50 hidden md:block'>
               <MobileNavigation />
             </div>
           </div>

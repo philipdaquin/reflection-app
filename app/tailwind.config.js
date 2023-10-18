@@ -9,6 +9,9 @@ module.exports = {
     extend: {
       fontFamily: { 
         'primary' : ['Inter']
+      },
+      boxShadow: { 
+        customMedium: '0 7px 41px 0 rgba(0, 0, 0, 0.27)'
       }
     },
   },
