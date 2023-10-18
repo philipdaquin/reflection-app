@@ -1,4 +1,4 @@
-import { AudioData, TextClassification } from "../../typings"
+import { AudioData, MAIN_SERVER, TextClassification } from "../../typings"
 import {BSON} from 'bson'
  
 /*
@@ -6,7 +6,7 @@ import {BSON} from 'bson'
 */
 export async function getAllByDate(date: Date): Promise<AudioData[] | null> { 
 
-    return fetch("http://localhost:4001/api/audio/get-all-by-date", {
+    return fetch(`${MAIN_SERVER}/api/audio/get-all-by-date`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

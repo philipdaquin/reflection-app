@@ -5,6 +5,7 @@ import AudioStreaming from './AudioStreaming';
 import { useAudioRecorder } from 'react-audio-voice-recorder';
 import WebSocketClient from './WebsocketClient';
 import { UploadButton } from './navigation/mobile/AddEntryContent';
+import { MAIN_SERVER } from '../typings';
 
 
 
@@ -74,7 +75,7 @@ function RecordComponent() {
 
                 const formData = new FormData();
                 formData.append('audio', resp);
-                fetch("http://localhost:4001/api/upload", {
+                fetch(`${MAIN_SERVER}/api/upload`, {
                     method: "POST",
                     body: formData,
                 })

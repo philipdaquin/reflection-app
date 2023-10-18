@@ -1,4 +1,4 @@
-import { AudioData, TextClassification } from "../../typings"
+import { AudioData, MAIN_SERVER, TextClassification } from "../../typings"
 import {BSON} from 'bson'
  
 /*
@@ -6,7 +6,7 @@ import {BSON} from 'bson'
 */
 export async function getRecentAudioEntries(): Promise<AudioData[] | null> { 
 
-    return fetch("http://localhost:4001/api/audio/get-recent", {
+    return fetch(`${MAIN_SERVER}/api/audio/get-recent`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'

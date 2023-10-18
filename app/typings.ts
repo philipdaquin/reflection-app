@@ -320,3 +320,8 @@ export const ALL_FILTER: FilterOptions[] = [
     ];
     
 
+export const MAIN_SERVER: string = "http://localhost:4001"
+// export const MAIN_SERVER: string = `${process.env.MAIN_SERVER}`
+export const CLIENT_SERVER: string = "http://localhost:3000"
+
+

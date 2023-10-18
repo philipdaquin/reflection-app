@@ -1,3 +1,4 @@
+import { MAIN_SERVER } from "../../typings"
 
  
 /*
@@ -5,7 +6,7 @@
 */
 export async function getTextSummary(input: string): Promise<string | null> { 
 
-    return fetch("http://localhost:4001/api/audio/summary", {
+    return fetch(`${MAIN_SERVER}/api/audio/summary`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

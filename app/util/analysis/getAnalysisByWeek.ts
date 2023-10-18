@@ -1,4 +1,4 @@
-import { AudioData, TextClassification } from "../../typings"
+import { AudioData, MAIN_SERVER, TextClassification } from "../../typings"
 import {BSON} from 'bson'
  
 /*
@@ -6,7 +6,7 @@ import {BSON} from 'bson'
 */
 export async function getAnalysisByWeek(date: Date): Promise<TextClassification[] | null> { 
     
-    return fetch("http://localhost:4001/api/analysis/get-all-by-week", {
+    return fetch(`${MAIN_SERVER}/api/analysis/get-all-by-week`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

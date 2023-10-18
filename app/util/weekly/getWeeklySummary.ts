@@ -1,12 +1,12 @@
 import useLocalStorage, { OPENAI_KEY } from "../../hooks/useLocalStorage";
-import { WeeklySummary } from "../../typings"
+import { MAIN_SERVER, WeeklySummary } from "../../typings"
 
  
 /*
     GETS WEEKLY SUMMARY 
 */
 export async function getWeeklySummary(): Promise<WeeklySummary | null> { 
-    return fetch("http://localhost:4001/api/weekly/get-weekly-summary", {
+    return fetch(`${MAIN_SERVER}/api/weekly/get-weekly-summary`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'

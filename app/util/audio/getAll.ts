@@ -1,12 +1,12 @@
 import {BSON} from 'bson'
-import { AudioData, TextClassification } from '../../typings'
+import { AudioData, MAIN_SERVER, TextClassification } from '../../typings'
  
 /*
     GETS WEEKLY SUMMARY 
 */
 export async function getAll(): Promise<AudioData[] | null> { 
 
-    return fetch("http://localhost:4001/api/audio/get-all", {
+    return fetch(`${MAIN_SERVER}/api/audio/get-all`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'

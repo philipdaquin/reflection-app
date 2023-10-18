@@ -1,4 +1,5 @@
 import useLocalStorage, { ELEVEN_LABS_KEY, OPENAI_KEY } from "../../hooks/useLocalStorage"
+import { MAIN_SERVER } from "../../typings"
 
 // Send the WAV fle to the server 
 export async function uploadChatRecording(wavFile: Blob): Promise<Blob> {
@@ -20,7 +21,7 @@ export async function uploadChatRecording(wavFile: Blob): Promise<Blob> {
     const formData = new FormData();
     formData.append('audio', wavFile, 'recording.wav')
 
-    return fetch("http://localhost:4001/api/audio/upload", {
+    return fetch(`${MAIN_SERVER}/api/audio/upload`, {
       method: "POST",
       body: formData,
     //   headers,

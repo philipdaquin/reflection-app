@@ -78,7 +78,7 @@ function HomeNav() {
 
             icon={<MdOutlineReceiptLong size={33} color={colour('/weekly_calendar')}/>}/>
           
-          <div onClick={openToggle}  className='bg-[#000] relative bottom-[39px] px-[14px] rounded-full items-center flex flex-row justify-center cursor-pointer'>
+          <div onClick={openToggle}  className='bg-[#000] ring-4 shadow-2xl ring-white relative bottom-[39px] px-[14px] rounded-full items-center flex flex-row justify-center cursor-pointer'>
             <PlusIcon height={30} width={30} color="white"/>
           </div>
       

@@ -1,8 +1,8 @@
-import { AudioData } from "../../typings"
+import { AudioData, MAIN_SERVER } from "../../typings"
 
 export async function getEntry(id: string): Promise<AudioData | null> { 
     console.log(id)
-    return fetch("http://localhost:4001/api/audio/get-entry", {
+    return fetch(`${MAIN_SERVER}/api/audio/get-entry`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

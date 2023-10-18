@@ -54,7 +54,7 @@ function MobileNavigation() {
         style={{boxShadow: '0 2px 10px 0 rgba(0, 0, 0, 0.25)'}}
         >
             <NavButton 
-              routerName='/'
+              routerName=''
               icon={<BsSuitHeartFill size={24} color={colour('/')}/>}/>
             <NavButton 
               routerName='weekly_calendar'

@@ -6,6 +6,7 @@ import { recentEntryTimeStamp } from '../util/recentEntryTimeStamp'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { toast } from 'react-hot-toast'
+import { CLIENT_SERVER } from '../typings'
 
 interface LinkProps { 
   link: string
@@ -16,7 +17,7 @@ export function LinkButton({link}: LinkProps) {
   const copy_text = () => { 
     setOpenToggle(true);
     toast("✅ Copied Link")
-    let fullLink = `http://localhost:3000/play/${link}`
+    let fullLink = `${CLIENT_SERVER}/play/${link}`
     navigator.clipboard.writeText(fullLink);
   }  
   return (

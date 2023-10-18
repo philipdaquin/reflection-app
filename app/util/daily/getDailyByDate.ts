@@ -1,4 +1,4 @@
-import { DailySummary, MoodFrequency, WeeklySummary } from "../../typings"
+import { DailySummary, MAIN_SERVER, MoodFrequency, WeeklySummary } from "../../typings"
 
  
 /*
@@ -6,7 +6,7 @@ import { DailySummary, MoodFrequency, WeeklySummary } from "../../typings"
 */
 export async function getDailyByDate(date: Date): Promise<DailySummary | null> { 
 
-    return fetch("http://localhost:4001/api/daily/get-by-date", {
+    return fetch(`${MAIN_SERVER}/api/daily/get-by-date`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

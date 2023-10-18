@@ -6,6 +6,7 @@ import { useRecoilState } from 'recoil'
 import { useRouter } from 'next/router';
 import { AudioUrl, RecordingState, TimerState } from '../../atoms/atoms'
 import { convertWav } from '../../util/convertWav'
+import { MAIN_SERVER } from '../../typings'
 interface Props { 
   icon: any
 }
@@ -98,7 +99,7 @@ function StartStopRecording() {
           .then((resp) => {
               const formData = new FormData();
                 formData.append('audio', resp);
-                fetch("http://localhost:4001/api/openai-chat", {
+                fetch(`${MAIN_SERVER}/api/openai-chat`, {
                 method: "POST",
                 body: formData,
               })
