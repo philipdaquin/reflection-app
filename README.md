@@ -11,7 +11,7 @@ https://getreflection.framer.website/
 Beta Version / Demo version :
 - This will only store your API keys in your browser
 - You will need to use your own OPEN AI API key to access Chat GPT 
-- This will not store your audio files/ nor any media files nor any data  
+- This will not store your audio files/ nor any media files nor any data therefore you wont be able to play it back 
 - The Audio transcribe engine is ran on your local device 
 - Some of the features are purposely not (yet) implemented
 
