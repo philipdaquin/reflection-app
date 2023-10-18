@@ -16,4 +16,4 @@ docker build -t reflection-app .
 docker tag reflection-app philipasd/reflection-app:0.0.0
 
 # Publish Image 
-docker push philipasd/reflection-app:0.0.0
+# docker push philipasd/reflection-app:0.0.0
