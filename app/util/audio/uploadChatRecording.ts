@@ -21,7 +21,8 @@ export async function uploadChatRecording(wavFile: Blob): Promise<Blob> {
     const formData = new FormData();
     formData.append('audio', wavFile, 'recording.wav')
 
-    return fetch(`${MAIN_SERVER}/api/audio/upload`, {
+    // return fetch(`${MAIN_SERVER}/api/audio/upload`, {
+        return fetch(`${MAIN_SERVER}/api/audio/batch-upload`, {
       method: "POST",
       body: formData,
     //   headers,
