@@ -32,16 +32,13 @@ impl MongoDbClient {
         let mut client_options = ClientOptions::parse(MONGO_URI.as_str())
             .await
             .expect("Failed to created MongoDB client");
-
         let credential = Credential::builder()
             .username(MONGODB_USERNAME.to_string())
             .password(MONGODB_PASSWORD.to_string())
             .build();   
         client_options.credential = Some(credential);
-
-
-        let client = Client::with_options(client_options).expect("Unable to establish connection");
-        
+        let client = Client::with_options(client_options)
+            .expect("Unable to establish connection");
         // let client = Client::with_uri_str(MONGO_URI.to_string())
         //     .await
         //     .expect("Failed to create MongoDB client");

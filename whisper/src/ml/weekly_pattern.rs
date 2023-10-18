@@ -72,7 +72,6 @@ impl WeeklyAnalysisDTO {
     /// Example usage: 
     /// ```
     ///  // Initialise and save to database 
-    ///  let weekly_summary = WeeklyAnalysis::new().save().await?;
     /// 
     /// ```
     pub fn new() -> Self { 

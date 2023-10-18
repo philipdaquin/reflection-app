@@ -16,8 +16,7 @@ pub async fn new_server(port: u32) -> std::io::Result<()> {
     // This createa new SSE Client
     let broadcaster = Broadcaster::create();
     log::info!("🚀 Starting HTTP server on port {} ", port);
-    log::info!("📭 GraphiQL playground: http://localhost:{}/graphiql", port);
-    log::info!("📢 Query at https://studio.apollographql.com/dev");
+    log::info!("🤖 Connected to MongoDB!",);
     
     HttpServer::new(move || {
         App::new()
