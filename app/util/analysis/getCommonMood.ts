@@ -1,7 +1,7 @@
-import { MoodFrequency } from "../../typings"
+import { MAIN_SERVER, MoodFrequency } from "../../typings"
 
 export async function getCommonMood(): Promise<MoodFrequency[] | null> { 
-    return fetch('http://localhost:4001/api/analysis/get-common-mood', {
+    return fetch(`${MAIN_SERVER}/api/analysis/get-common-mood`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json'
