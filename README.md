@@ -32,6 +32,7 @@ https://getreflection.framer.website/
 - No storage of audio or media files is involved, preventing playback capabilities.
 - The audio transcription engine is ran on your local device
 - Certain features remain intentionally unimplemented for now
+- ONLY supports WAV files 
 
 
 ## V1 Features 
