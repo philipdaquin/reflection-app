@@ -1,14 +1,20 @@
-# Background 
-For many people, there is a great deal of purpose and self-worth tied to our work. We often face new challenges, which can turn into learning opportunities that foster growth and change. As we commit ourselves to meaningful endeavours in the workplace, how might we make sure that we’re actively tracking out thoughts and moods to help promote and maintain mental health?
 
-- How could this practice be made more accessible for people in the workplace? For example, many find journaling a good way to expressively examine and document what thoughts might occupy them at any given time, both good and bad
-- What are some ways in which people can document their thoughts without it feeling too repetitive or task based, or share things that they’ve learned with those around them? How might this tool offer guidance or support, without feeling obtrusive?
+<p align="center">
+  <p align="center">
+   <img width="150" height="150" src="https://github.com/philipdaquin/reflection-app/assets/85416532/1b66cec6-67b8-4c49-ab70-fd3e252ff60b" alt="Logo">
+  </p>
+	<h1 align="center"><b>Reflection Beta - Journal, Analyse and Plan</b></h1>
+</p>
 
-
-# Reflection Beta - Journal, Analyse and Plan
 Reflection is a journaling app that understands your messy thoughts, track your mood and offers  personalised action plans to enhance and sustain mental health wellbeing. 
 
-Understand 
+Unleash inner growth and clarity in simple steps: 
+1. Journal your thoughts
+2. Understand your thoughts
+3. Analyse your wellbeing
+4. Understand the user
+5. Develop an action plan
+6. Track your progress
 
 
 **This is only a sample version to showcase the MVP of the product. It represents the beta release, primarily intended for validating product-market fit.**
@@ -37,15 +43,12 @@ https://getreflection.framer.website/
 🖥️ User Friendly Interface and Data visualization
 ✏️ Edit your Audio Journal Summary
 
-## Installing 
+## Getting Started  
 
-
+- Install Docker 
 
 
 ## Product-Solution  
-
-
-
 **💡 Business Idea**
 The business idea is to develop an AI-powered home healthcare analytics platform that provides personalized health recommendations to users based on their daily activities, health data, and the data gathered from their connected healthcare devices. This platform aims to improve individuals' health outcomes and enable them to proactively manage their health in the comfort of their own homes.
 
