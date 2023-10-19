@@ -3,7 +3,7 @@
   <p align="center">
    <img width="150" height="150" src="https://github.com/philipdaquin/reflection-app/assets/85416532/1b66cec6-67b8-4c49-ab70-fd3e252ff60b" alt="Logo">
   </p>
-	<h1 align="center"><b>Reflection Beta - Journal, Analyse and Plan</b></h1>
+	<h2 align="center"><b>Reflection Beta - Journal, Analyse and Plan</b></h2>
 </p>
 
 Reflection is a journaling app that understands your messy thoughts, track your mood and offers  personalised action plans to enhance and sustain mental health wellbeing. 
@@ -32,6 +32,7 @@ https://getreflection.framer.website/
 - No storage of audio or media files is involved, preventing playback capabilities.
 - The audio transcription engine is ran on your local device
 - Certain features remain intentionally unimplemented for now
+- ONLY supports WAV files 
 
 
 ## V1 Features 
@@ -44,8 +45,13 @@ https://getreflection.framer.website/
 - ✏️ Edit your Audio Journal Summary
 
 ## Getting Started  
+To get started, 
+You may need to install Docker in your system: https://docs.docker.com/engine/install/
+Next, 
 
-- Install Docker 
+```
+	bash build-application.sh
+```
 
 
 ## Product-Solution  
