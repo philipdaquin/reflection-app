@@ -3,6 +3,25 @@ version: '1.0'
 services:
 
 
+  # Gateway / Load Balancer 
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    tty: true
+    networks:
+      - whisper-local
+    depends_on:
+      client-service: 
+        condition: service_started
+      whisper-service: 
+        condition: service_started
+
+
   client-service: 
     build: ./app
     container_name: client-service
