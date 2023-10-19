@@ -35,13 +35,13 @@ https://getreflection.framer.website/
 
 
 ## V1 Features 
-🌟 Automated Mood tracker
-🎤 Unlimited time to speak
-🎙️ Insert your audio journal in 2 ways: Upload or Record directly
-🧠 Receive AI powered analytics, personalized recommendations, and insights
-📊 Summarize your mood objectively
-🖥️ User Friendly Interface and Data visualization
-✏️ Edit your Audio Journal Summary
+- 🌟 Automated Mood tracker
+- 🎤 Unlimited time to speak
+- 🎙️ Insert your audio journal in 2 ways: Upload or Record directly
+- 🧠 Receive AI powered analytics, personalized recommendations, and insights
+- 📊 Summarize your mood objectively
+- 🖥️ User Friendly Interface and Data visualization
+- ✏️ Edit your Audio Journal Summary
 
 ## Getting Started  
 
