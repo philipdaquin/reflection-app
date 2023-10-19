@@ -101,23 +101,27 @@ RUN apt-get update && \
   apt-get install -y cmake  && \
   apt-get install -y build-essential && \
   apt-get clean
-
 FROM chef as planner
 COPY . .
+COPY models /app/models/
+
 # Compute a lock-like file for our project
 RUN cargo chef prepare  --recipe-path recipe.json
-
 FROM chef as builder
 COPY --from=planner /app/recipe.json recipe.json
 # Build our project dependencies, not our application!
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
+COPY models /app/models
+
 # ENV SQLX_OFFLINE true
 # Build our project
 RUN cargo build --release --bin whisper
-
 FROM debian:bookworm-slim AS runtime
+
 WORKDIR /app
+COPY models /app/models
+COPY . . 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends openssl ca-certificates pkg-config libssl-dev libclang-dev cmake build-essential \
     && apt-get clean -y \
@@ -125,6 +129,41 @@ RUN apt-get update -y \
 COPY --from=builder /app/target/release/whisper whisper
 # COPY configuration configuration
 # ENV APP_ENVIRONMENT production
+EXPOSE 4001
 ENTRYPOINT ["./whisper"]
 
-EXPOSE 4001
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# FROM rust:slim-buster
+
+# RUN apt-get update && \
+#   apt-get -y upgrade && \
+#   apt-get -y install libssl-dev pkg-config && \
+#   apt-get install -y libclang-dev && \
+#   apt-get install -y cmake  && \
+#   apt-get install -y build-essential && \
+#   apt-get clean
+
+# WORKDIR /app
+# COPY ["Cargo.toml", "Cargo.lock", "/app/"]
+# COPY . /app/
+
+
+# RUN cargo build --release
+
+# EXPOSE 4001
+
+# ENTRYPOINT ["/bin/bash", "-c", "cargo run --release"]

@@ -4,7 +4,7 @@ use crate::error::Result;
 use lazy_static::lazy_static;
 
 lazy_static! { 
-    pub static ref MONGO_URI: String = std::env::var("MONGODB_URI").unwrap_or_else(|_| "mongodb://localhost:27017".into());
+    pub static ref MONGO_URI: String = std::env::var("MONGODB_URI").unwrap_or_else(|_| "mongodb://username:password@mongo-db:27017".into());
     pub static ref MONGODB_USERNAME: String = std::env::var("MONGODB_USERNAME").unwrap_or_else(|_| "username".into());
     pub static ref MONGODB_PASSWORD: String = std::env::var("MONGODB_PASSWORD").unwrap_or_else(|_| "password".into());
 }
@@ -28,15 +28,16 @@ impl From<Client> for MongoDbClient {
 }
 
 impl MongoDbClient {  
-    pub async fn establish_connection() -> Result<&'static Self> { 
-        let mut client_options = ClientOptions::parse(MONGO_URI.as_str())
+    pub async fn establish_connection(uri: &str) -> Result<&'static Self> { 
+        let mut client_options = ClientOptions::parse(uri)
             .await
             .expect("Failed to created MongoDB client");
-        let credential = Credential::builder()
-            .username(MONGODB_USERNAME.to_string())
-            .password(MONGODB_PASSWORD.to_string())
-            .build();   
-        client_options.credential = Some(credential);
+        // Disabling Authentication for Development mode 
+        // let credential = Credential::builder()
+        //     .username(MONGODB_USERNAME.to_string())
+        //     .password(MONGODB_PASSWORD.to_string())
+        //     .build();   
+        // client_options.credential = Some(credential);
         let client = Client::with_options(client_options)
             .expect("Unable to establish connection");
         // let client = Client::with_uri_str(MONGO_URI.to_string())

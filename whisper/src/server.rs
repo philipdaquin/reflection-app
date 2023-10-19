@@ -1,5 +1,6 @@
 
 use std::sync::Arc;
+use dotenv::dotenv;
 
 use actix_web::{ middleware::Logger, App, HttpServer, web};
 use actix_cors::Cors;
@@ -7,16 +8,20 @@ use crate::{persistence::{db::MongoDbClient}, controllers::{audio_data::configur
 
 
 pub async fn new_server(port: u32) -> std::io::Result<()> {
+    dotenv().ok();
+    
+    
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    let url = std::env::var("MONGODB_URI").unwrap_or_else(|_| "mongodb://mongo-db:27017".into());
 
-    let mongodb_client = MongoDbClient::establish_connection()
+    let mongodb_client = MongoDbClient::establish_connection(&url)
         .await
-        .unwrap(); 
+        .expect("Unable to make a connection to MongoDB Server"); 
     // Fail fast
 
     // This createa new SSE Client
     let broadcaster = Broadcaster::create();
-    log::info!("🚀 Starting HTTP server on port {} ", port);
+    log::info!("🚀 Starting HTTP server on port 'http://0.0.0.0:{}' ", port);
     log::info!("🤖 Connected to MongoDB!",);
     
     HttpServer::new(move || {
@@ -33,7 +38,7 @@ pub async fn new_server(port: u32) -> std::io::Result<()> {
             .wrap(Logger::default())
     })
     .workers(3)
-    .bind(format!("127.0.0.1:{}", port))?
+    .bind(format!("0.0.0.0:{}", port))?
     .run()
     .await
 }

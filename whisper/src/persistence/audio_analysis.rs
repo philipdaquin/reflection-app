@@ -4,6 +4,7 @@ use chrono::{Utc, Duration, TimeZone, Datelike, NaiveDate, Weekday};
 use mongodb::{Collection, Cursor};
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
 use mongodb::options::AggregateOptions;
+use crate::error::ServerError;
 use crate::ml::text_classification::MoodFrequency;
 use crate::{error::Result, ml::text_classification::TextClassification};
 use super::db::MongoDbClient;
@@ -145,10 +146,14 @@ impl TextAnalysisInterface for AnalysisDb {
         
         let filter = doc! { };
         
-        // Get the matching document 
-        let mut doc = collection.find(filter, None).await?;
+        let doc = collection.find(filter, None).await;
         
-        while let Some(doc) = doc.try_next().await? {
+        let mut cursor = match doc {
+            Ok(res) => res,
+            Err(e) => return Err(e.into())
+        };
+
+        while let Some(doc) = cursor.try_next().await? {
             result.push(doc);
         }
 
@@ -177,9 +182,14 @@ impl TextAnalysisInterface for AnalysisDb {
         };
         
         // Get the matching document 
-        let mut doc = collection.find(filter, None).await?;
+        let doc = collection.find(filter, None).await;
         
-        while let Some(doc) = doc.try_next().await? {
+        let mut cursor = match doc {
+            Ok(res) => res,
+            Err(e) => return Err(e.into())
+        };
+
+        while let Some(doc) = cursor.try_next().await? {
             result.push(doc);
         }
         Ok(result)

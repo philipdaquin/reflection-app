@@ -1,13 +1,11 @@
-
-
 docker kill whisper-service
 docker rm whisper-service
 
 # Build 
-cargo build --release
+# cargo build --release
 
-# # Test 
-cargo test
+# # # Test 
+# cargo test
 
 # Package 
 cargo build --release

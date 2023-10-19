@@ -13,6 +13,7 @@ services:
         condition: service_started
     networks:
       - whisper-local
+      
 
       
   whisper-service: 
