@@ -51,8 +51,18 @@ You may need to install Docker in your system: https://docs.docker.com/engine/in
 Next, 
 
 ```
-	bash build-application.sh
+# ./reflection-app
+
+	docker-compose up -d 
 ```
+
+Get started over to this link:` http://localhost:8000 `
+
+For reference: 
+- Backend Service: http://localhost:4001
+- Client Service: http://localhost:3000
+
+
 
 
 ## Product-Solution  
