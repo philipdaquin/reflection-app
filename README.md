@@ -27,7 +27,6 @@ Unleash inner growth and clarity in simple steps:
 **This is only a sample version to showcase the MVP of the product. It represents the beta release, primarily intended for validating product-market fit.**
 
 **NOTE**: Project is currently discontinued and made available for users who are interested in future development. If you have an interest in this product, please sign up for the waiting list to express your interest!"
-
 https://getreflection.framer.website/
 
 **Reflection V2**
@@ -41,7 +40,6 @@ https://getreflection.framer.website/
 - Certain features remain intentionally unimplemented for now
 - ONLY supports WAV files 
 
-
 ## V1 Features 
 - 🌟 Automated Mood tracker
 - 🎤 Unlimited time to speak
@@ -50,6 +48,7 @@ https://getreflection.framer.website/
 - 📊 Summarize your mood objectively
 - 🖥️ User Friendly Interface and Data visualization
 - ✏️ Edit your Audio Journal Summary
+
 
 ## Getting Started  
 To get started, 
@@ -62,7 +61,7 @@ Next,
 	docker-compose up -d 
 ```
 
-Get started over to this link:` http://localhost:8000 `
+Get started over to this link:` http://localhost:8000 ` and grab your api key here: https://platform.openai.com/account/api-keys 
 
 **For reference:** 
 - Backend Service: http://localhost:4001
