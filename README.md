@@ -1,7 +1,7 @@
 
 <p align="center">
   <p align="center">
-   <img width="150" height="150" src="https://github.com/philipdaquin/reflection-app/assets/85416532/1b66cec6-67b8-4c49-ab70-fd3e252ff60b" alt="Logo">
+   <img width="150" height="150" src="https://github.com/philipdaquin/reflection-app/assets/85416532/f0d4568d-f147-4393-b298-fee8aaf8b80e" alt="Logo">
   </p>
 	<h2 align="center"><b>Reflection Beta - Journal, Analyse and Plan</b></h2>
 </p>
@@ -25,7 +25,7 @@ FRONTEND Demo: https://voice-journal-beta.vercel.app/
 https://getreflection.framer.website/
 
 **Reflection V2**
-![whisper-sample](https://github.com/philipdaquin/human_assistant/assets/85416532/66722145-11f2-4fa2-ba32-c58d477ad860)
+![whisper-sample](https://github.com/philipdaquin/reflection-app/assets/85416532/fb95bdf2-a904-4a5e-af23-93ae0b779b85)
 
 **Beta Version / Demo version** :
 - Stores your API keys in your browser
@@ -51,8 +51,19 @@ You may need to install Docker in your system: https://docs.docker.com/engine/in
 Next, 
 
 ```
-	bash build-application.sh
+# ./reflection-app
+
+	docker-compose up -d 
 ```
+
+Get started over to this link:` http://localhost:8000 `
+
+**For reference:** 
+- Backend Service: http://localhost:4001
+- Client Service: http://localhost:3000
+
+**Test if there's any data**
+http://localhost:8000/api/audio/get-all
 
 
 ## Product-Solution  
