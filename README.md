@@ -16,6 +16,7 @@ Unleash inner growth and clarity in simple steps:
 5. Develop an action plan
 6. Track your progress
 
+FRONTEND Demo: https://voice-journal-beta.vercel.app/
 
 **This is only a sample version to showcase the MVP of the product. It represents the beta release, primarily intended for validating product-market fit.**
 
