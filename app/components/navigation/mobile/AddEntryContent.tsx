@@ -158,14 +158,14 @@ function MenuContent({nextPage}: MenuProps) {
         {/* <Button routerName='/chat' title='Chat with AI'>
           <RiChatVoiceLine size={24} color="#000"/>
         </Button> */}
-        <Button routerName='/' title='Chat with AI (Unavailable)'>
+        <Button routerName='' title='Chat with AI (Unavailable)'>
           <RiChatVoiceLine size={24} color="#000"/>
         </Button>
 
 
 
 
-        <Button routerName='/record' title='Record Audio'>
+        <Button routerName='record' title='Record Audio'>
           <MicrophoneIcon height={24} width={24} color="#000"/>
         </Button>
       </div>

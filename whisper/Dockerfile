@@ -121,7 +121,7 @@ FROM debian:bookworm-slim AS runtime
 
 WORKDIR /app
 COPY models /app/models
-COPY . . 
+# COPY . . 
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends openssl ca-certificates pkg-config libssl-dev libclang-dev cmake build-essential \
     && apt-get clean -y \
