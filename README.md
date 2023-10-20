@@ -19,7 +19,7 @@ Unleash inner growth and clarity in simple steps:
 5. Develop an action plan
 6. Track your progress
 
-**FRONTEND Demo**: https://voice-journal-beta.vercel.app/
+**FRONTEND Demo w/o BACKEND SERVICE**: https://voice-journal-beta.vercel.app/
 
 
 <a href="https://www.producthunt.com/posts/reflection-beta?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-reflection&#0045;beta" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=420952&theme=light" alt="Reflection&#0032;Beta - Unlock&#0032;Higher&#0032;Performance&#0032;with&#0032;Effortless&#0032;Journaling | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
