@@ -1,7 +1,7 @@
 
 <p align="center">
   <p align="center">
-   <img width="150" height="150" src="https://github.com/philipdaquin/reflection-app/assets/85416532/1b66cec6-67b8-4c49-ab70-fd3e252ff60b" alt="Logo">
+   <img width="150" height="150" src="https://github.com/philipdaquin/reflection-app/assets/85416532/f0d4568d-f147-4393-b298-fee8aaf8b80e" alt="Logo">
   </p>
 	<h2 align="center"><b>Reflection Beta - Journal, Analyse and Plan</b></h2>
 </p>
