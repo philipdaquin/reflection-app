@@ -1,11 +1,11 @@
-import { MAIN_SERVER } from "../../typings"
+import { MAIN_SERVER, UPLOAD_SERVER } from "../../typings"
 
 /*
     Update the Audio file on server
 */
 export async function deleteEntry(id: string): Promise<boolean> { 
 
-    return fetch(`${MAIN_SERVER}/api/audio/delete-entry`, { 
+    return fetch(`${UPLOAD_SERVER}/api/audio/delete-entry`, { 
         method: "DELETE",
         headers: { 
             "Content-Type": "application/json"

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
-import { AudioData, MAIN_SERVER, ProgressData } from "../typings"
+import { AudioData, MAIN_SERVER, ProgressData, UPLOAD_SERVER } from "../typings"
 import { useRouter } from "next/router"
 import useLocalStorage, { OPENAI_KEY } from "./useLocalStorage"
 import { Toaster, toast } from "react-hot-toast"
@@ -112,7 +112,7 @@ export const UploadProgressProvider = ({children}: Props) => {
 
     useEffect(() => {
         if (isUploading)  {
-            eventSourceRef.current = new EventSource(`${MAIN_SERVER}/api/audio/events`);
+            eventSourceRef.current = new EventSource(`${UPLOAD_SERVER}/api/audio/events`);
             
             eventSourceRef.current.addEventListener('message', (event) => {
             const preData = JSON.parse(event.data);

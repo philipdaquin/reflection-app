@@ -1,5 +1,5 @@
 import useLocalStorage, { OPENAI_KEY } from "../../hooks/useLocalStorage";
-import { AudioData, MAIN_SERVER } from "../../typings";
+import { AudioData, MAIN_SERVER, UPLOAD_SERVER } from "../../typings";
 
 // Send the WAV fle to the server 
 // Updates both DailySummary and WeeklySummary
@@ -22,7 +22,8 @@ export async function uploadAudioRecording(formData: FormData, apiKey: string, )
       'Authorization': `Bearer ${apiKey}`,
     };
 
-    return fetch(`${MAIN_SERVER}/api/audio/batch-upload`, {
+    // return fetch(`${MAIN_SERVER}/api/audio/batch-upload`, {
+    return fetch(`${UPLOAD_SERVER}/api/audio/batch-upload`, {
       method: "POST",
       body: formData,
       headers
