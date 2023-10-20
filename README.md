@@ -25,7 +25,7 @@ FRONTEND Demo: https://voice-journal-beta.vercel.app/
 https://getreflection.framer.website/
 
 **Reflection V2**
-![whisper-sample](https://github.com/philipdaquin/human_assistant/assets/85416532/66722145-11f2-4fa2-ba32-c58d477ad860)
+![whisper-sample](https://github.com/philipdaquin/reflection-app/assets/85416532/fb95bdf2-a904-4a5e-af23-93ae0b779b85)
 
 **Beta Version / Demo version** :
 - Stores your API keys in your browser
