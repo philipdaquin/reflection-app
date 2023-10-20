@@ -58,11 +58,12 @@ Next,
 
 Get started over to this link:` http://localhost:8000 `
 
-For reference: 
+**For reference:** 
 - Backend Service: http://localhost:4001
 - Client Service: http://localhost:3000
 
-
+**Test if there's any data**
+http://localhost:8000/api/audio/get-all
 
 
 ## Product-Solution  
