@@ -3,7 +3,10 @@
   <p align="center">
    <img width="150" height="150" src="https://github.com/philipdaquin/reflection-app/assets/85416532/f0d4568d-f147-4393-b298-fee8aaf8b80e" alt="Logo">
   </p>
-	<h2 align="center"><b>Reflection Beta - Journal, Analyse and Plan</b></h2>
+	<h2 align="center">
+		<b>Reflection Beta - Journal, Analyse and Plan</b>
+	</h2>
+ 	
 </p>
 
 Reflection is a journaling app that understands your messy thoughts, track your mood and offers  personalised action plans to enhance and sustain mental health wellbeing. 
@@ -16,7 +19,10 @@ Unleash inner growth and clarity in simple steps:
 5. Develop an action plan
 6. Track your progress
 
-FRONTEND Demo: https://voice-journal-beta.vercel.app/
+**FRONTEND Demo**: https://voice-journal-beta.vercel.app/
+
+
+<a href="https://www.producthunt.com/posts/reflection-beta?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-reflection&#0045;beta" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=420952&theme=light" alt="Reflection&#0032;Beta - Unlock&#0032;Higher&#0032;Performance&#0032;with&#0032;Effortless&#0032;Journaling | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 **This is only a sample version to showcase the MVP of the product. It represents the beta release, primarily intended for validating product-market fit.**
 
